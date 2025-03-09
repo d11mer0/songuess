@@ -1,0 +1,60 @@
+.button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.button.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.button.primary:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.button.primary:active {
+    background-color: var(--primary-active);
+    transform: scale(1.05);
+}
+
+.button.secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.button.secondary:hover {
+    background-color: var(--secondary-hover);
+    transform: scale(1.05);
+}
+
+.button.secondary:active {
+    background-color: var(--secondary-active);
+    transform: scale(1.05);
+}
+
+
+.button.danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.button.danger:hover {
+    background-color: var(--danger-hover);
+    transform: scale(1.05);
+}
+
+.button.danger:active {
+    background-color: var(--danger-active);
+    transform: scale(1.05);
+}

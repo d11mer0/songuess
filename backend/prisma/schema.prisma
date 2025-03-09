@@ -1,0 +1,38 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int     @id @default(autoincrement())
+  login      String  @unique
+  password   String?
+  email      String  @unique
+  google_id  String? @unique
+  isVerified Boolean @default(false)
+  avatar     String?
+  record     Int     @default(0)
+  tokens     Token[]
+}
+
+model Token {
+  id         Int    @id @default(autoincrement())
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  token      String @unique
+  type       String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+model Song {
+  id     Int    @id @default(autoincrement())
+  author String
+  length Int
+  link   String
+}

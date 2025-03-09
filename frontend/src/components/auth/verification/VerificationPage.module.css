@@ -1,0 +1,47 @@
+.auth-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: var(--text-main);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.auth-button:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.auth-button.try-again {
+    background-color: var(--danger-color);
+    font-weight: bold;
+}
+
+.auth-button.try-again:hover {
+    background-color: var(--danger-hover);
+    transform: scale(1.08);
+}
+
+.auth-message .auth-success, .auth-error {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.auth-message {
+    color: var(--text-secondary);
+}
+
+.auth-success {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.auth-error {
+    color: var(--danger-color);
+    font-weight: bold;
+}

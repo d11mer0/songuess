@@ -1,0 +1,128 @@
+.footer {
+    background-color: var(--background-primary);
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid var(--background-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Навігація */
+.footerNav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap; /* Додає адаптивність, якщо бракує місця */
+}
+
+.footerNav a {
+    text-decoration: none;
+    color: var(--secondary-color);
+    transition: color 0.2s ease-in-out;
+}
+
+.footerNav a:hover {
+    color: var(--secondary-hover);
+}
+
+/* Соцмережі */
+.footerSocials {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.footerSocials a {
+    color: var(--text-main);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.footerSocials a:hover {
+    color: var(--text-hover);
+}
+
+/* Форма підписки */
+.newsletter {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.newsletter input {
+    padding: 8px;
+    border: 1px solid var(--background-tertiary);
+    background-color: var(--background-secondary);
+    color: var(--text-main);
+    border-radius: 4px;
+    width: 200px;
+}
+
+.newsletter input::placeholder {
+    color: var(--text-secondary);
+}
+
+.newsletter input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.newsletter button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.newsletter button:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.newsletter button:active {
+    background-color: var(--primary-active);
+}
+
+/* Копірайт */
+.copyright {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* ---- АДАПТИВНІСТЬ ---- */
+@media (max-width: 600px) {
+    .footerNav ul {
+        flex-direction: column; /* Робить навігацію вертикальною */
+        gap: 10px;
+    }
+
+    .footerSocials {
+        flex-direction: column; /* Соцмережі в стовпчик */
+        gap: 8px;
+    }
+
+    .newsletter {
+        flex-direction: column; /* Форма підписки в колонку */
+        gap: 8px;
+    }
+
+    .newsletter input {
+        width: 100%; /* Розтягується на всю доступну ширину */
+        max-width: 250px; /* Але не більше ніж 250px */
+    }
+
+    .newsletter button {
+        width: 100%;
+        max-width: 250px;
+    }
+}

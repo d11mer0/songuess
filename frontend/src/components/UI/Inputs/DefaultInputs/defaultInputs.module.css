@@ -1,0 +1,98 @@
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px; /* Додає відступи між інпутами */
+}
+
+.input {
+    color: var(--text-main);
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    outline: none;
+    background: transparent;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, font-size 0.2s ease-in-out;
+}
+
+/* Додаємо зміну кольору при фокусі */
+.input:focus {
+    border-color: var(--primary-active);
+    box-shadow: 0 0 8px var(--primary-box-shadow-color);
+}
+
+/* Плаваючий label */
+.label {
+    cursor: text;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--background-secondary);
+    padding: 0 5px;
+    font-size: 16px;
+    color: var(--primary-color);
+    transition: all 0.2s ease-in-out;
+}
+
+.input:focus + .label,
+.input:not(:placeholder-shown) + .label {
+    top: 0;
+    font-size: 14px;
+    color: var(--primary-color);
+    transition: all 0.1s ease-in-out;
+}
+
+
+.passwordWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input.password {
+    padding-right: 40px; /* Враховуємо місце для кнопки */
+}
+
+.togglePassword {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+
+
+input:-webkit-autofill::first-line {
+    color: var(--text-main) !important; /* Щоб змінити колір тексту */
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--text-main) !important;  /* Колір тексту */
+    background-color: var(--background-secondary) !important;
+    box-shadow: 0 0 0px 1000px var(--background-secondary) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: var(--text-main) !important; /* Колір курсора */
+}
+
+/* Для Firefox */
+input:-moz-autofill {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-main) !important;
+    caret-color: var(--text-main) !important; /* Колір курсора */
+}
+
+/* Для Edge/IE */
+input:-ms-autofill {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-main) !important;
+    caret-color: var(--text-main) !important; /* Колір курсора */
+}

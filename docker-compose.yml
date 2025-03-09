@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    restart: always
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_DB: songuess
+      POSTGRES_USER: dimero
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dimero -d songuess"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    container_name: nest_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy  # ✅ Чекаємо, поки PostgreSQL буде готовий
+    ports:
+      - "3000:3000"
+      - "5555:5555"  # Prisma Studio
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: "postgresql://dimero:password@db:5432/songuess"
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_GOOGLE_CLIENT_ID=877282899502-4jql4rt8rh4o9uh9b2rr9bjft2b36pb1.apps.googleusercontent.com
+      - CHOKIDAR_USEPOLLING=true  # ✅ Включаємо live reload у контейнері
+    depends_on:
+      - backend
+
+    
+volumes:
+  postgres_data:
