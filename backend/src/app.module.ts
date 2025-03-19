@@ -6,8 +6,16 @@ import { SongsModule } from './songs/songs.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
+import { DeezerModule } from './deezer/deezer.module';
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }),PrismaModule, UserModule, AuthModule, SongsModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule, 
+    UserModule, 
+    AuthModule, 
+    SongsModule,
+    DeezerModule
+  ],
   providers: [
     {
       provide: APP_GUARD,

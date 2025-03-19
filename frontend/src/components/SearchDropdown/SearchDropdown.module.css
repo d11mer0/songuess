@@ -1,0 +1,52 @@
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+  
+.searchInput {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+}
+  
+.dropdownList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 4px;
+    list-style: none;
+    padding: 5px 0;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+}
+  
+.dropdownItem {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+}
+  
+.dropdownItem:hover {
+    background: #333;
+}
+  
+.albumTitle {
+    font-weight: bold;
+}
+  
+.artistName {
+    color: #aaa;
+    font-size: 14px;
+}
