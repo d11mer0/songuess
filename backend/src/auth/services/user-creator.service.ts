@@ -23,6 +23,19 @@ export class UserService {
     });
   }
 
+  async generateUniqueLogin(name: string): Promise<string> {
+    let baseLogin = name.replace(/\s+/g, '_').toLowerCase(); // Замінюємо пробіли на "_"
+    let uniqueLogin = baseLogin;
+    let counter = 1;
+
+    // Перевіряємо, чи такий login вже є в БД, якщо так – додаємо число
+    while (await this.prisma.user.findUnique({ where: { login: uniqueLogin } })) {
+        uniqueLogin = `${baseLogin}_${counter++}`;
+    }
+
+    return uniqueLogin;
+}
+
   async findOrCreateGoogleUser({ email, name, sub: google_id, picture: avatar }) {
     let user = await this.prisma.user.findUnique({ where: { google_id } });
 
@@ -33,9 +46,11 @@ export class UserService {
         return this.prisma.user.update({ where: { email }, data: { google_id } });
       }
 
+      const login = await this.generateUniqueLogin(name);
+
       return this.prisma.user.create({
         data: {
-          login: name.replace(/\s+/g, '_').toLowerCase(),
+          login,
           email,
           google_id,
           isVerified: true,

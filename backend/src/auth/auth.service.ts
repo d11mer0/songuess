@@ -8,7 +8,7 @@ import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../common/mail/mail.service'; // ✅ Додай цей імпорт
 
-import { TokenService } from '../common/services/token.service';
+import { TokenService } from '../common/services/token/token.service';
 import { HashService } from '../common/services/hash.service';
 
 import { UserService } from './services/user-creator.service';
@@ -72,7 +72,7 @@ export class AuthService {
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is missing');
     }
-    const decoded = this.tokenService.verifyToken(refreshToken, this.configService.get<string>('JWT_REFRESH_SECRET', 'refresh_secret'));
+    const decoded = this.tokenService.verifyRefreshToken(refreshToken);
     return this.tokenService.generateTokens(decoded.id, decoded.login, decoded.email);
   
   }

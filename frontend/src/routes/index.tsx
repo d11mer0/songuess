@@ -6,6 +6,7 @@ import Footer from '../components/Footer/Footer';
 import { useGetMeQuery } from "../store/api/userApi";
 import ErrorPage from '../pages/DefaultPages/ErrorPage/ErrorPage';
 import UserRoutes from "./modules/users/UserRoutes";
+import GameRoutes from "./modules/game/GameRoutes";
 
 const AppRoutes: React.FC = () => {
 
@@ -20,6 +21,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/auth/*" element={<AuthRoutes />} />
         <Route path="/songs/*" element={<SongsRoutes />} />
+        <Route path="/game/*" element={<GameRoutes />} />
         <Route path="/user/*" element={<UserRoutes />} />
         <Route path="/" element={<Navigate to="/songs" replace/>} />
         <Route path="*" element={<Navigate to="/error" replace />} />

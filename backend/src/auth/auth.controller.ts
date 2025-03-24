@@ -9,23 +9,31 @@ import { RefreshTokenResponseDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendTokenEmailDto, SendTokenEmailResponseDto } from './dto/send-token-email.dto';
 import { GoogleAuthDto, GoogleAuthResponseDto } from './dto/google-auth.dto';
-import { Response, Request } from 'express';
+import { Response, Request, CookieOptions } from 'express';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse} from '@nestjs/swagger';
+
+const cookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  path: "/",
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
+};
 
 @ApiTags('auth') // Swagger група
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
+  @Public() 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Логін користувача' })
   @ApiResponse({ status: 200, description: 'Успішний вхід', type: LoginResponseDto })
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(loginDto);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
     return res.json({ accessToken });
   }
 
@@ -45,7 +53,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Оновлений accessToken', type: RefreshTokenResponseDto })
   async refresh(@Req() req: Request, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.refreshTokens(req.cookies.refreshToken);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
     return res.json({ accessToken });
   }
 
@@ -95,7 +103,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Авторизація через Google успішна', type: GoogleAuthResponseDto })
   async googleAuth(@Body() dto: GoogleAuthDto, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.googleAuth(dto.id_token);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    res.cookie("refreshToken", refreshToken, cookieOptions);
     return res.json({ accessToken });
   }
 }

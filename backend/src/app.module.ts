@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import { DeezerModule } from './deezer/deezer.module';
+import { GameModule } from './game/game.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -14,7 +15,8 @@ import { DeezerModule } from './deezer/deezer.module';
     UserModule, 
     AuthModule, 
     SongsModule,
-    DeezerModule
+    DeezerModule,
+    GameModule
   ],
   providers: [
     {

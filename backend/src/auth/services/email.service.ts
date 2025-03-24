@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from '../../common/mail/mail.service';
-import { TokenService } from '../../common/services/token.service';
+import { TokenService } from '../../common/services/token/token.service';
 
 @Injectable()
 export class EmailService {

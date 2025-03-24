@@ -10,6 +10,7 @@ const App: React.FC = () => {
     triggerRefresh();
   }, [triggerRefresh]);
 
+  console.log(localStorage);
   return (
     <div className="page-container">
       <AppRoutes />
