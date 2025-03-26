@@ -8,37 +8,30 @@ export class RoomService {
 
   constructor(@Inject(forwardRef(() => GameService)) private readonly gameService: GameService) {}
 
-  createRoom(playerId: string, login: string): string {
-    const roomId = Math.random().toString(36).substring(2, 9);
-    const newRoom: GameRoom = { id: roomId, players: [{ id: playerId, login }] };
+  createRoom(playerId: number, login: string): string {
+    const id = this.generateRoomId();
+    const newRoom: GameRoom = { id: id, players: [{ id: playerId, login }] };
     this.rooms.push(newRoom);
-    this.gameService['broadcastRoomsList']();
-    return roomId;
+    this.broadcastRoomUpdates();
+    return id;
   }
 
-  joinRoom(roomId: string, playerId: string, login: string): boolean {
-    const room = this.rooms.find(room => room.id === roomId);
+  joinRoom(roomId: string, playerId: number, login: string): GameRoom | null {
+    const room = this.findRoom(roomId);
     if (room && room.players.length < 2) {
       room.players.push({ id: playerId, login });
-      this.gameService['broadcastRoomsList']();
-      return true;
+      this.broadcastRoomUpdates();
+      return room;
     }
-    return false;
+    return null;
   }
 
-  leaveRoom(roomId: string, playerId: string) {
-    const room = this.rooms.find(room => room.id === roomId);
-    if (room) {
-      room.players = room.players.filter(p => p.id !== playerId);
-      if (room.players.length === 0) {
-        this.rooms = this.rooms.filter(r => r.id !== roomId);
-      }
-      this.gameService['broadcastRoomsList']();
-    }
+  leaveRoom(playerId: number): void{
+    this.removePlayerFromRooms(playerId);
   }
 
   getRoomInfo(roomId: string): GameRoom {
-    return this.rooms.find(room => room.id === roomId) || { id: roomId, players: [] };
+    return this.findRoom(roomId) || { id: roomId, players: [] };
   }
 
   getAllRooms(): GameRoom[] {
@@ -49,94 +42,39 @@ export class RoomService {
     }));
   }
 
-  findRoom(roomId: string) {
+  findRoom(roomId: string): GameRoom | undefined {
     return this.rooms.find(room => room.id === roomId);
   }
 
-  findRoomByPlayerId(playerId: string): GameRoom | undefined {
+  findRoomByPlayerId(playerId: number): GameRoom | undefined {
     return this.rooms.find(room => room.players.some(player => player.id === playerId));
   }
 
-  isUserInRoom(roomId: string, playerId: string): boolean {
-    const room = this.rooms.find(room => room.id === roomId);
-    return room ? room.players.some(player => player.id === playerId) : false;
+  isUserInRoom(roomId: string, playerId: number): boolean {
+    return !!this.findRoom(roomId)?.players.some(player => player.id === playerId);
   }
 
-  handlePlayerDisconnect(playerId: string) {
+  handlePlayerDisconnect(playerId: number) {
+    this.removePlayerFromRooms(playerId);
+  }
+
+  removePlayerFromRooms(playerId: number) {
     this.rooms.forEach(room => {
       room.players = room.players.filter(player => player.id !== playerId);
     });
-    this.rooms = this.rooms.filter(room => room.players.length > 0);
+    this.cleanUpRooms();
+  }
+
+  private generateRoomId(): string {
+    return Math.random().toString(36).substring(2, 9);
+  }
+
+  private broadcastRoomUpdates() {
     this.gameService['broadcastRoomsList']();
   }
 
-  removePlayerFromRooms(playerId: string) {
-    this.rooms.forEach(room => {
-      room.players = room.players.filter(player => player.id !== playerId);
-    });
+  private cleanUpRooms() {
     this.rooms = this.rooms.filter(room => room.players.length > 0);
+    this.broadcastRoomUpdates();
   }
 }
-
-/*
-
-import { Injectable } from '@nestjs/common';
-import { GameRoom, Player } from '../interfaces/game.interface';
-
-@Injectable()
-export class RoomService {
-  private rooms: GameRoom[] = [];
-
-  createRoom(playerId: string, login: string): string {
-    const roomId = Math.random().toString(36).substring(2, 9);
-    const newRoom: GameRoom = { id: roomId, players: [{ id: playerId, login }] };
-    this.rooms.push(newRoom);
-    return roomId;
-  }
-
-  joinRoom(roomId: string, playerId: string, login: string): boolean {
-    const room = this.rooms.find(room => room.id === roomId);
-    if (room && room.players.length < 2) {
-      room.players.push({ id: playerId, login });
-      return true;
-    }
-    return false;
-  }
-
-  leaveRoom(roomId: string, playerId: string) {
-    const room = this.rooms.find(room => room.id === roomId);
-    if (room) {
-      room.players = room.players.filter(p => p.id !== playerId);
-    }
-  }
-
-  getRoomInfo(roomId: string): GameRoom | undefined {
-    return this.rooms.find(room => room.id === roomId);
-  }
-
-  getAllRooms(): GameRoom[] {
-    return this.rooms.map(room => ({
-      id: room.id,
-      players: room.players,
-      maxPlayers: 2,
-    }));
-  }
-
-  getRoomByPlayerId(playerId: string): GameRoom | undefined {
-    return this.rooms.find(room => room.players.some(player => player.id === playerId));
-  }
-
-  isUserInRoom(roomId: string, playerId: string): boolean {
-    const room = this.rooms.find(room => room.id === roomId);
-    return room ? room.players.some(player => player.id === playerId) : false;
-  }
-
-  removePlayerFromRooms(playerId: string) {
-    this.rooms.forEach(room => {
-      room.players = room.players.filter(player => player.id !== playerId);
-    });
-    this.rooms = this.rooms.filter(room => room.players.length > 0);
-  }
-}
-
-*/
