@@ -3,7 +3,7 @@
     width: 100%;
     max-width: 400px;
 }
-  
+
 .searchInput {
     width: 100%;
     padding: 10px;
@@ -12,7 +12,7 @@
     border-radius: 4px;
     outline: none;
 }
-  
+
 .dropdownList {
     position: absolute;
     top: 100%;
@@ -29,7 +29,7 @@
     overflow-y: auto;
     z-index: 10;
 }
-  
+
 .dropdownItem {
     padding: 10px;
     cursor: pointer;
@@ -37,15 +37,15 @@
     justify-content: space-between;
     color: #fff;
 }
-  
+
 .dropdownItem:hover {
     background: #333;
 }
-  
+
 .albumTitle {
     font-weight: bold;
 }
-  
+
 .artistName {
     color: #aaa;
     font-size: 14px;

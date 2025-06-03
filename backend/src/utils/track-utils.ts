@@ -1,9 +1,25 @@
 export function normalizeTitle(title: string): string {
-    return title.trim().toLowerCase().replace(/[\u2018\u2019\u201A\u201B]/g, "'");
+    return title
+        .trim()
+        .toLowerCase()
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'");
 }
 
-export function filterTracks(tracks: any[], nonOriginalKeywords: string[]) {
-    tracks.sort((a, b) => new Date(a?.release_date).getTime() - new Date(b?.release_date).getTime());
+export function filterTracks(tracks: any[]) {
+    return tracks.filter((track) => track.preview && track.preview !== '');
+}
+
+export function filterTracksByArtist(
+    tracks: any[],
+    nonOriginalKeywords: string[],
+) {
+    tracks = tracks.filter((track) => !!track?.preview);
+
+    tracks.sort(
+        (a, b) =>
+            new Date(a?.release_date).getTime() -
+            new Date(b?.release_date).getTime(),
+    );
 
     const trackMap = new Map<string, any>();
 
@@ -18,7 +34,10 @@ export function filterTracks(tracks: any[], nonOriginalKeywords: string[]) {
             trackMap.set(trackKey, currentTrack);
         } else {
             const existingTrack = trackMap.get(trackKey)!;
-            if (new Date(currentTrack?.release_date) < new Date(existingTrack?.release_date)) {
+            if (
+                new Date(currentTrack?.release_date) <
+                new Date(existingTrack?.release_date)
+            ) {
                 trackMap.set(trackKey, currentTrack);
             }
             continue;
@@ -30,7 +49,11 @@ export function filterTracks(tracks: any[], nonOriginalKeywords: string[]) {
 
             const normalizedCompareTitle = normalizeTitle(compareTrack.title);
             if (normalizedCompareTitle.includes(normalizedTitle)) {
-                if (nonOriginalKeywords.some(keyword => normalizedCompareTitle.includes(keyword))) {
+                if (
+                    nonOriginalKeywords.some((keyword) =>
+                        normalizedCompareTitle.includes(keyword),
+                    )
+                ) {
                     tracks[j] = null;
                 }
             }

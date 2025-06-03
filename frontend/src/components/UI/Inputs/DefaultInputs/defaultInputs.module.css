@@ -1,4 +1,3 @@
-
 .inputWrapper {
     position: relative;
     width: 100%;
@@ -14,7 +13,10 @@
     border-radius: 6px;
     outline: none;
     background: transparent;
-    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, font-size 0.2s ease-in-out;
+    transition:
+        border-color 0.3s ease-in-out,
+        box-shadow 0.3s ease-in-out,
+        font-size 0.2s ease-in-out;
 }
 
 /* Додаємо зміну кольору при фокусі */
@@ -45,7 +47,6 @@
     transition: all 0.1s ease-in-out;
 }
 
-
 .passwordWrapper {
     position: relative;
     width: 100%;
@@ -66,17 +67,15 @@
     font-size: 18px;
 }
 
-
-
 input:-webkit-autofill::first-line {
     color: var(--text-main) !important; /* Щоб змінити колір тексту */
 }
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-text-fill-color: var(--text-main) !important;  /* Колір тексту */
+    -webkit-text-fill-color: var(--text-main) !important; /* Колір тексту */
     background-color: var(--background-secondary) !important;
     box-shadow: 0 0 0px 1000px var(--background-secondary) inset !important;
     transition: background-color 5000s ease-in-out 0s;

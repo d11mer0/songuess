@@ -1,15 +1,26 @@
 export interface Player {
-    id: string;
+    id: number;
     login: string;
+    isOnline: boolean;
 }
 
-export interface RoomInfo {
-    id: string;
-    players: Player[];
+export interface LobbyOptions {
+    allowAutoJoin: boolean;
+    publicLobby: boolean;
+    maxPlayers: number;
+}
+
+export enum RoomState {
+    ADDING = 'adding', // Коли гравці ще приєднуються (лоббі)
+    CREATING = 'creating', // Коли налаштовується гра (вибір альбомів/артиста/плейліста)
+    STARTED = 'started', // Коли гра запущена
+    ENDED = 'ended',
 }
 
 export interface Room {
     id: string;
-    maxPlayers: number;
     players: Player[];
+    lobbyOptions: LobbyOptions;
+    leaderId?: number;
+    state: RoomState;
 }

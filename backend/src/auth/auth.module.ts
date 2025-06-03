@@ -13,26 +13,31 @@ import { GoogleAuthService } from './services/google-auth.service';
 import { TokenModule } from '../common/services/token/token.module';
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_EXPIRE', '6h') },
-      }),
-    }),
-    MailModule,
-    TokenModule,
-  ],
-  controllers: [AuthController],
-  providers: [
-    AuthService,
-    HashService,
-    PrismaService,
-    EmailService,
-    UserService,
-    GoogleAuthService
-  ],
-  exports: [AuthService, HashService, JwtModule],
+    imports: [
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.get<string>('JWT_ACCESS_SECRET'),
+                signOptions: {
+                    expiresIn: configService.get<string>(
+                        'JWT_ACCESS_EXPIRE',
+                        '6h',
+                    ),
+                },
+            }),
+        }),
+        MailModule,
+        TokenModule,
+    ],
+    controllers: [AuthController],
+    providers: [
+        AuthService,
+        HashService,
+        PrismaService,
+        EmailService,
+        UserService,
+        GoogleAuthService,
+    ],
+    exports: [AuthService, HashService, JwtModule],
 })
 export class AuthModule {}

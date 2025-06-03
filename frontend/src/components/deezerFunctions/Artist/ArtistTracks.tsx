@@ -1,28 +1,51 @@
-import { useGetAllTracksByArtistQuery } from "../../../store/api/deezerApi";
-import TrackList from "../Track/TrackList";
+import { useGetAllTracksByArtistQuery } from '../../../store/api/deezerApi';
+import { SelectedTracks, TrackItem } from '../../../types/gameTypes';
+import TrackList from '../Track/TrackList';
 
 interface ArtistTracksProps {
-  artistId: number;
+    artistId: number;
+    onSendTracks?: (tracks: SelectedTracks) => void;
+    isList?: boolean;
 }
 
-interface Track {
-  id: number;
-  title: string;
-  preview: string;
-  album?: { title: string };
-}
+const ArtistTracks: React.FC<ArtistTracksProps> = ({
+    artistId,
+    onSendTracks,
+    isList = true,
+}) => {
+    const { data, error, isLoading } = useGetAllTracksByArtistQuery(artistId);
+    const tracks =
+        data?.map((track: TrackItem) => ({
+            id: track.id,
+            title: track.title,
+            preview: track.preview,
+            album: {
+                id: track.album?.id,
+                title: track.album?.title,
+                picture: track.album?.picture,
+            },
+        })) || [];
 
-const ArtistTracks: React.FC<ArtistTracksProps> = ({ artistId }) => {
-  const { data, error, isLoading } = useGetAllTracksByArtistQuery(artistId);
-
-  const tracks = data?.map((track: Track) => ({
-    id: track.id,
-    title: track.title,
-    preview: track.preview,
-    albumName: track.album?.title,
-  })) || [];
-
-  return <TrackList title="Треки артиста" tracks={tracks} isLoading={isLoading} error={error} />;
+    return (
+        <>
+            <TrackList
+                title="Треки артиста"
+                tracks={tracks}
+                isLoading={isLoading}
+                error={error}
+                isList={isList}
+            />
+            {onSendTracks && (
+                <button
+                    onClick={() => {
+                        onSendTracks({ tracks: tracks });
+                    }}
+                >
+                    send data
+                </button>
+            )}
+        </>
+    );
 };
 
 export default ArtistTracks;

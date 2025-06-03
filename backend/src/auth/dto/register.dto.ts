@@ -7,12 +7,19 @@ export class RegisterDto {
     @IsNotEmpty()
     login: string;
 
-    @ApiProperty({ example: 'user@example.com', description: 'Email користувача' })
+    @ApiProperty({
+        example: 'user@example.com',
+        description: 'Email користувача',
+    })
     @IsEmail()
     @IsNotEmpty()
     email: string;
 
-    @ApiProperty({ example: 'password123', description: 'Пароль користувача', minLength: 6 })
+    @ApiProperty({
+        example: 'password123',
+        description: 'Пароль користувача',
+        minLength: 6,
+    })
     @IsString()
     @IsNotEmpty()
     @MinLength(6)
@@ -22,4 +29,4 @@ export class RegisterDto {
 export class RegisterResponseDto {
     @ApiProperty({ example: 'User registered successfully' })
     message: string;
-  }
+}

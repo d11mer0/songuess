@@ -1,193 +1,195 @@
 .navbar {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--background-secondary);
-  padding: 5px 10px;
-  color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-secondary);
+    padding: 5px 10px;
+    color: var(--text-main);
 }
 
 .navTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .navLeft {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--primary-color);
-  text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
 }
 
 /* Навігаційні посилання */
 .navLinks {
-  display: flex;
-  gap: 15px;
+    display: flex;
+    gap: 15px;
 }
 
 .navLink {
-  color: var(--text-main);
-  text-decoration: none;
-  font-size: 16px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 16px;
 }
 
 .navLink:hover {
-  color: var(--text-hover);
+    color: var(--text-hover);
 }
 
 /* Випадаюче меню */
 .navRight {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .userMenu {
-  display: flex;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 5px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 .userMenu:hover {
-  background-color: var(--background-highlight);
+    background-color: var(--background-highlight);
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 8px;
 }
 
 .login {
-  font-size: 20px;
-  margin-right: 10px;
-  user-select: none;
+    font-size: 20px;
+    margin-right: 10px;
+    user-select: none;
 }
 
 .arrow {
-  font-size: 18px;
-  transition: transform 0.2s ease;
+    font-size: 18px;
+    transition: transform 0.2s ease;
 }
 
 .rotate {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .dropdownMenu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: var(--background-tertiary);
-  border-radius: 5px;
-  overflow: hidden;
-  min-width: 150px;
-  box-shadow: 0px 4px 8px var(--primary-box-shadow-color);
-  z-index: 10;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--background-tertiary);
+    border-radius: 5px;
+    overflow: hidden;
+    min-width: 150px;
+    box-shadow: 0px 4px 8px var(--primary-box-shadow-color);
+    z-index: 10;
 
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(-5px);
-  transition: opacity 0.2s, transform 0.2s ease-in-out;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition:
+        opacity 0.2s,
+        transform 0.2s ease-in-out;
 }
 
 .userMenu:hover .dropdownMenu {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0);
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .dropdownItem {
-  width: 100%;
-  padding: 10px 15px;
-  text-align: left;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: block;
-  text-decoration: none;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
 }
 
 .dropdownItem:hover {
-  background-color: var(--background-highlight);
+    background-color: var(--background-highlight);
 }
 
 /* Лінія (відображається тільки у мобільному меню) */
 .separator {
-  width: 100%;
-  height: 1px;
-  background-color: var(--background-highlight);
-  margin: 5px 0;
-  display: none;
+    width: 100%;
+    height: 1px;
+    background-color: var(--background-highlight);
+    margin: 5px 0;
+    display: none;
 }
 
 /* Мобільний контейнер */
 .mobileContainer {
-  display: none;
-  flex-direction: column;
-  width: 100%;
+    display: none;
+    flex-direction: column;
+    width: 100%;
 }
 
 /* Бургер-меню */
 .burger {
-  display: inline-flex; /* Замість inline-block */
-  width: max-content; /* Додає адаптивність */
-  text-align: left;
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: var(--text-main);
-  cursor: pointer;
-  margin-top: 5px;
-  transition: transform 0.2s ease, color 0.2s ease;
-
+    display: inline-flex; /* Замість inline-block */
+    width: max-content; /* Додає адаптивність */
+    text-align: left;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    margin-top: 5px;
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
 }
 
 .burger:hover {
-  color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .burger:active {
-  transform: scale(0.95);
+    transform: scale(0.95);
 }
 
 .mobileMenu {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding-top: 10px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 10px;
 }
 
 .mobileMenuOpen {
-  display: flex;
+    display: flex;
 }
 
 @media (max-width: 768px) {
-  .mobileContainer {
-    display: flex;
-  }
+    .mobileContainer {
+        display: flex;
+    }
 
-  .separator {
-    display: block;
-  }
-  .navLinks {
-    display: none;
-  }
+    .separator {
+        display: block;
+    }
+    .navLinks {
+        display: none;
+    }
 
-  .login {
-    display: none;
-  }
+    .login {
+        display: none;
+    }
 }
-

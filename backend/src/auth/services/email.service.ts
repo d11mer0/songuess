@@ -5,29 +5,29 @@ import { TokenService } from '../../common/services/token/token.service';
 
 @Injectable()
 export class EmailService {
-  constructor(
-    private prisma: PrismaService,
-    private mailService: MailService,
-    private tokenService: TokenService,
-  ) {}
+    constructor(
+        private prisma: PrismaService,
+        private mailService: MailService,
+        private tokenService: TokenService,
+    ) {}
 
-  private async generateEmailVerificationToken(userId: number) {
-    const token = this.tokenService.generateEmailToken(userId);
+    private async generateEmailVerificationToken(userId: number) {
+        const token = this.tokenService.generateEmailToken(userId);
 
-    await this.prisma.token.create({
-      data: {
-        userId,
-        token,
-        type: 'EMAIL_VERIFICATION',
-        expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000),
-      },
-    });
+        await this.prisma.token.create({
+            data: {
+                userId,
+                token,
+                type: 'EMAIL_VERIFICATION',
+                expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000),
+            },
+        });
 
-    return token;
-  }
+        return token;
+    }
 
-  async sendEmailVerification(userId: number, email: string) {
-    const token = await this.generateEmailVerificationToken(userId);
-    await this.mailService.sendVerificationEmail(email, token);
-  }
+    async sendEmailVerification(userId: number, email: string) {
+        const token = await this.generateEmailVerificationToken(userId);
+        await this.mailService.sendVerificationEmail(email, token);
+    }
 }

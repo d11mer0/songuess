@@ -1,79 +1,80 @@
 .email {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .fileButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  font-size: 16px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-  background-color: var(--secondary-color);
-  color: var(--text-main);
-  border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    background-color: var(--secondary-color);
+    color: var(--text-main);
+    border: none;
 }
 
 .fileButton:hover {
-  background-color: var(--secondary-hover);
+    background-color: var(--secondary-hover);
 }
 
 .fileButton.selected {
-  background-color: var(--success-color);
+    background-color: var(--success-color);
 }
 
 .icon {
-  font-size: 20px;
+    font-size: 20px;
 }
 
 .hiddenInput {
-  display: none;
+    display: none;
 }
 
 /* Drag & Drop – залишив фон таким, як був */
 .dropZone {
-  margin-top: 15px;
-  padding: 20px;
-  border: 2px dashed #757575; /* Колір залишив */
-  border-radius: 6px;
-  text-align: center;
-  font-size: 16px;
-  color: #a0a0a0; /* Колір залишив */
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+    margin-top: 15px;
+    padding: 20px;
+    border: 2px dashed #757575; /* Колір залишив */
+    border-radius: 6px;
+    text-align: center;
+    font-size: 16px;
+    color: #a0a0a0; /* Колір залишив */
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .dropZone.dragging {
-  border-color: var(--primary-color);
-  background-color: rgba(30, 136, 229, 0.1);
-  color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: rgba(30, 136, 229, 0.1);
+    color: var(--primary-color);
 }
 
 .uploadButtonContainer {
-  margin-top: 20px;
-  text-align: center;
+    margin-top: 20px;
+    text-align: center;
 }
 
-
 .buttonContainer {
-  display: flex;
-  gap: 12px; /* Відстань між кнопками */
-  flex-wrap: wrap; /* Щоб кнопки переносились на новий рядок, якщо не влазять */
+    display: flex;
+    gap: 12px; /* Відстань між кнопками */
+    flex-wrap: wrap; /* Щоб кнопки переносились на новий рядок, якщо не влазять */
 }
 
 @media (max-width: 500px) {
-  .buttonContainer {
-    flex-direction: column; /* На вузьких екранах кнопки стають у стовпчик */
-    align-items: center;
-    gap: 8px; /* Менший відступ для компактності */
-  }
-  .buttonContainer button {
-    width: 90%;
-  }
+    .buttonContainer {
+        flex-direction: column; /* На вузьких екранах кнопки стають у стовпчик */
+        align-items: center;
+        gap: 8px; /* Менший відступ для компактності */
+    }
+    .buttonContainer button {
+        width: 90%;
+    }
 }

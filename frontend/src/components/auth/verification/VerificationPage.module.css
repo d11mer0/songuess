@@ -8,7 +8,9 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    transition: background-color 0.2s, transform 0.2s;
+    transition:
+        background-color 0.2s,
+        transform 0.2s;
 }
 
 .auth-button:hover {
@@ -26,7 +28,8 @@
     transform: scale(1.08);
 }
 
-.auth-message .auth-success, .auth-error {
+.auth-message .auth-success,
+.auth-error {
     font-size: 16px;
     text-align: center;
     margin-bottom: 15px;

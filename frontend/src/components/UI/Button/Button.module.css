@@ -5,7 +5,9 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition:
+        background-color 0.2s,
+        transform 0.1s;
 }
 
 .button:disabled {
@@ -42,7 +44,6 @@
     background-color: var(--secondary-active);
     transform: scale(1.05);
 }
-
 
 .button.danger {
     background-color: var(--danger-color);

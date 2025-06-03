@@ -1,4 +1,4 @@
-import { socketInstance } from "./socketInstance";
+import { socketInstance } from './socketInstance';
 
 class SocketEmitter {
     emit(event: string, data?: any) {

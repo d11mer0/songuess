@@ -9,20 +9,20 @@ import { ConfigModule } from '@nestjs/config';
 import { DeezerModule } from './deezer/deezer.module';
 import { GameModule } from './game/game.module';
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule, 
-    UserModule, 
-    AuthModule, 
-    SongsModule,
-    DeezerModule,
-    GameModule
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard, // 🔹 Глобальний guard для авторизації
-    }
-  ],
+    imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        PrismaModule,
+        UserModule,
+        AuthModule,
+        SongsModule,
+        DeezerModule,
+        GameModule,
+    ],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard, // 🔹 Глобальний guard для авторизації
+        },
+    ],
 })
 export class AppModule {}

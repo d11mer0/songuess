@@ -1,11 +1,11 @@
-import { 
-    WebSocketGateway, 
-    WebSocketServer, 
-    OnGatewayConnection, 
-    OnGatewayDisconnect, 
-    ConnectedSocket, 
-    SubscribeMessage, 
-    MessageBody
+import {
+    WebSocketGateway,
+    WebSocketServer,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    ConnectedSocket,
+    SubscribeMessage,
+    MessageBody,
 } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -13,8 +13,8 @@ import { GameService } from '../services/game.service';
 
 @WebSocketGateway({
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:3000',
-      credentials: true,
+        origin: process.env.CLIENT_URL || 'http://localhost:3000',
+        credentials: true,
     },
 })
 @Injectable()
@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage('reconnectRoom')
-    async handleReconnectRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { id: string }) {
-        await this.gameService.reconnectRoom(client, data.id);
+    async handleReconnectRoom(@ConnectedSocket() client: Socket) {
+        await this.gameService.reconnectRoom(client);
     }
 }

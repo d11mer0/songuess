@@ -4,8 +4,8 @@ import { DeezerService } from './deezer.service';
 import { DeezerController } from './deezer.controller';
 
 @Module({
-  imports: [HttpModule],
-  controllers: [DeezerController],
-  providers: [DeezerService],
+    imports: [HttpModule],
+    controllers: [DeezerController],
+    providers: [DeezerService],
 })
 export class DeezerModule {}

@@ -81,7 +81,9 @@
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 4px;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    transition:
+        background-color 0.2s ease-in-out,
+        transform 0.1s ease-in-out;
 }
 
 .newsletter button:hover {

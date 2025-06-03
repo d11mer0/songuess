@@ -9,18 +9,17 @@ import EditSongPage from '../../../pages/Songs/EditSongPage';
 
 import ProtectedRoute from '../../guards/ProtectedRoute';
 
-
 const SongsRoutes: React.FC = () => (
     <Routes>
-      <Route path="/artist" element={<ArtistPage />} />
-      <Route path="/playlist" element={<PlaylistPage />} />
-      <Route path="/album" element={<AlbumPage />} />
-      <Route path="/track" element={<TrackPage />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/edit/:id" element={<EditSongPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/error" replace />} />
+        <Route path="/artist" element={<ArtistPage />} />
+        <Route path="/playlist" element={<PlaylistPage />} />
+        <Route path="/album" element={<AlbumPage />} />
+        <Route path="/track" element={<TrackPage />} />
+        <Route element={<ProtectedRoute />}>
+            <Route path="/edit/:id" element={<EditSongPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/error" replace />} />
     </Routes>
-  );
-  
-  export default SongsRoutes;
+);
+
+export default SongsRoutes;

@@ -1,79 +1,84 @@
 /* 🔹 Reset стилів */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-  background-color: var(--background-primary);
-  color: var(--text-main);
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-main);
 }
 
 /* 🔹 Змінні кольорів */
 
 :root {
-  /* Основні кольори */
-  --text-main: #E0E0E0; /* Світло-сірий для основного тексту */
-  --text-hover: #FFFFFF; /* Білий для підсвіченого тексту */
-  --text-secondary: #A0A0A0; /* Темніший сірий для другорядного тексту */
-  --text-secondary-hover: #B0B0B0; /* Трохи світліший сірий при наведенні */
+    /* Основні кольори */
+    --text-main: #e0e0e0; /* Світло-сірий для основного тексту */
+    --text-hover: #ffffff; /* Білий для підсвіченого тексту */
+    --text-secondary: #a0a0a0; /* Темніший сірий для другорядного тексту */
+    --text-secondary-hover: #b0b0b0; /* Трохи світліший сірий при наведенні */
 
-  /* Фонові кольори */
-  --background-primary: #1C1C1C; /* Темно-сірий для основного фону */
-  --background-secondary: #2A2A2A; /* Трохи світліший для контрасту між секціями */
-  --background-tertiary: #333333; /* Світліший для карток, панелей, елементів */
-  --background-highlight: #3D3D3D; /* Акцентний для підсвічування вибраних елементів */
+    /* Фонові кольори */
+    --background-primary: #1c1c1c; /* Темно-сірий для основного фону */
+    --background-secondary: #2a2a2a; /* Трохи світліший для контрасту між секціями */
+    --background-tertiary: #333333; /* Світліший для карток, панелей, елементів */
+    --background-highlight: #3d3d3d; /* Акцентний для підсвічування вибраних елементів */
 
-  /* Акцентні кольори */
-  --primary-color: #9B5DE5; /* Пурпуровий для основних акцентів */
-  --primary-hover: #B075F7; /* Світліший пурпуровий при наведенні */
-  --primary-active: #7A3EB5; /* Темніший пурпуровий при активному стані */
+    /* Акцентні кольори */
+    --primary-color: #9b5de5; /* Пурпуровий для основних акцентів */
+    --primary-hover: #b075f7; /* Світліший пурпуровий при наведенні */
+    --primary-active: #7a3eb5; /* Темніший пурпуровий при активному стані */
 
-  --secondary-color: #F15BB5; /* Рожевий для другорядних акцентів */
-  --secondary-hover: #F47DC8; /* Світліший рожевий при наведенні */
-  --secondary-active: #C1448E; /* Темніший рожевий при активному стані */
+    --secondary-color: #f15bb5; /* Рожевий для другорядних акцентів */
+    --secondary-hover: #f47dc8; /* Світліший рожевий при наведенні */
+    --secondary-active: #c1448e; /* Темніший рожевий при активному стані */
 
-  --danger-color: #FF6F61; /* Червоний для помилок */
-  --danger-hover: #FF8A80; /* Світліший червоний при наведенні */
-  --danger-active: #E05550; /* Темніший червоний при активному стані */
+    --danger-color: #ff6f61; /* Червоний для помилок */
+    --danger-hover: #ff8a80; /* Світліший червоний при наведенні */
+    --danger-active: #e05550; /* Темніший червоний при активному стані */
 
-  --success-color: #28C76F; /* Зелений для успішних дій */
-  --success-hover: #5DD492; /* Світліший зелений при наведенні */
-  --success-active: #219653; /* Темніший зелений при активному стані */
+    --success-color: #28c76f; /* Зелений для успішних дій */
+    --success-hover: #5dd492; /* Світліший зелений при наведенні */
+    --success-active: #219653; /* Темніший зелений при активному стані */
 
-  /* Тіні */
-  --primary-box-shadow-color: rgba(0, 0, 0, 0.5); /* Тінь для елементів */
-  --text-shadow-color: rgba(0, 0, 0, 0.3); /* Тінь для тексту */
+    /* Тіні */
+    --primary-box-shadow-color: rgba(0, 0, 0, 0.5); /* Тінь для елементів */
+    --text-shadow-color: rgba(0, 0, 0, 0.3); /* Тінь для тексту */
 }
 
 /* 🔹 Загальні стилі для тексту */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  margin-bottom: 10px;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 p {
-  margin-bottom: 10px;
-  line-height: 1.5;
+    margin-bottom: 10px;
+    line-height: 1.5;
 }
 
-
-input{
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--primary-color);
-  border-radius: 5px;
-  font-size: 16px;
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 input:focus {
-  border-color: var(--hover-color);
-  outline: none;
-  box-shadow: 0 0 5px var(--hover-color);
+    border-color: var(--hover-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--hover-color);
 }
 
 /* МОДАЛЬНЕ:*/
@@ -86,33 +91,32 @@ input:focus {
 }
 
 .modal-header {
-  display: flex;
-  justify-content: center; /* Центрує вміст */
-  position: relative;
+    display: flex;
+    justify-content: center; /* Центрує вміст */
+    position: relative;
 }
 
 .modal-title {
-  flex-grow: 1; /* Дозволяє заголовку займати весь простір */
-  text-align: center;
+    flex-grow: 1; /* Дозволяє заголовку займати весь простір */
+    text-align: center;
 }
 
 .modal-header .btn-close {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-
 .modal-body {
-  background-color: var(--background-secondary);
+    background-color: var(--background-secondary);
 }
 
 .modal-footer {
-  background-color: var(--background-tertiary);
-  border-top: 1px solid var(--border-color);
+    background-color: var(--background-tertiary);
+    border-top: 1px solid var(--border-color);
 }
 
 .btn-close {
-  filter: invert(1); /* Робить іконку закриття білою */
+    filter: invert(1); /* Робить іконку закриття білою */
 }

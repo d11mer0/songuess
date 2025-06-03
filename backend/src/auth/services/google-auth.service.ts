@@ -4,23 +4,25 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GoogleAuthService {
-  private googleClient: OAuth2Client;
+    private googleClient: OAuth2Client;
 
-  constructor(private configService: ConfigService) {
-    this.googleClient = new OAuth2Client(this.configService.get<string>('GOOGLE_CLIENT_ID'));
-  }
-
-  async verifyGoogleToken(idToken: string) {
-    const ticket = await this.googleClient.verifyIdToken({
-      idToken,
-      audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
-    });
-
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email || !payload.name) {
-      throw new UnauthorizedException('Invalid Google ID Token');
+    constructor(private configService: ConfigService) {
+        this.googleClient = new OAuth2Client(
+            this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        );
     }
 
-    return payload;
-  }
+    async verifyGoogleToken(idToken: string) {
+        const ticket = await this.googleClient.verifyIdToken({
+            idToken,
+            audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email || !payload.name) {
+            throw new UnauthorizedException('Invalid Google ID Token');
+        }
+
+        return payload;
+    }
 }

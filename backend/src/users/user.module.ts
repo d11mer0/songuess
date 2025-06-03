@@ -6,9 +6,9 @@ import { UploadModule } from '../common/upload/upload.module';
 import { ImageModule } from '../common/image/image.module';
 
 @Module({
-  imports: [UploadModule, ImageModule],
-  controllers: [UserController],
-  providers: [UserService, PrismaService],
-  exports: [UserService],
+    imports: [UploadModule, ImageModule],
+    controllers: [UserController],
+    providers: [UserService, PrismaService],
+    exports: [UserService],
 })
 export class UserModule {}
