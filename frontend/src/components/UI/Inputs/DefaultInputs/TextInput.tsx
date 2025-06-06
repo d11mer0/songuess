@@ -1,14 +1,13 @@
 import styles from './defaultInputs.module.css';
 
-interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type TextInputProps = {
     label: string;
     className?: string;
-}
+} & React.InputHTMLAttributes<HTMLInputElement>;
 
 const TextInput: React.FC<TextInputProps> = ({
     className = '',
     label,
-    value,
     ...props
 }) => {
     return (
@@ -16,7 +15,6 @@ const TextInput: React.FC<TextInputProps> = ({
             <input
                 id={label}
                 type="text"
-                value={value}
                 placeholder=" "
                 className={styles.input}
                 {...props}

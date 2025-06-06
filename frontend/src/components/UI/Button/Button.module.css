@@ -59,3 +59,22 @@
     background-color: var(--danger-active);
     transform: scale(1.05);
 }
+
+.button.neutral {
+    background-color: #4a4a4a;
+    color: #cccccc;
+    transition:
+        background-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.button.neutral:hover {
+    background-color: #5c5c5c;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05),
+                0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.button.neutral:active {
+    background-color: #3c3c3c;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
+}

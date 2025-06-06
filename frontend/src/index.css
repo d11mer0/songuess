@@ -120,3 +120,60 @@ input:focus {
 .btn-close {
     filter: invert(1); /* Робить іконку закриття білою */
 }
+
+.checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--background-tertiary);
+    border: 2px solid var(--primary-color);
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkbox:checked {
+    background-color: var(--primary-color);
+}
+
+.checkbox::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 7px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.checkbox:checked::after {
+    opacity: 1;
+}
+
+.checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 4px var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox:hover {
+    border-color: var(--primary-color);
+    background-color: var(--background-secondary);
+}
+
+/* Можна зробити окремий ефект, коли наведено на вже відмічений чекбокс */
+.checkbox:checked:hover {
+    border-color: var(--primary-hover, #5a28c9);
+    background-color: var(--primary-hover, #5a28c9); /* fallback якщо немає змінної */
+}
+
+/* Optional: додатковий ефект підсвітки */
+.checkbox:hover {
+    box-shadow: 0 0 5px rgba(143, 80, 255, 0.4); /* фіолетова тінь */
+}

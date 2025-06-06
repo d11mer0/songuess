@@ -1,5 +1,6 @@
 import { selectRooms } from '../../../../store/gameplay/gameplaySelectors';
 import { useAppSelector } from '../../../../store/hooks';
+import Button from '../../../UI/Button/Button';
 import styles from '../GameLobby.module.css';
 
 interface Props {
@@ -8,26 +9,51 @@ interface Props {
 
 const RoomList = ({ joinRoom }: Props) => {
     const rooms = useAppSelector(selectRooms);
+
     return (
-        <div>
-            <h3>Доступні кімнати:</h3>
+        <div className={styles.roomListContainer}>
+            <h3 className={styles.sectionTitle}>Доступні кімнати</h3>
+
             {rooms.length > 0 ? (
-                <ul>
+                <ul className={styles.roomList}>
                     {rooms.map((room) => (
-                        <li key={room.id}>
-                            Кімната {room.id} ({room.players.length}/
-                            {room.lobbyOptions.maxPlayers} гравців)
-                            <button
+                        <li key={room.id} className={styles.roomItem}>
+                            <p className={styles.roomTitle}>Room №{room.id}</p>
+                            <p className={styles.playersHeader}>
+                                Players 
+                                ({room.players.length}/{room.lobbyOptions.maxPlayers})
+                            </p>
+                            <ul className={styles.playerLoginsList}>
+                                {room.players.map((player) => (
+                                    <li key={player.login}>
+                                        {player.login}
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <p className={styles.roomPlayersCountCentered}>
+                                
+                            </p>
+
+                            <Button
+                                variant="secondary"
+                                style={{
+                                    borderRadius: '40px',
+                                    width: '40px',
+                                    height: '40px',
+                                    fontSize: '22px',
+                                    padding: '0px',
+                                    margin: '0px',
+                                }}
                                 onClick={() => joinRoom(room.id)}
-                                className={styles.button}
                             >
-                                Приєднатися
-                            </button>
+                                +
+                            </Button>
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>Немає доступних кімнат</p>
+                <p className={styles.noRooms}>Наразі немає доступних кімнат</p>
             )}
         </div>
     );

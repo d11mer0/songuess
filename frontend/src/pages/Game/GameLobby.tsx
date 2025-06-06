@@ -20,7 +20,7 @@ const GameLobby = () => {
 
     return (
         <div className={styles.container}>
-            <h2>Game Room</h2>
+            <h2 style={{marginBottom: '50px'}}>Game lobby</h2>
             {!roomInfo ? (
                 <>
                     <LobbyControls

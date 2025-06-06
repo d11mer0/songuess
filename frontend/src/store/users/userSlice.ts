@@ -2,26 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi';
 import { userApi } from '../api/userApi';
 import { setAccessToken } from '../../utils/setAccessToken';
-
-interface User {
-    id: number;
-    email?: string;
-    login: string;
-    name: string;
-    avatar?: string;
-    role?: string;
-}
-
-interface AuthResponse {
-    accessToken: string;
-    user: User;
-}
-
-interface UserState {
-    isAuthenticated: boolean;
-    user: User | null;
-}
-
+import { UserState, User, AuthResponse } from './userTypes';
 const initialState: UserState = {
     isAuthenticated: false,
     user: null,

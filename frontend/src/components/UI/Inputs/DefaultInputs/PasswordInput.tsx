@@ -1,21 +1,15 @@
 import { useState } from 'react';
 import styles from './defaultInputs.module.css';
+import React from 'react';
 
-interface PasswordInputProps {
+type PasswordInputProps = {
     label: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     className?: string;
-    name?: string;
-    required?: boolean; // 🟢 Додаємо required
-}
+} & React.InputHTMLAttributes<HTMLInputElement>;
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
     className = '',
     label,
-    value,
-    name,
-    required,
     ...props
 }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -25,9 +19,6 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
             <input
                 id={label}
                 type={showPassword ? 'text' : 'password'}
-                value={value}
-                name={name}
-                required={required} // 🟢 Додаємо required у input
                 placeholder=" "
                 className={`${styles.input} ${styles.password}`}
                 {...props}

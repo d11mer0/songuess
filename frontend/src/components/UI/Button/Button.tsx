@@ -1,7 +1,7 @@
 import styles from './Button.module.css';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'danger'; // Можна додати інші стилі
+    variant?: 'primary' | 'secondary' | 'danger'| 'neutral'; // Можна додати інші стилі
     width?: string;
 }
 

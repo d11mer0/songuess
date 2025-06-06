@@ -1,21 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Room, RoomState } from '../../types/roomTypes';
 import { GameRoundPublicData } from '../../types/gameTypes';
-
-interface RoundResult {
-    correctAnswer: string;
-    answer: string;
-    timeTaken: number;
-    isCorrect: boolean;
-}
-
-interface GameplayState {
-    currentRoom: Room | null;
-    rooms: Room[];
-    trackInfo: GameRoundPublicData | null;
-    roundResult: RoundResult | null;
-    initialAnswer: string | null;
-}
+import { GameplayState, RoundResult } from './types';
 
 const initialState: GameplayState = {
     currentRoom: null,

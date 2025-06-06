@@ -1,4 +1,3 @@
-// /hooks/useGameRoom.ts
 import { useCallback, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {

@@ -1,14 +1,13 @@
 import styles from './defaultInputs.module.css';
 
-interface EmailInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type EmailInputProps = {
     label: string;
     className?: string;
-}
+} & React.InputHTMLAttributes<HTMLInputElement>;
 
 const EmailInput: React.FC<EmailInputProps> = ({
     className = '',
     label,
-    value,
     ...props
 }) => {
     return (
@@ -16,7 +15,6 @@ const EmailInput: React.FC<EmailInputProps> = ({
             <input
                 id={label}
                 type="email"
-                value={value}
                 placeholder=" "
                 className={styles.input}
                 {...props}
