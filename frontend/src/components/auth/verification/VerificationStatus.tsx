@@ -12,7 +12,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
     if (!token) {
         return (
             <p className={styles['auth-message']}>
-                Перевірте пошту та підтвердіть ваш акаунт.
+                Check your email and confirm your account.
             </p>
         );
     }
@@ -20,13 +20,13 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
     if (error) {
         return (
             <p className={styles['auth-error']}>
-                Верифікація не вдалася:{' '}
-                {(error as any).data?.message || 'Помилка'}
+                Unsuccessfull verification:{' '}
+                {(error as any).data?.message || 'Error'}
             </p>
         );
     }
 
-    return <p className={styles['auth-success']}>Ваш email підтверджено!</p>;
+    return <p className={styles['auth-success']}>Your email confirmed</p>;
 };
 
 export default VerificationStatus;

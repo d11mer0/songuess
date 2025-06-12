@@ -12,9 +12,9 @@ const INPUT_COMPONENTS: Record<
     string,
     { label: string; component: React.FC<any> }
 > = {
-    login: { label: 'Логін', component: TextInputAuth },
+    login: { label: 'Login', component: TextInputAuth },
     email: { label: 'Email', component: EmailInputAuth },
-    password: { label: 'Пароль', component: PasswordInputAuth },
+    password: { label: 'Password', component: PasswordInputAuth },
 };
 
 const AuthFormInputs: React.FC<AuthFormInputsProps> = ({

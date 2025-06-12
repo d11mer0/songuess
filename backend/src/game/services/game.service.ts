@@ -6,6 +6,7 @@ import { RoomHelperService } from './room/room-helper.service';
 import { GameRoom, GameRoomState } from '../interfaces/game.interface';
 import { sanitizeRoom } from '../../utils/room-utils/sanitizeRoom';
 import { formatRoundPayload } from '../../utils/gameplay-utils';
+import { RoomManagerService } from './room/room-manager.service';
 @Injectable()
 export class GameService {
     private server: Server | null = null;
@@ -15,6 +16,7 @@ export class GameService {
         private readonly tokenService: TokenService,
         private readonly userService: UserService,
         private readonly roomHelperService: RoomHelperService,
+        private readonly roomManagerService: RoomManagerService
     ) {}
 
     setServer(server: Server) {
@@ -46,7 +48,9 @@ export class GameService {
                 if (isClear === false) {
                     this.roomHelperService.assignNewLeader(room.id);
                     this.server?.to(room.id).emit('playerDisconnected', room);
+                    this.roomManagerService.broadcastRoomsList();
                 }
+
             }
         }
 
@@ -86,7 +90,9 @@ export class GameService {
         if (player) player.isOnline = true;
 
         client.join(room.id);
+        this.roomManagerService.broadcastRoomsList(); // ← додай це
         this.server?.to(room.id).emit('joinedRoom', sanitizeRoom(room));
+        
         return room;
     }
 

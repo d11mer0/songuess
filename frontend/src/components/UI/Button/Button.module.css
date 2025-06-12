@@ -4,6 +4,9 @@
     font-weight: 600;
     border: none;
     border-radius: 6px;
+    font-family: var(--font-title);
+    letter-spacing: 0.05em; /* ⬅️ додає характеру */
+    text-transform: uppercase; /* ⬅️ опціонально, але виглядає круто */
     cursor: pointer;
     transition:
         background-color 0.2s,

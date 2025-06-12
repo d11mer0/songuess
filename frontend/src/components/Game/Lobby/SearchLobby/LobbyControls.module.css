@@ -1,0 +1,121 @@
+.container {
+    padding: 20px;
+    text-align: center;
+}
+
+/* 🎮 Нові стилі для LobbyControls */
+.controlsContainer {
+    background-color: var(--background-secondary);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    max-width: 400px;
+    margin: 0 auto 32px auto;
+}
+
+.sectionTitle {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--text-main, #ffffff);
+}
+
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: var(--text-main);
+    cursor: pointer;
+    text-align: left;
+    user-select: none;
+}
+
+.playerCountContainer {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.counterWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* центр у контейнері */
+}
+
+.counterButton {
+    width: 28px;
+    height: 30px;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.counterButton:hover {
+    background-color: var(--primary-hover);
+}
+
+
+.counterButton:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+/* Права кнопка: заокруглення тільки справа */
+.counterButton:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+
+.counterInput {
+    width: 38px;
+    height: 30px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid var(--primary-color);
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    background-color: var(--background-tertiary);
+    color: var(--text-main);
+    outline: none;
+    appearance: textfield;
+    caret-color: var(--primary-color);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.counterInput:focus {
+    border-top: 1px solid var(--primary-hover);
+    border-bottom: 1px solid var(--primary-hover);
+    box-shadow: inset 0 1px 3px rgba(155, 93, 229, 0.6), 0 0 2px var(--primary-hover);
+}
+
+.inputLabel {
+    font-size: 16px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+
+

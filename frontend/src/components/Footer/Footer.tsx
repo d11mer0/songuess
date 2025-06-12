@@ -8,16 +8,16 @@ const Footer: React.FC = () => {
             <nav className={styles.footerNav}>
                 <ul>
                     <li>
-                        <Link to="/about">Про нас</Link>
+                        <Link to="/about">About us</Link>
                     </li>
                     <li>
-                        <Link to="/contact">Контакти</Link>
+                        <Link to="/contact">Contacts</Link>
                     </li>
                     <li>
-                        <Link to="/privacy">Політика конфіденційності</Link>
+                        <Link to="/privacy">Privacy Policy</Link>
                     </li>
                     <li>
-                        <Link to="/terms">Умови використання</Link>
+                        <Link to="/terms">Terms of use</Link>
                     </li>
                 </ul>
             </nav>
@@ -49,14 +49,13 @@ const Footer: React.FC = () => {
 
             {/* Форма підписки */}
             <form className={styles.newsletter}>
-                <input type="email" placeholder="Введіть email" required />
-                <button type="submit">Підписатися</button>
+                <input type="email" placeholder="Input email" required />
+                <button type="submit">Sign up</button>
             </form>
 
             {/* Copyright */}
             <p className={styles.copyright}>
-                &copy; {new Date().getFullYear()} Назва сайту. Всі права
-                захищені.
+                &copy; {new Date().getFullYear()} MusicApp. All rights reserved.
             </p>
         </footer>
     );

@@ -1,7 +1,7 @@
 import { selectRooms } from '../../../../store/gameplay/gameplaySelectors';
 import { useAppSelector } from '../../../../store/hooks';
 import Button from '../../../UI/Button/Button';
-import styles from '../GameLobby.module.css';
+import styles from './RoomList.module.css';
 
 interface Props {
     joinRoom: (roomId: string) => void;
@@ -12,7 +12,7 @@ const RoomList = ({ joinRoom }: Props) => {
 
     return (
         <div className={styles.roomListContainer}>
-            <h3 className={styles.sectionTitle}>Доступні кімнати</h3>
+            <h3 className={styles.sectionTitle}>Available rooms</h3>
 
             {rooms.length > 0 ? (
                 <ul className={styles.roomList}>
@@ -25,15 +25,24 @@ const RoomList = ({ joinRoom }: Props) => {
                             </p>
                             <ul className={styles.playerLoginsList}>
                                 {room.players.map((player) => (
-                                    <li key={player.login}>
+                                    <li
+                                        key={player.login}
+                                        className={styles.playerLogin}
+                                    >
+                                        <span
+                                            style={{
+                                                display: 'inline-block',
+                                                width: '8px',
+                                                height: '8px',
+                                                borderRadius: '50%',
+                                                marginRight: '6px',
+                                                backgroundColor: player.isOnline === true ? '#4caf50' : '#777',
+                                            }}
+                                        />
                                         {player.login}
                                     </li>
                                 ))}
                             </ul>
-
-                            <p className={styles.roomPlayersCountCentered}>
-                                
-                            </p>
 
                             <Button
                                 variant="secondary"
@@ -41,9 +50,8 @@ const RoomList = ({ joinRoom }: Props) => {
                                     borderRadius: '40px',
                                     width: '40px',
                                     height: '40px',
-                                    fontSize: '22px',
+                                    fontSize: '28px',
                                     padding: '0px',
-                                    margin: '0px',
                                 }}
                                 onClick={() => joinRoom(room.id)}
                             >
@@ -53,7 +61,7 @@ const RoomList = ({ joinRoom }: Props) => {
                     ))}
                 </ul>
             ) : (
-                <p className={styles.noRooms}>Наразі немає доступних кімнат</p>
+                <p className={styles.noRooms}>No available rooms</p>
             )}
         </div>
     );

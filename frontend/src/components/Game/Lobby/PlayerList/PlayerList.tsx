@@ -20,7 +20,7 @@ const PlayerList: FC<Props> = ({ onKick }) => {
                 <p key={p.id}>
                     {p.id} {p.login} {p.isOnline ? '+' : '-'}
                     {currentRoom.leaderId === userId && p.id !== currentRoom.leaderId && (
-                        <button onClick={() => onKick(p.id)}>❌</button>
+                        <button onClick={() => onKick(p.id)}>❌</button>                        
                     )}
                 </p>
             ))}

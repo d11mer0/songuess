@@ -27,17 +27,17 @@ const ForgotPassword: React.FC = () => {
         <div className={styles['auth-container']}>
             {emailSent ? (
                 <p className={styles['auth-message']}>
-                    На вашу пошту надійшов лист із інструкціями щодо відновлення
-                    пароля. Перевірте папку "Вхідні" або "Спам".
+                    An email with instructions on how to reset your password has 
+                    been sent to your inbox. Please check your inbox or spam folder.
                 </p>
             ) : (
                 <AuthFormWrapper
-                    title="Відновлення пароля"
+                    title="Password recovery"
                     onSubmit={handleSubmit}
                     inputs={['email']}
                     formData={formData}
                     handleChange={handleChange}
-                    submitButtonText="Надіслати"
+                    submitButtonText="Send"
                     error={error as any}
                     isLoading={isLoading}
                     links={[{ to: '/auth/login', label: 'Log in' }]}

@@ -1,5 +1,5 @@
 import { useGameRoom } from '../../hooks/GameRoom/useGameRoom';
-import styles from '../../components/Game/Lobby/GameLobby.module.css';
+import styles from '../../components/Game/Lobby/SearchLobby/LobbyControls.module.css';
 import LobbyControls from '../../components/Game/Lobby/SearchLobby/LobbyControls';
 import RoomList from '../../components/Game/Lobby/SearchLobby/RoomList';
 import CurrentRoom from '../../components/Game/Lobby/JoinedLobby/CurrentRoom';
@@ -20,7 +20,7 @@ const GameLobby = () => {
 
     return (
         <div className={styles.container}>
-            <h2 style={{marginBottom: '50px'}}>Game lobby</h2>
+            <h2 style={{marginBottom: '50px', color:'#9b5de5', fontSize:'42px'}}>Game lobby</h2>
             {!roomInfo ? (
                 <>
                     <LobbyControls

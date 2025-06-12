@@ -45,10 +45,10 @@ const ResendModal: React.FC<ResendModalProps> = ({ isOpen, onClose }) => {
                                   data: {
                                       message:
                                           (error.data as any).message ||
-                                          'Помилка',
+                                          'Error',
                                   },
                               }
-                            : 'Помилка запиту'
+                            : 'Request error'
                         : undefined
                 }
                 isLoading={isLoading}

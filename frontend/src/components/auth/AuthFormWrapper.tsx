@@ -41,7 +41,7 @@ const AuthFormWrapper: React.FC<AuthFormWrapperProps> = ({
                 />
                 <AuthFormError error={error} />
                 <Button variant="primary" type="submit" disabled={isLoading}>
-                    {isLoading ? 'Завантаження...' : submitButtonText}
+                    {isLoading ? 'Loading...' : submitButtonText}
                 </Button>
                 {children}
                 {isLoading && (

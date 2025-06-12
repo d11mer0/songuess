@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     socketEmitter,
+    socketHandlers,
 } from '../../services/socket';
 import { useGameRoomListeners } from './useGameRoomListeners';
 import { LobbyOptions} from '../../types/roomTypes';
@@ -9,13 +10,12 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createKickMember } from '../../utils/socketUtils/createKickMember';
 import { useSocketConnection } from '../common/useSocketConnection';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
-import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
-import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
+import { selectCurrentRoom} from '../../store/gameplay/gameplaySelectors';
+import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
 
 export const useGameRoom = () => {
     const dispatch = useAppDispatch();
     const roomInfo = useAppSelector(selectCurrentRoom);
-   
     const kickMember = createKickMember(roomInfo?.id);
     
     const [searchParams] = useSearchParams();
@@ -50,6 +50,11 @@ export const useGameRoom = () => {
             dispatch(setCurrentRoom(null));
             updateSearchParams(null);
             socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
+            
+            socketHandlers.on('roomsList', (rooms) => {
+                dispatch(setRooms(rooms));
+            });
+            socketEmitter.emit('getRooms');
 
         }
     }, [roomInfo, updateSearchParams]);

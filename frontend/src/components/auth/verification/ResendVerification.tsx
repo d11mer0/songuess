@@ -22,7 +22,7 @@ const ResendVerification: React.FC<ResendVerificationProps> = ({
         </Button>
     ) : (
         <p className={styles['auth-message']}>
-            Повторний запит буде доступний через {resendTimeout} сек.
+            Retry request will be available in {resendTimeout} seconds.
         </p>
     );
 };

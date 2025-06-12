@@ -13,19 +13,18 @@ const Gameplay = () => {
 
     const { kickMember, deleteRoom, launchGame, submitAnswer } = useGameplay();
     
-    if (!currentRoom) return <div>Немає активної кімнати</div>;
+    if (!currentRoom) return <div>No active rooms</div>;
     
     return (
         <div>
-            <h2>Геймплей</h2>
-            <button onClick={()=>{console.log(currentRoom.state)}}>check</button>
+            <h2>Gameplay</h2>
             <div>
-                <h3>Кімната: {currentRoom.id}</h3>
+                <h3>Room №{currentRoom.id}</h3>
                 
                 <PlayerList onKick={kickMember} />
 
                 {currentRoom?.leaderId === user?.id && (
-                    <button onClick={deleteRoom}>ЗАКІНЧИТИ ГРУ</button>
+                    <button onClick={deleteRoom}>Finish game</button>
                 )}
                 <div style={{ marginTop: '100px' }}>
                     {(() => {
@@ -37,7 +36,7 @@ const Gameplay = () => {
                             case RoomState.ENDED:
                                 return <GameFinished />;
                             default:
-                                return <p>Невідомий стан гри</p>;
+                                return <p>Unkonwn state</p>;
                         }
                     })()}
                 </div>

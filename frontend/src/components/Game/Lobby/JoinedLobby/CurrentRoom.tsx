@@ -1,4 +1,4 @@
-import styles from '../GameLobby.module.css';
+import styles from './JoinedLobby.module.css';
 import RoomPlayerList from './RoomPlayerList';
 import InviteLink from './InviteLink';
 import { useAppSelector } from '../../../../store/hooks';
@@ -25,12 +25,12 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
             />
             {roomInfo.leaderId === user?.id && (
                 <button onClick={startGame} className={styles.startButton}>
-                    Почати гру
+                    Start game
                 </button>
             )}
             <InviteLink roomId={roomInfo.id} />
             <button onClick={leaveRoom} className={styles.exitButton}>
-                Вийти
+                Leave
             </button>
         </div>
     );

@@ -10,7 +10,7 @@ interface Props {
 
 const RoomPlayerList = ({ players, leaderId, kickMember }: Props) => {
     const { user } = useSelector((state: RootState) => state.user); // Отримуємо поточного користувача
-
+    console.log(players);
     return (
         <ul>
             {players.map((player) => (

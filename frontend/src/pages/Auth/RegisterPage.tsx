@@ -30,13 +30,13 @@ const RegisterPage: React.FC = () => {
     return (
         <div className={styles['auth-container']}>
             <AuthFormWrapper
-                title="Реєстрація"
+                title="Registration"
                 onSubmit={handleSubmit}
                 inputs={['login', 'email', 'password']}
                 formData={formData}
                 handleChange={handleChange}
                 error={error as any}
-                submitButtonText="Зареєструватися"
+                submitButtonText="Sign up"
                 isLoading={isLoading}
                 links={[{ to: '/auth/login', label: 'Log in' }]}
             />

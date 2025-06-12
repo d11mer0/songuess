@@ -13,7 +13,7 @@ const InviteLink = ({ roomId }: Props) => {
 
     return (
         <button onClick={copyInviteLink} className="button">
-            Запросити друзів
+            Invite friends
         </button>
     );
 };

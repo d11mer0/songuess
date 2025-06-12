@@ -35,21 +35,21 @@ const ResetPassword: React.FC = () => {
         <div className={styles['auth-container']}>
             {!token ? (
                 <p className={styles['auth-message']}>
-                    Невірне посилання для скидання пароля
+                    Invalid password reset link
                 </p>
             ) : passwordChanged ? (
                 <p className={styles['auth-message']}>
-                    Пароль успішно змінено! Ви будете перенаправлені...
+                    Password changed successfully! You will be redirected...
                 </p>
             ) : (
                 <AuthFormWrapper
-                    title="Введення нового пароля"
+                    title="New password setting"
                     onSubmit={handleSubmit}
                     inputs={['password']}
                     formData={formData}
                     handleChange={handleChange}
                     error={error as any}
-                    submitButtonText="Змінити пароль"
+                    submitButtonText="Change password"
                     isLoading={isLoading}
                     links={[{ to: '/auth/login', label: 'Log in' }]}
                 />

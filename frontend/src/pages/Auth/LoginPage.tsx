@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
                 formData={formData}
                 handleChange={handleChange}
                 error={error as any}
-                submitButtonText="Увійти"
+                submitButtonText="Sign in"
                 isLoading={isLoading}
                 links={[
                     { to: '/auth/register', label: 'Sign up' },

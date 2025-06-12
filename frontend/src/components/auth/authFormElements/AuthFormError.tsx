@@ -35,7 +35,7 @@ const AuthFormError: React.FC<AuthFormErrorProps> = ({ error }) => {
         <p className={`${styles.error} ${fadeOut ? styles['fade-out'] : ''}`}>
             {typeof error === 'string'
                 ? error
-                : error?.data?.message || 'Помилка'}
+                : error?.data?.message || 'Error'}
         </p>
     );
 };
