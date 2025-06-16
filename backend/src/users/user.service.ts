@@ -6,6 +6,9 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ImageService } from '../common/image/image.service';
+import { Prisma } from '@prisma/client';
+
+
 @Injectable()
 export class UserService {
     constructor(
@@ -13,17 +16,28 @@ export class UserService {
         private imageService: ImageService,
     ) {}
 
-    private async findUserOrThrow(userId: number, selectFields = {}) {
+    private async findUserOrThrow<T extends Prisma.UserSelect>(
+        userId: number,
+        selectFields: T,
+    ): Promise<Prisma.UserGetPayload<{ select: typeof select }>> {
+        const select = {
+            ...selectFields,
+            id: true,
+            login: true,
+        } as const;
+
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, login: true, ...selectFields },
+            select,
         });
 
         if (!user) {
             throw new NotFoundException('Користувача не знайдено');
         }
-        return user;
+
+        return user as Prisma.UserGetPayload<{ select: typeof select }>;
     }
+
 
     async getProfile(userId: number) {
         return this.findUserOrThrow(userId, {

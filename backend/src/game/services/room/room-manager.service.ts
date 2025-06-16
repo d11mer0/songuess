@@ -8,6 +8,7 @@ import {
 import { GameRoomState } from '../../interfaces/game.interface';
 import { RoomQueryService } from './room-query.service';
 import { RoomHelperService } from './room-helper.service';
+import { UserService } from '../../../users/user.service';
 
 @Injectable()
 export class RoomManagerService {
@@ -18,6 +19,8 @@ export class RoomManagerService {
         private readonly roomQueryService: RoomQueryService,
         @Inject(forwardRef(() => RoomHelperService))
         private readonly roomHelperService: RoomHelperService,
+        private userService: UserService
+
     ) {}
 
     setServer(server: Server) {
@@ -32,16 +35,23 @@ export class RoomManagerService {
         return this.server;
     }
 
-    createRoom(
+    async createRoom(
         playerId: number,
         login: string,
         lobbyOptions: LobbyOptions,
-    ): string {
+    ): Promise<string> {
         const id = this.roomHelperService.generateRoomId();
         this.roomHelperService.removeUserFromOtherRooms(playerId);
+        const userInfo = await this.userService.getUserById(playerId);
+
         const newRoom: GameRoom = {
             id,
-            players: [{ id: playerId, login, isOnline: true }],
+            players: [{ 
+                id: playerId, 
+                login, 
+                avatar: userInfo.avatar,
+                isOnline: true 
+            }],
             lobbyOptions: {
                 ...lobbyOptions,
                 allowAutoJoin: lobbyOptions.publicLobby
@@ -56,15 +66,15 @@ export class RoomManagerService {
         return id;
     }
 
-    joinRoom(roomId: string, playerId: number, login: string): GameRoom | null {
+    async joinRoom(roomId: string, playerId: number, login: string): Promise<GameRoom | null> {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room || room.state !== GameRoomState.ADDING) return null;
-
+        const userInfo = await this.userService.getUserById(playerId);
         let player = room.players.find((p) => p.id === playerId);
         if (!player) {
             if (room.players.length < room.lobbyOptions.maxPlayers) {
                 this.roomHelperService.removeUserFromOtherRooms(playerId);
-                player = { id: playerId, login, isOnline: true };
+                player = { id: playerId, login, isOnline: true, avatar: userInfo.avatar };
                 room.players.push(player);
                 this.broadcastRoomsList();
                 return room;

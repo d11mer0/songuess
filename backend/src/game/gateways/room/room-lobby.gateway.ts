@@ -30,14 +30,14 @@ export class RoomLobbyGateway {
         this.roomManagerService.setServer(this.server);
     }
     @SubscribeMessage('createRoom')
-    handleCreateRoom(
+    async handleCreateRoom(
         @ConnectedSocket() client: Socket,
         @MessageBody() lobbyOptions: LobbyOptions,
     ) {
         const user = client.data.user;
         if (!user) return;
 
-        const roomId = this.roomManagerService.createRoom(
+        const roomId = await this.roomManagerService.createRoom(
             user.id,
             user.login,
             lobbyOptions,
@@ -57,13 +57,15 @@ export class RoomLobbyGateway {
     ) {
         const user = client.data.user;
         if (!user) return;
-        const room = this.roomManagerService.joinRoom(
+        const room = await this.roomManagerService.joinRoom(
             data.id,
             user.id,
             user.login,
         );
         if (room) {
             await client.join(room.id);
+            console.log("ЗВИЧАЙНИЙ JOIN!");
+            console.log(room);
             this.server.to(room.id).emit('joinedRoom', room);
         } else {
             client.emit('joinedRoom', null);
@@ -71,7 +73,7 @@ export class RoomLobbyGateway {
     }
 
     @SubscribeMessage('autoJoinRoom')
-    handleAutoJoin(@ConnectedSocket() client: Socket) {
+    async handleAutoJoin(@ConnectedSocket() client: Socket) {
         const user = client.data.user;
         if (!user) return;
 
@@ -79,11 +81,13 @@ export class RoomLobbyGateway {
             this.roomManagerService.allRooms,
         );
         if (room) {
-            this.roomManagerService.joinRoom(room.id, user.id, user.login);
-            client.join(room.id);
-            this.server.to(room.id).emit('joinedRoom', room);
+            const updatedRoom = await this.roomManagerService.joinRoom(room.id, user.id, user.login);
+            if (updatedRoom) {
+                await client.join(updatedRoom.id);
+                this.server.to(updatedRoom.id).emit('joinedRoom', updatedRoom);
+            }
         } else {
-            const newRoomId = this.roomManagerService.createRoom(
+            const newRoomId = await this.roomManagerService.createRoom(
                 user.id,
                 user.login,
                 {

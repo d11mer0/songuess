@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { socketHandlers } from '../../services/socket';
+import { socketEmitter, socketHandlers } from '../../services/socket';
 import { Room, RoomState } from '../../types/roomTypes';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -95,6 +95,8 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 socketHandlers.on('roomsList', handleRoomsUpdate);
             }
             dispatch(setCurrentRoom(wasKicked ? null : room));
+            socketEmitter.emit('getRooms');
+            
         },
         [dispatch, updateSearchParams, user?.id],
     );

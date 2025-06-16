@@ -60,6 +60,7 @@ export const useGameRoom = () => {
     }, [roomInfo, updateSearchParams]);
 
     const autoJoinRoom = useCallback(() => {
+        console.log("Я ТУТ!");
         socketEmitter.emit('autoJoinRoom');
     }, []);
 

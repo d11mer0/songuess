@@ -8,9 +8,6 @@ import {
     UseInterceptors,
     UploadedFile,
     Req,
-    BadRequestException,
-    HttpCode,
-    HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -22,6 +19,7 @@ import {
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 import { AuthRequest } from '../common/types/exress-request';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiUpdateProfile, ApiUpdateAvatar } from './user.swagger';
@@ -36,7 +34,7 @@ export class UserController {
     @ApiResponse({
         status: 200,
         description: 'Профіль знайдено',
-        type: UpdateUserDto,
+        type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Користувач не знайдений' })
     getProfile(@Req() req: AuthRequest) {
@@ -66,7 +64,7 @@ export class UserController {
     @ApiResponse({
         status: 200,
         description: 'Дані про користувача',
-        type: UpdateUserDto,
+        type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Користувач не знайдений' })
     getUserById(@Param('id') id: number) {

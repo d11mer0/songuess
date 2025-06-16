@@ -8,13 +8,16 @@ import './index.css';
 
 import App from './App';
 import store from './store/store';
+import { ToastProvider } from './components/UI/Toast/ToastContext';
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Provider store={store}>
         <GoogleOAuthProvider clientId={CLIENT_ID}>
             <BrowserRouter>
-                <App />
+                <ToastProvider>
+                    <App />
+                </ToastProvider>
             </BrowserRouter>
         </GoogleOAuthProvider>
     </Provider>,

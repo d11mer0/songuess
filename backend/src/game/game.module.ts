@@ -24,6 +24,7 @@ import { RoomLobbyGateway } from './gateways/room/room-lobby.gateway';
         RoomQueryService,
         RoomHelperService,
         GameplayService,
+
     ],
     exports: [
         GameService,

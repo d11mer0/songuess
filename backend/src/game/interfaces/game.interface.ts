@@ -5,6 +5,7 @@ export interface Player {
     id: number;
     login: string;
     isOnline: boolean;
+    avatar: string | null;
 }
 
 export interface LobbyOptions {

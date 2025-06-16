@@ -3,6 +3,7 @@ import RoomPlayerList from './RoomPlayerList';
 import InviteLink from './InviteLink';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
+import Button from '../../../UI/Button/Button';
 
 interface Props {
     startGame: () => void;
@@ -16,22 +17,26 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
 
     if(!roomInfo) return<div>No room info here</div>;
     return (
-        <div>
-            <h3>Кімната: {roomInfo.id}</h3>
+        <div className={styles.roomContainer}>
+            <h3 className={styles.roomTitle}>Кімната №{roomInfo.id}</h3>
             <RoomPlayerList
                 players={roomInfo.players}
                 kickMember={kickMember}
                 leaderId={roomInfo.leaderId}
+                maxPlayers={roomInfo.lobbyOptions.maxPlayers}
             />
-            {roomInfo.leaderId === user?.id && (
-                <button onClick={startGame} className={styles.startButton}>
-                    Start game
-                </button>
-            )}
-            <InviteLink roomId={roomInfo.id} />
-            <button onClick={leaveRoom} className={styles.exitButton}>
-                Leave
-            </button>
+            <div className={styles.buttonGroup}>
+                <InviteLink roomId={roomInfo.id} />
+                <Button variant="danger" onClick={leaveRoom} width='30%'>
+                    Leave room
+                </Button>
+
+                {roomInfo.leaderId === user?.id && (
+                    <Button variant="primary" onClick={startGame} width='35%'>
+                        Start game
+                    </Button>
+                )}
+            </div>
         </div>
     );
 };
