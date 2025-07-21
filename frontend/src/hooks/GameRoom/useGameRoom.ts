@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     socketEmitter,
@@ -48,7 +48,7 @@ export const useGameRoom = () => {
         if (roomInfo) {
             socketEmitter.emit('leaveRoom', { id: roomInfo.id });
             dispatch(setCurrentRoom(null));
-            updateSearchParams(null);
+            //updateSearchParams(null);
             socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
             
             socketHandlers.on('roomsList', (rooms) => {
@@ -60,7 +60,6 @@ export const useGameRoom = () => {
     }, [roomInfo, updateSearchParams]);
 
     const autoJoinRoom = useCallback(() => {
-        console.log("Я ТУТ!");
         socketEmitter.emit('autoJoinRoom');
     }, []);
 
@@ -69,6 +68,15 @@ export const useGameRoom = () => {
             socketEmitter.emit('startGame', { id: roomInfo.id });
         }
     }, [roomInfo]);
+
+    useEffect(() => {
+        const roomParam = searchParams.get('room');
+        if (roomParam && !roomInfo) {
+            joinRoom(roomParam);
+            updateSearchParams(null);
+        }
+    }, [joinRoom, searchParams]);
+
 
     return {
         createRoom,

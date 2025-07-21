@@ -13,6 +13,24 @@
         transform 0.1s;
 }
 
+.responsive {}
+
+@media (max-width: 520px) and (min-width: 321px) {
+    .responsive {
+        width: auto !important;
+        margin: 0; /* прибираємо auto-margin, щоб не центровано */
+    }
+}
+
+/* МЕНШЕ або рівно 320px: width: 95%, по центру */
+@media (max-width: 320px) {
+    .responsive {
+        width: 95% !important;
+        margin: 0 auto; /* центровано */
+    }
+}
+
+
 .button:disabled {
     cursor: not-allowed;
     opacity: 0.6;

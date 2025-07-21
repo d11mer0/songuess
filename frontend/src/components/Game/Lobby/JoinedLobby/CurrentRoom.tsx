@@ -20,10 +20,7 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
         <div className={styles.roomContainer}>
             <h3 className={styles.roomTitle}>Кімната №{roomInfo.id}</h3>
             <RoomPlayerList
-                players={roomInfo.players}
                 kickMember={kickMember}
-                leaderId={roomInfo.leaderId}
-                maxPlayers={roomInfo.lobbyOptions.maxPlayers}
             />
             <div className={styles.buttonGroup}>
                 <InviteLink roomId={roomInfo.id} />

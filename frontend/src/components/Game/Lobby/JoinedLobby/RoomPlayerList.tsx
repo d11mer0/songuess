@@ -1,22 +1,23 @@
-import { Player } from '../../../../types/roomTypes';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store/store';
 import styles from './JoinedLobby.module.css';
 
 interface Props {
-    players: Player[];
-    leaderId: number | undefined;
     kickMember: (memberId: number) => void;
-    maxPlayers: number;
 }
 
 import { FaCrown } from 'react-icons/fa';
 import { BsXLg, BsPerson } from 'react-icons/bs';
+import { useAppSelector } from '../../../../store/hooks';
+import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 
-const RoomPlayerList = ({ players, leaderId, kickMember, maxPlayers }: Props) => {
+const RoomPlayerList = ({kickMember}: Props) => {
     const { user } = useSelector((state: RootState) => state.user);
+    const roomInfo = useAppSelector(selectCurrentRoom);
+    
+    if(!roomInfo) return<div></div>;
 
-    const slots = Array.from({ length: maxPlayers }, (_, index) => players[index] ?? null);
+    const slots = Array.from({ length: roomInfo.lobbyOptions.maxPlayers }, (_, index) => roomInfo.players[index] ?? null);
 
     return (
             <ul className={styles.grid}>
@@ -25,7 +26,7 @@ const RoomPlayerList = ({ players, leaderId, kickMember, maxPlayers }: Props) =>
                         <div className={styles.playerInfo}>
                             {player ? ( <>
                                 <div className={styles.avatarWrapper}>
-                                    {player.id === leaderId && (
+                                    {player.id === roomInfo.leaderId && (
                                         <span className={styles.leaderBadge}>
                                             <FaCrown />
                                         </span>
@@ -35,7 +36,7 @@ const RoomPlayerList = ({ players, leaderId, kickMember, maxPlayers }: Props) =>
                                         alt={player.login}
                                         className={styles.avatar}
                                     />
-                                    {user?.id === leaderId && player.id !== leaderId && (
+                                    {user?.id === roomInfo.leaderId && player.id !== roomInfo.leaderId && (
                                         <button
                                             onClick={() => kickMember(player.id)}
                                             className={styles.kickIcon}

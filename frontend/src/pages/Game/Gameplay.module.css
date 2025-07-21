@@ -1,0 +1,83 @@
+.pageWrapper {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+}
+
+.headerRow {
+    width: max(85%, 500px);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* 🔹 Перероблений заголовок */
+.title {
+    font-size: 28px;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* 🔹 Кнопка завершення гри по правому краю */
+.finishButtonWrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 🔹 Секція гравців */
+.playersSection {
+    margin: 0 auto;
+    width: 500px;
+    background-color: var(--background-secondary);
+    padding: 25px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--primary-box-shadow-color);
+    margin-bottom: 30px;
+    transition: all 0.3s ease-in-out; /* плавне згортання / поява */
+}
+
+
+@media (max-width: 540px) {
+    .playersSection {
+        width: auto;
+    }
+    .headerRow, .gameSection {
+        width: 100%;
+    }
+    .headerRow {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; /* відстань між заголовком і кнопкою */
+        text-align: center;
+    }
+}
+
+/* 🔹 Секція гри */
+.gameSection {  
+    width: 85%;
+    margin: 0 auto;
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--primary-box-shadow-color);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 🔹 Контент гри */
+.gameContent {
+    margin-top: 10px;
+}
+
+/* 🔹 Обгортка для кнопки фінішу */
+.finishButtonWrapper {
+    margin-top: 20px;
+    text-align: center;
+}

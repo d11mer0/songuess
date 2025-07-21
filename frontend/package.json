@@ -28,7 +28,8 @@
     "@types/redux-thunk": "^2.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "prettier": "^3.5.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "scripts": {
     "dev": "vite",

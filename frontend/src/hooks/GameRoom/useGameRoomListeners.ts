@@ -43,7 +43,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
     const handleRoomCreated = useCallback(
         (data: Room) => {
             dispatch(setCurrentRoom(data));
-            updateSearchParams(data.id);
+            //updateSearchParams(data.id);
 
             socketHandlers.on('playerDisconnected', (room) =>
                 dispatch(setCurrentRoom(room))
@@ -63,7 +63,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                     return;
                 }
                 dispatch(setCurrentRoom(data));
-                updateSearchParams(data.id);
+                //updateSearchParams(data.id);
 
                 socketHandlers.on('playerDisconnected', (room) =>
                     dispatch(setCurrentRoom(room))
@@ -74,7 +74,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             } else {
                 dispatch(setCurrentRoom(null));
                 socketHandlers.on('roomsList', handleRoomsUpdate);
-                updateSearchParams(null);
+
             }
         }, [
             navigate,
@@ -90,7 +90,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 (player) => player.id === user?.id,
             );
             if (wasKicked) {
-                updateSearchParams(null);
+
                 socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
                 socketHandlers.on('roomsList', handleRoomsUpdate);
             }

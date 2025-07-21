@@ -1,8 +1,3 @@
-.container {
-    padding: 20px;
-    text-align: center;
-}
-
 .roomListContainer {
     background-color: var(--background-secondary);
     padding: 24px;
@@ -11,6 +6,14 @@
     max-width: 1200px;
     margin: 0 auto 32px auto;
     width: 100%;
+    transition: all 0.3s ease;
+}
+
+.emptyState {
+    background: none;
+    box-shadow: none;
+    padding: 32px 16px;
+    text-align: center;
 }
 
 .sectionTitle {
@@ -18,6 +21,70 @@
     font-weight: bold;
     margin-bottom: 20px;
     color: var(--text-main, #ffffff);
+    text-align: center;
+}
+
+.emptyText {
+    font-size: 34px;
+    font-family: var(--font-title);
+    line-height: 1.3;
+    background: linear-gradient(90deg, #f15bb5, #f47dc8, #c1448e); /* secondary color gradient */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    margin-bottom: 8px;
+    animation: floatIn 1s ease forwards, pulse 2s infinite ease-in-out;
+}
+
+.emptySubtext {
+    font-size: 20px;
+    font-family: var(--font-title);
+    color: var(--text-main);
+    display: block;
+    margin-top: 12px;
+    animation: fadeIn 2s ease forwards;
+}
+
+.emoji {
+    all: unset;
+    display: inline;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    font-size: 1em;
+    vertical-align: middle;
+    text-shadow: none;
+    -webkit-text-fill-color: initial;
+}
+
+@keyframes floatIn {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.04);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .roomList {
@@ -47,6 +114,21 @@
     flex-shrink: 0;
 }
 
+.roomTitle {
+    font-size: 16px;
+    color: var(--text-main, #fff);
+    font-weight: bold;
+    margin: 0;
+    align-self: flex-start;
+}
+
+.playersHeader {
+    font-size: 20px;
+    color: var(--text-main);
+    margin: 4px 0 6px;
+    text-align: center;
+}
+
 @media (max-width: 900px) {
     .roomItem {
         width: 30%;
@@ -65,21 +147,6 @@
     }
 }
 
-.roomTitle {
-    font-size: 16px;
-    color: var(--text-main, #fff);
-    font-weight: bold;
-    margin: 0;
-    align-self: flex-start;
-}
-
-.playersHeader {
-    font-size: 20px;
-    color: var(--text-main);
-    margin: 4px 0 6px;
-    text-align: center;
-}
-
 .playerLoginsList {
     list-style: none;
     padding: 0;
@@ -94,7 +161,6 @@
     overflow: hidden; /* або auto, якщо хочеш скрол */
 }
 
-
 .playerLogin {
     font-size: 16px;
     font-family: var(--font-mono);
@@ -102,6 +168,28 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.playerStatusDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.online {
+    background-color: #4caf50;
+}
+
+.offline {
+    background-color: #777;
+}
+
+/*ЗДАЄТЬСЯ НЕ ВИКОРИСТОВУЮТЬСЯ:*/
+.container {
+    padding: 20px;
+    text-align: center;
 }
 
 .lobbyLeader {
@@ -117,9 +205,4 @@
     text-align: center;
 }
 
-.noRooms {
-    font-size: 14px;
-    color: var(--text-main, #aaa);
-    margin-top: 10px;
-    text-align: center;
-}
+

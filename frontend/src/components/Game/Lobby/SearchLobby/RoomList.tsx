@@ -1,6 +1,7 @@
 import { selectRooms } from '../../../../store/gameplay/gameplaySelectors';
 import { useAppSelector } from '../../../../store/hooks';
-import Button from '../../../UI/Button/Button';
+import RoomItem from './RoomList/RoomItem';
+import EmptyRoomListState from './RoomList/EmptyRoomListState';
 import styles from './RoomList.module.css';
 
 interface Props {
@@ -9,59 +10,23 @@ interface Props {
 
 const RoomList = ({ joinRoom }: Props) => {
     const rooms = useAppSelector(selectRooms);
+    const noRooms = rooms.length === 0;
 
     return (
-        <div className={styles.roomListContainer}>
-            <h3 className={styles.sectionTitle}>Available rooms</h3>
-
-            {rooms.length > 0 ? (
-                <ul className={styles.roomList}>
-                    {rooms.map((room) => (
-                        <li key={room.id} className={styles.roomItem}>
-                            <p className={styles.roomTitle}>Room №{room.id}</p>
-                            <p className={styles.playersHeader}>
-                                Players 
-                                ({room.players.length}/{room.lobbyOptions.maxPlayers})
-                            </p>
-                            <ul className={styles.playerLoginsList}>
-                                {room.players.map((player) => (
-                                    <li
-                                        key={player.login}
-                                        className={styles.playerLogin}
-                                    >
-                                        <span
-                                            style={{
-                                                display: 'inline-block',
-                                                width: '8px',
-                                                height: '8px',
-                                                borderRadius: '50%',
-                                                marginRight: '6px',
-                                                backgroundColor: player.isOnline === true ? '#4caf50' : '#777',
-                                            }}
-                                        />
-                                        {player.login}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <Button
-                                variant="secondary"
-                                style={{
-                                    borderRadius: '40px',
-                                    width: '40px',
-                                    height: '40px',
-                                    fontSize: '28px',
-                                    padding: '0px',
-                                }}
-                                onClick={() => joinRoom(room.id)}
-                            >
-                                +
-                            </Button>
-                        </li>
-                    ))}
-                </ul>
+        <div
+            className={`${styles.roomListContainer} ${noRooms ? styles.emptyState : ''}`}
+        >
+            {noRooms ? (
+                <EmptyRoomListState />
             ) : (
-                <p className={styles.noRooms}>No available rooms</p>
+                <>
+                    <h3 className={styles.sectionTitle}>Available rooms</h3>
+                    <ul className={styles.roomList}>
+                        {rooms.map((room) => (
+                            <RoomItem key={room.id} room={room} onJoin={joinRoom} />
+                        ))}
+                    </ul>
+                </>
             )}
         </div>
     );
