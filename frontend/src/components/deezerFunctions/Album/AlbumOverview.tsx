@@ -1,6 +1,13 @@
 import { useGetAlbumByIdQuery } from '../../../store/api/deezerApi';
 import { SelectedTracks } from '../../../types/gameTypes';
+import StartGameButtonBlock from '../../Game/Creating/TracksSelection/components/StartGameButtonBlock';
+import Loader from '../../UI/Loader/Loader/Loader';
+import OverviewLoadingPlaceholder from '../../UI/Loader/OverviewLoading/OverviewLoadingPlaceholder';
 import TrackList from '../Track/TrackList';
+
+import styles from './AlbumOverview.module.css';
+
+
 
 interface AlbumOverviewProps {
     albumId: number;
@@ -24,13 +31,29 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
     const {
         data: albumData,
         isLoading,
-        error,
+        isFetching,
+        error
     } = useGetAlbumByIdQuery(albumId, { skip: !albumId });
 
-    if (isLoading) return <p>Завантаження...</p>;
-    if (error)
-        return <p style={{ color: 'red' }}>Помилка завантаження альбому</p>;
-    if (!albumData) return null;
+    if (isLoading || isFetching) return <Loader text='Tracks are loading...'/>
+    if (!albumData || error) return null;
+
+    const handleSendTracks = () => {
+        if (!albumData || !onSendTracks) return;
+        const {
+            tracks: tracksWithData,
+            artist,
+            ...filteredAlbum
+        } = albumData;
+        const tracks = tracksWithData?.data || [];
+
+        onSendTracks({
+            type: 'ALBUM',
+            album: filteredAlbum,
+            artist,
+            tracks,
+        });
+    };
 
     const tracks =
         albumData.tracks?.data.map((track: Track) => ({
@@ -38,46 +61,37 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
             title: track.title,
             preview: track.preview,
         })) || [];
-
+        
     return (
-        <div>
+        <div className={styles.albumContainer}>
             {!hideAlbumInfo && (
-                <>
-                    <h3>{albumData.title}</h3>
+                <div className={styles.albumInfo}>
                     <img
                         src={albumData.cover_big}
                         alt={albumData.title}
-                        width="200"
+                        className={styles.albumCover}
                     />
-                    <p>Виконавець: {albumData.artist.name}</p>
-                </>
+                    <div className={styles.albumDetails}>
+                        <h3 className={styles.albumTitle}>{albumData.title}</h3>
+                        <p className={styles.artistName}>
+                            <span>Singer:</span> {albumData.artist.name}
+                        </p>
+                    </div>
+                </div>
             )}
 
             <TrackList
-                title="Треки альбому"
+                title="Tracks of selected album"
                 tracks={tracks}
                 isLoading={isLoading}
                 isList={isList}
             />
+        
             {onSendTracks && (
-                <button
-                    onClick={() => {
-                        const {
-                            tracks: tracksWithData,
-                            artist,
-                            ...filteredAlbum
-                        } = albumData;
-                        const tracks = tracksWithData?.data || [];
-                        onSendTracks({
-                            type: 'ALBUM',
-                            album: filteredAlbum,
-                            artist,
-                            tracks,
-                        });
-                    }}
-                >
-                    send data
-                </button>
+                <StartGameButtonBlock
+                    trackCount={tracks.length}
+                    onClick={handleSendTracks}
+                />
             )}
         </div>
     );

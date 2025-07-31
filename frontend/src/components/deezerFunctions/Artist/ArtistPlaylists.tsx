@@ -6,6 +6,10 @@ import {
 import PlaylistList from '../Playlist/PlaylistList';
 import PlaylistTracks from '../Playlist/PlaylistTracks';
 import { SelectedTracks } from '../../../types/gameTypes';
+import StartGameButtonBlock from '../../Game/Creating/TracksSelection/components/StartGameButtonBlock';
+import Loader from '../../UI/Loader/Loader/Loader';
+
+import styles from './Artist.module.css';
 
 interface ArtistPlaylistsProps {
     artistName: string;
@@ -22,49 +26,68 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
         null,
     );
 
-    // Запит на отримання плейлістів виконавця
-    const { data: playlists, isLoading: isLoadingPlaylists } =
+    const { data: playlists, isFetching: isLoadingPlaylists } =
         useSearchPlaylistsByArtistQuery(artistName);
 
-    // Запит на отримання деталей плейліста + його треків
-    const { data: playlistData, isLoading: isLoadingTracks } =
+    const { data: playlistData, isFetching: isLoadingTracks } =
         useGetPlaylistByIdQuery(selectedPlaylistId, {
             skip: !selectedPlaylistId,
         });
+
+    useEffect(() => {
+        setSelectedPlaylistId(null);
+    }, [artistName]);
 
     if (!artistName) return null;
 
     return (
         <div>
-            <h2>Плейлісти {artistName}</h2>
-            <PlaylistList
-                playlists={playlists || []}
-                isLoading={isLoadingPlaylists}
-                onSelect={setSelectedPlaylistId}
-            />
+            <div className={styles.header}>
+                <h2 className={styles.playlistsTitle}>Top 5 playlists of <span className={styles.artist}>{artistName}</span></h2>
+            </div>
+            
+             <div className={styles.list}>
+                {isLoadingPlaylists ? (
+                    <Loader text="Searching playlists..." />
+                ) : (
+                    <PlaylistList
+                        playlists={playlists || []}
+                        onSelect={setSelectedPlaylistId}
+                        selectedId={selectedPlaylistId || undefined}
+                    />
+                )}
+            </div>
 
-            {selectedPlaylistId && (
-                <PlaylistTracks
-                    tracks={playlistData?.tracks?.data || []}
-                    isLoading={isLoadingTracks}
-                    isList={isList}
-                />
+            {(selectedPlaylistId && !isLoadingPlaylists) && (
+                <div className={styles.details}>
+                    {isLoadingTracks ? (
+                        <Loader text="Loading selected playlist..." />
+                    ) : (
+                        <PlaylistTracks
+                            tracks={playlistData?.tracks?.data || []}
+                            isLoading={isLoadingTracks}
+                            isList={isList}
+                        />
+                    )}
+                </div>
             )}
-            {onSendTracks && (
-                <button
-                    onClick={() => {
-                        onSendTracks({
-                            playlist: {
-                                id: playlistData.id,
-                                title: playlistData.title,
-                                picture: playlistData.picture_big,
-                            },
-                            tracks: playlistData?.tracks?.data,
-                        });
-                    }}
-                >
-                    send data
-                </button>
+            
+            {(onSendTracks && selectedPlaylistId && !isLoadingPlaylists && !isLoadingTracks) && (
+                <>
+                    <StartGameButtonBlock
+                        trackCount={playlistData?.tracks?.data.length}
+                        onClick={() => {
+                            onSendTracks({
+                                playlist: {
+                                    id: playlistData.id,
+                                    title: playlistData.title,
+                                    picture: playlistData.picture_big,
+                                },
+                                tracks: playlistData?.tracks?.data,
+                            })
+                        }}
+                    />
+                </>
             )}
         </div>
     );

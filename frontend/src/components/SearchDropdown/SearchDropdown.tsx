@@ -1,4 +1,8 @@
 import React, { useState, useRef } from 'react';
+
+import { BsSearch } from 'react-icons/bs'; // додай на початку файлу
+import { BsX } from 'react-icons/bs';
+
 import styles from './SearchDropdown.module.css';
 
 interface SearchDropdownProps<T> {
@@ -6,8 +10,10 @@ interface SearchDropdownProps<T> {
     setValue: (value: string) => void;
     options: T[];
     onSelect: (id: number) => void;
-    optionLabel: keyof T; // Поле, яке використовується як назва
-    getSubtext?: (item: T) => string; // Функція, яка повертає додатковий текст (наприклад, ім'я артиста)
+    optionLabel: keyof T; 
+    getSubtext?: (item: T) => string; 
+    autoCloseDelay?: number | false; 
+    placeholder?: string;
 }
 
 const SearchDropdown = <T extends { id: number }>({
@@ -17,6 +23,8 @@ const SearchDropdown = <T extends { id: number }>({
     onSelect,
     optionLabel,
     getSubtext,
+    autoCloseDelay = false,
+    placeholder = "Search ..."
 }: SearchDropdownProps<T>) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -24,35 +32,71 @@ const SearchDropdown = <T extends { id: number }>({
 
     const handleSelect = (id: number) => {
         onSelect(id);
-        setValue(''); // Очищаємо поле інпута
+        setValue('');
 
         if (timeoutRef.current !== null) clearTimeout(timeoutRef.current);
-        timeoutRef.current = window.setTimeout(() => {
+
+        if (autoCloseDelay === false) {
             setIsDropdownOpen(false);
             inputRef.current?.blur();
-        }, 3000);
+        } else {
+            timeoutRef.current = window.setTimeout(() => {
+                setIsDropdownOpen(false);
+                inputRef.current?.blur();
+            }, autoCloseDelay);
+        }
+    };
+
+    const highlightMatch = (text: string, query: string) => {
+        const index = text.toLowerCase().indexOf(query.toLowerCase());
+        if (index === -1 || !query) return <>{text}</>;
+
+        return (
+            <>
+                {text.slice(0, index)}
+                <span className={styles.highlightedMatch}>
+                    {text.slice(index, index + query.length)}
+                </span>
+                {text.slice(index + query.length)}
+            </>
+        );
     };
 
     return (
         <div className={styles.searchContainer}>
-            <input
-                ref={inputRef}
-                type="text"
-                className={styles.searchInput}
-                value={value}
-                onChange={(e) => {
-                    setValue(e.target.value);
-                    setIsDropdownOpen(true);
-                }}
-                placeholder="Пошук..."
-                onBlur={() => {
-                    timeoutRef.current = window.setTimeout(
-                        () => setIsDropdownOpen(false),
-                        300,
-                    );
-                }}
-                onFocus={() => setIsDropdownOpen(true)}
-            />
+            <div className={styles.inputWrapper}>
+                <span className={styles.searchIcon}>
+                    <BsSearch />
+                </span>
+                <input
+                    ref={inputRef}
+                    type="text"
+                    className={styles.searchInput}
+                    value={value}
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                        setIsDropdownOpen(true);
+                    }}
+                    placeholder={placeholder}
+                    onBlur={() => {
+                        timeoutRef.current = window.setTimeout(
+                            () => setIsDropdownOpen(false),
+                            300,
+                        );
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                />
+                {value && (
+                    <button
+                        className={styles.clearButton}
+                        onClick={() => setValue('')}
+                        type="button"
+                        aria-label="Clear search"
+                    >
+                        <BsX />
+                    </button>
+                )}
+            </div>
 
             {isDropdownOpen && options.length > 0 && (
                 <ul className={styles.dropdownList}>
@@ -63,7 +107,7 @@ const SearchDropdown = <T extends { id: number }>({
                             onMouseDown={() => handleSelect(item.id)}
                         >
                             <span className={styles.mainText}>
-                                {String(item[optionLabel])}
+                                {highlightMatch(String(item[optionLabel]), value)}
                             </span>
                             {getSubtext && (
                                 <span className={styles.subText}>

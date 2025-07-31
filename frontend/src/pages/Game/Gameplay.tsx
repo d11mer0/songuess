@@ -1,15 +1,16 @@
+import { useState } from 'react';
+
 import { useGameplay } from '../../hooks/Gameplay/useGameplay';
-import { RoomState } from '../../types/roomTypes';
-import CreatingGame from '../../components/Game/Creating/CreatingGame';
-import PlayingGame from '../../components/Game/Play/PlayingGame';
-import GameFinished from '../../components/Game/GameFinished/GameFinished';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
 import { useAppSelector } from '../../store/hooks';
 import RoomPlayerList from '../../components/Game/Lobby/JoinedLobby/RoomPlayerList';
+import Button from '../../components/UI/Button/Button';
+import CustomModal from '../../components/UI/Modal/Modal';
+import GameplayHeader from '../../components/Game/Gameplay/GameplayHeader';
+import GameContent from '../../components/Game/Gameplay/GameContent';
 
 import styles from './Gameplay.module.css';
-import { useState } from 'react';
-import Button from '../../components/UI/Button/Button';
+import FinishGameModal from '../../components/Game/Gameplay/FinishGameModal';
 
 const Gameplay = () => {
     const { user } = useAppSelector((state) => state.user);
@@ -17,54 +18,47 @@ const Gameplay = () => {
     const { kickMember, deleteRoom, launchGame, submitAnswer } = useGameplay();
     
     const [showPlayers, setShowPlayers] = useState(false); // 🔹
+    const [showFinishModal, setShowFinishModal] = useState(false);
 
-    if (!currentRoom) return <></>;  
+    if (!currentRoom) return <></>
 
     return (
-        <div className={styles.pageWrapper}>
-            <div className={styles.headerRow}>
-                <h3 className={styles.title}>Room №{currentRoom.id}</h3>
-                <Button
-                    variant="neutral"
-                    onClick={() => setShowPlayers(prev => !prev)}
-                    aria-expanded={showPlayers}
-                    aria-controls="players-section"
-                >
-                    {showPlayers ? 'Hide Players' : 'Show Players'}
-                </Button>
-            </div>
-            {showPlayers && (
-                <>
-                    <div id="players-section" className={styles.playersSection}>
-                        <RoomPlayerList kickMember={kickMember} />
-                    </div>
-                    <hr className={styles.divider} />
-                </>
-            )}
-            <div className={styles.gameSection}>
-                <div className={styles.gameContent}>
-                    {(() => {
-                        switch (currentRoom.state) {
-                            case RoomState.CREATING:
-                                return <CreatingGame startGame={launchGame} />;
-                            case RoomState.STARTED:
-                                return <PlayingGame onSubmitAnswer={submitAnswer} />;
-                            case RoomState.ENDED:
-                                return <GameFinished />;
-                            default:
-                                return <p>Unknown state</p>;
-                        }
-                    })()}
-                </div>    
-                {currentRoom?.leaderId === user?.id && (
-                   <div className={styles.finishButtonWrapper}>
-                        <Button variant="danger" onClick={deleteRoom} >
-                            Finish Game
-                        </Button>
-                    </div>
+        <>
+            <div className={styles.pageWrapper}>
+                <GameplayHeader
+                    roomId={currentRoom.id}
+                    showPlayers={showPlayers}
+                    togglePlayers={() => setShowPlayers(prev => !prev)}
+                />
+                {showPlayers && (
+                    <>
+                        <div id="players-section" className={styles.playersSection}>
+                            <RoomPlayerList kickMember={kickMember} />
+                        </div>
+                        <hr className={styles.divider} />
+                    </>
                 )}
+                <div className={styles.gameSection}>
+                    <GameContent
+                        state={currentRoom.state}
+                        onStart={launchGame}
+                        onSubmitAnswer={submitAnswer}
+                    />
+                    {currentRoom?.leaderId === user?.id && (
+                        <div className={styles.finishButtonWrapper}>
+                            <Button width='300px' variant="danger" onClick={() => setShowFinishModal(true)}>
+                                Finish Game
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+            <FinishGameModal
+                isOpen={showFinishModal}
+                onClose={() => setShowFinishModal(false)}
+                onConfirm={deleteRoom}
+            />
+        </>
     );
 };
 

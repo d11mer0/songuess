@@ -1,0 +1,50 @@
+/*both*/
+.sendButtonWrapper {
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column; /* ➕ додай це */
+    align-items: center;     /* щоб центрувати все по центру */
+    gap: 0.75rem;            /* ➕ для гарнішого простору між кнопкою та текстом */
+}
+
+/*PlaylistSelection.tsx*/
+.clearButtonWrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: '0.5rem'
+}
+
+.warningText {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--warning-color, #d9534f); /* червоний або через змінну */
+    background-color: rgba(217, 83, 79, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 650px;
+    font-weight: 500;
+}
+
+/*Artist Selection*/
+.container {
+    padding: 24px;
+    margin-top: 30px;
+    text-align: center;
+    
+}
+
+.heading {
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.buttonGroup {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 16px;
+    flex-wrap: wrap;
+}

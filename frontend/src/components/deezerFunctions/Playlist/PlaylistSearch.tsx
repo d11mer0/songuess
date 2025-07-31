@@ -30,7 +30,8 @@ const PlaylistSearch: React.FC<PlaylistSearchProps> = ({
             options={(searchResults?.data as Playlist[])?.slice(0, 5) || []}
             onSelect={onSelect}
             optionLabel="title"
-            getSubtext={(playlist) => playlist.user?.name || 'Автор невідомий'}
+            getSubtext={(playlist) => playlist.user?.name || 'Unknown author'}
+            placeholder="Search playlist... e.g. 'Dua Lipa - Best Tracks'"
         />
     );
 };

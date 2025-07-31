@@ -33,6 +33,7 @@ const AlbumSearch: React.FC<AlbumSearchProps> = ({
             onSelect={onSelect} // ✅ SearchDropdown вже повертає id, тому передаємо напряму
             optionLabel="title"
             getSubtext={(album) => album.artist.name}
+            placeholder="Search album... e.g. 'Future Nostalgia'" // 👈 ДОДАЙ ЦЕ
         />
     );
 };

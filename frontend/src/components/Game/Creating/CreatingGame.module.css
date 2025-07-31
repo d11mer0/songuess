@@ -1,0 +1,145 @@
+.container {  
+    width: 820px;
+    margin: 0 auto;
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--primary-box-shadow-color);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+@media (max-width: 850px) {
+    .container {
+        width: 100%;
+    }
+}
+
+@media (max-width: 540px) {
+    .container { 
+        padding: 20px 0;
+    }
+}
+
+.sectionTitle {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--text-main, #ffffff);
+    text-align: center;
+}
+
+.emptyText {
+    font-size: 34px;
+    font-family: var(--font-title);
+    line-height: 1.3;
+    background: linear-gradient(90deg, #00c9ff, #92fe9d); /* змінено на холодніший градієнт */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    margin-bottom: 8px;
+    animation: floatIn 1s ease forwards, pulse 2s infinite ease-in-out;
+}
+
+.emptySubtext {
+    font-size: 20px;
+    font-family: var(--font-title);
+    color: var(--text-main);
+    display: block;
+    margin-top: 12px;
+    animation: fadeIn 2s ease forwards;
+}
+
+.emoji {
+    all: unset;
+    display: inline;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    font-size: 1em;
+    vertical-align: middle;
+    text-shadow: none;
+    -webkit-text-fill-color: initial;
+}
+
+@keyframes floatIn {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.04);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.section {
+    text-align: center;
+}
+
+.heading {
+    font-size: 2.2rem; /* було 1.5rem */
+    margin-bottom: 2rem; /* було 1rem */
+    color: var(--primary-color);
+}
+
+.gameTypeButtons {
+    display: flex;
+    width: 100%;
+    gap: 2rem; /* було 1rem */
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.typeButton {
+    padding: 0.8rem 2rem; /* було 0.5rem 1.2rem */
+    background-color: var(--background-highlight);
+    border: none; /* було: 1px solid var(--text-secondary) */
+    border-radius: 8px;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.typeButton:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background-color: var(--primary-hover);
+    transform: scale(1.03);
+}
+
+.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    transform: scale(1.05);
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.selectionSection {
+    width: 100%;
+}

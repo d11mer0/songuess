@@ -2,51 +2,147 @@
     position: relative;
     width: 100%;
     max-width: 400px;
+    margin: 0 auto; /* Центрує блок по горизонталі */
+    font-family: var(--font-main);
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.searchIcon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 22px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
 }
 
 .searchInput {
     width: 100%;
-    padding: 10px;
+    padding: 10px 14px;
+    padding-left: 40px; /* було 14px */
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid var(--background-highlight);
+    border-radius: 6px;
+    background-color: var(--background-secondary);
+    color: var(--text-main);
     outline: none;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
 }
+
+.searchInput:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(155, 93, 229, 0.3);
+}
+
+.clearButton {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clearButton:hover {
+    color: var(--primary-color);
+}
+
+
 
 .dropdownList {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 4px);
     left: 0;
     width: 100%;
-    background: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 4px;
+    background: var(--background-tertiary);
+    border: 1px solid var(--background-highlight);
+    border-radius: 6px;
     list-style: none;
-    padding: 5px 0;
+    padding: 6px 0;
     margin: 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    max-height: 200px;
+    box-shadow: 0 8px 16px var(--primary-box-shadow-color);
+    max-height: 240px;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 100;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.highlightedMatch {
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
 .dropdownItem {
-    padding: 10px;
+    padding: 10px 14px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    color: #fff;
+    align-items: center;
+    transition: background 0.2s ease, color 0.2s ease; /* додано color */
+    color: var(--text-main);
+    font-size: 15px;
+    flex-direction: row;
+    flex-wrap: wrap; /* для перестроювання */
+    
 }
 
 .dropdownItem:hover {
-    background: #333;
+    background-color: var(--background-highlight);
+    color: var(--text-hover);
 }
 
-.albumTitle {
-    font-weight: bold;
+.mainText {
+    font-weight: 500;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
-.artistName {
-    color: #aaa;
+.subText {
+    color: var(--text-secondary);
     font-size: 14px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+    .dropdownItem {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mainText {
+        margin-bottom: 2px;
+    }
+
+    .subText {
+        margin-left: 0;
+        align-self: flex-end;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
 }

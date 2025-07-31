@@ -2,17 +2,17 @@ import { useState } from 'react';
 import ArtistSearch from '../../components/deezerFunctions/Artist/ArtistSearch';
 import ArtistDetails from '../../components/deezerFunctions/Artist/ArtistDetails';
 import { ArtistPlaylists } from '../../components/deezerFunctions/Artist/ArtistPlaylists';
-import { Artist } from '../../components/deezerFunctions/types';
 import ArtistTracks from '../../components/deezerFunctions/Artist/ArtistTracks';
 import AlbumOverview from '../../components/deezerFunctions/Album/AlbumOverview';
 import ArtistAlbums from '../../components/deezerFunctions/Artist/ArtistAlbums';
+import { ArtistInfo } from '../../types/gameTypes';
 
 const ArtistPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
+    const [selectedArtist, setSelectedArtist] = useState<ArtistInfo  | null>(null);
     const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
 
-    const handleSelectArtist = (artist: Artist) => {
+    const handleSelectArtist = (artist: ArtistInfo ) => {
         setSelectedArtist(artist);
         setSelectedAlbumId(null);
     };

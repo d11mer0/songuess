@@ -5,6 +5,10 @@ import PlaylistTracks from '../../../deezerFunctions/Playlist/PlaylistTracks';
 import PlaylistDetails from '../../../deezerFunctions/Playlist/PlaylistDetails';
 import { SelectedTracks } from '../../../../types/gameTypes';
 
+import ClearSelectionButton from './components/ClearSelectionButton';
+import StartGameButtonBlock from './components/StartGameButtonBlock';
+import OverviewLoadingPlaceholder from '../../../UI/Loader/OverviewLoading/OverviewLoadingPlaceholder';
+
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
 }
@@ -15,12 +19,14 @@ const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
         null,
     );
 
-    const { data: playlistDetails, isLoading: isLoadingTracks } =
+    const { data: playlistDetails, isLoading: isLoadingTracks, isFetching } =
         useGetPlaylistByIdQuery(selectedPlaylistId!, {
             skip: !selectedPlaylistId,
         });
 
     const handleSendTracks = () => {
+        if (!playlistDetails) return;
+         
         handleStart({
             type: 'PLAYLIST',
             playlist: {
@@ -34,24 +40,29 @@ const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
 
     return (
         <div>
-            <h2>Пошук плейлістів</h2>
+            <h2 style={{textAlign: 'center'}}>Type name of a playlist</h2>
 
             <PlaylistSearch
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 onSelect={setSelectedPlaylistId}
             />
-
-            {playlistDetails && (
-                <div>
+            {(isLoadingTracks || isFetching) && <OverviewLoadingPlaceholder loadingText='Playlist tracks are loading...'/>}
+            {(selectedPlaylistId !== null && playlistDetails && !isFetching) && (
+                <>
                     <PlaylistDetails details={playlistDetails} />
                     <PlaylistTracks
                         tracks={playlistDetails.tracks.data}
                         isLoading={isLoadingTracks}
                         isList={false}
                     />
-                    <button onClick={handleSendTracks}>send data</button>
-                </div>
+                    <StartGameButtonBlock
+                        trackCount={playlistDetails.tracks.data.length}
+                        onClick={handleSendTracks}
+                    />
+                    <ClearSelectionButton onClear={() => setSelectedPlaylistId(null)} />
+
+                </>
             )}
         </div>
     );

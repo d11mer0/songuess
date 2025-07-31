@@ -1,0 +1,118 @@
+.albumContainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-radius: 8px;
+    color: var(--text-main);
+}
+
+.albumInfo {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.albumCover {
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.albumDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    justify-content: flex-start;
+}
+
+.albumTitle {
+    font-size: 2.5rem; /* було 1.2rem */
+    font-weight: bold;
+    margin: 0;
+    color: var(--secondary-color); /* явно вказуємо основний текстовий колір */
+
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;         /* обмеження на 2 рядки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.artistName {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.artistName span {
+    font-weight: normal;
+    color: var(--text-secondary); /* контрастніший колір саме для імені */
+}
+
+
+@media (max-width: 400px) {
+    .albumInfo {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .albumDetails {
+        align-items: center;
+    }
+
+    .artistName {
+        text-align: left; /* вирівнюємо текст ліворуч */
+        width: 100%; /* дозволяє зробити правильне вирівнювання */
+    }
+}
+
+
+.skeleton {
+    background-color: rgba(200, 200, 200, 0.2);
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonText {
+    height: 1.5rem;
+    width: 200px;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+}
+
+.loadingTrackList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Spinner */
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}

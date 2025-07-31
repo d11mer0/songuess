@@ -27,7 +27,7 @@ const PlaylistTracks: React.FC<PlaylistTracksProps> = ({
 
     return (
         <TrackList
-            title="Треки у вибраному плейлісті"
+            title="Tracks in selected playlist"
             tracks={formattedTracks}
             isLoading={isLoading}
             isList={isList}

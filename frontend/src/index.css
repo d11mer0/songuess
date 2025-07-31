@@ -13,9 +13,7 @@ body {
     background-color: var(--background-primary);
     color: var(--text-main);
 }
-p {
-    font-family: 'Courier New', Courier, monospace;
-}
+
 /* 🔹 Змінні кольорів */
 
 :root {

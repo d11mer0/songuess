@@ -1,0 +1,77 @@
+.listWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    justify-content: space-around;
+    padding: 12px 0;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: var(--background-tertiary);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px var(--primary-box-shadow-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.card:hover {
+    background-color: var(--background-highlight);
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 4px 10px var(--primary-box-shadow-color);
+    transform: translateY(-2px);
+}
+
+.active {
+    background-color: var(--secondary-active);
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 0 8px var(--secondary-color);
+    color: var(--text-hover);
+}
+
+.image {
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* вирівнюємо title і date по краях */
+    flex-grow: 1;
+    width: 100%;
+}
+
+
+.title {
+    font-family: var(--font-main);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0 0 10px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.trackDate {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.active .trackDate {   
+    color: var(--text-main);
+}

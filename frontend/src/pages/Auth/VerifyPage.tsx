@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useVerifyEmailMutation } from '../../store/api/authApi';
 
 import styles from './AuthPages.module.css';
-import Loader from '../../components/UI/Loader/Loader';
+import Loader from '../../components/UI/Loader/Loader/Loader';
 import VerificationStatus from '../../components/auth/verification/VerificationStatus';
 import ResendVerification from '../../components/auth/verification/ResendVerification';
 import ResendModal from '../../components/auth/verification/ResendModal';

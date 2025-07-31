@@ -1,7 +1,7 @@
 import AuthFormLinks from './authFormElements/AuthFormLinks';
 import AuthFormInputs from './authFormElements/AuthFormInputs';
 import AuthFormError from './authFormElements/AuthFormError';
-import Loader from '../UI/Loader/Loader';
+import Loader from '../UI/Loader/Loader/Loader';
 import styles from './AuthForm.module.css';
 import Button from '../UI/Button/Button';
 

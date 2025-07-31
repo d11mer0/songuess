@@ -1,19 +1,25 @@
+import styles from './Artist.module.css';
 import { useGetAlbumsByArtistQuery } from '../../../store/api/deezerApi';
+import Loader from '../../UI/Loader/Loader/Loader';
 
 interface Album {
     id: number;
     title: string;
     cover_big: string;
+    release_date: string;
+    fans: number;
 }
 
 interface ArtistAlbumsProps {
     artistId: number;
     onSelectAlbum: (albumId: number) => void;
+    selectedAlbumId: number | null;
 }
 
 const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
     artistId,
     onSelectAlbum,
+    selectedAlbumId,
 }) => {
     const {
         data: albumsData,
@@ -21,32 +27,42 @@ const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
         error,
     } = useGetAlbumsByArtistQuery(artistId, { skip: !artistId });
 
-    return (
-        <div>
-            <h3>Альбоми</h3>
+    if (isLoading) return <Loader text='Playlists are loading, please wait'/>;
+    if (!albumsData?.data?.length) return <></>
 
-            {isLoading ? (
-                <p>Завантаження...</p>
-            ) : error ? (
-                <p style={{ color: 'red' }}>Помилка завантаження альбомів</p>
-            ) : (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                    {albumsData?.data?.map((album: Album) => (
+    return (
+        <div className={styles.albumWrapper}>
+            <div className={styles.albumGrid}>
+                {albumsData.data.map((album: Album) => {
+                    const isActive = selectedAlbumId === album.id;
+                    return (
                         <div
                             key={album.id}
-                            style={{ textAlign: 'center', cursor: 'pointer' }}
+                            className={`${styles.albumCard} ${isActive ? styles.active : ''}`}
                             onClick={() => onSelectAlbum(album.id)}
+                            title={album.title}
                         >
                             <img
                                 src={album.cover_big}
                                 alt={album.title}
-                                style={{ width: '150px', borderRadius: '8px' }}
+                                className={styles.albumImage}
                             />
-                            <p>{album.title}</p>
+                            <div className={styles.albumInfo}>
+                                <p className={styles.albumTitle}>{album.title}</p>
+                                <p className={styles.fans}>Fans: {album.fans.toLocaleString()}</p>
+                                <p className={styles.releaseDate}>
+                                    {new Date(album.release_date).toLocaleDateString(undefined, {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </p>
+                                
+                            </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    );
+                })}
+            </div>
         </div>
     );
 };

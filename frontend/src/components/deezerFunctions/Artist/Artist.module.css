@@ -1,0 +1,164 @@
+/*ArtistDetails.tsx*/
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 30px 0 20px 0;
+    gap: 12px;
+    font-family: var(--font-main);
+}
+
+.avatar {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff22; /* можна винести як окрему змінну, якщо часто повторюється */
+    box-shadow: 0 4px 12px var(--primary-box-shadow-color);
+    transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width:350px) {
+    .avatar {
+        width: 85%;
+        height: auto;
+    }
+}
+
+.name {
+    font-size: 42px;
+    letter-spacing: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    margin: 0;
+    font-family: var(--font-title);
+    text-shadow: 1px 1px 2px var(--text-shadow-color);
+}
+
+.stats {
+    display: flex;
+    gap: 16px;
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.link {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: var(--primary-color);
+}
+
+/*ArtistTrakcs*/
+.header {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.playlistsTitle {
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-main);
+    letter-spacing: 2px;
+}
+
+.artist {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.8rem;   
+}
+
+
+/*ArtistAlbums*/
+.albumsWrapper {
+    padding: 12px 0;
+}
+
+.albumGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+}
+
+.albumCard {
+    background-color: var(--background-tertiary);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px var(--primary-box-shadow-color);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.albumCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px var(--primary-box-shadow-color);
+    border: 1px solid var(--secondary-color);
+}
+
+.active {
+    background-color: var(--secondary-active);
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 0 8px var(--secondary-color);
+    color: var(--text-hover);
+}
+
+.albumImage {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.albumInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+    height: 100%;
+    text-align: center;
+}
+
+.albumTitle {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-main);
+    margin: 0 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.releaseDate {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: right;
+    margin: 10px 0 0 0;
+
+}
+
+.fans {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.active .releaseDate {
+    color: var(--text-hover);
+}

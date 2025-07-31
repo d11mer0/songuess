@@ -4,7 +4,7 @@ import { useUpdateAvatarMutation } from '../../store/api/userApi';
 import { updateUser } from '../../store/users/userSlice';
 import CustomModal from '../UI/Modal/Modal';
 import Button from '../UI/Button/Button';
-import Loader from '../UI/Loader/Loader';
+import Loader from '../UI/Loader/Loader/Loader';
 import AuthFormError from '../auth/authFormElements/AuthFormError';
 import FileUploadButton from './EditAvatar/FileUploadButton';
 import DragAndDropZone from './EditAvatar/DragAndDropZone';
