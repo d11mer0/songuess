@@ -2,6 +2,7 @@ export interface GameProgress {
     currentRound: number;
     rounds: GameRound[]; // масив усіх раундів
     playerResults: Record<number, Record<number, PlayerRoundResult>>;
+    totalScores: Record<number, number>; // ✅ додати це поле
 }
 
 export interface GameRound {
@@ -23,4 +24,5 @@ export interface PlayerRoundResult {
     answer: string | null;
     isCorrect: boolean;
     timeTaken: number | null;
+    score: number;
 }

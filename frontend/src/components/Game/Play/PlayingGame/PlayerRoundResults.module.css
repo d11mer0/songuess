@@ -1,0 +1,107 @@
+.playersResultsWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.playerCard {
+    background-color: var(--background-tertiary);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px var(--primary-box-shadow-color);
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    /* Нове */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 320px; /* Фіксована висота */
+}
+
+.playerAvatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.playerName {
+    font-weight: bold;
+    font-size: 1.7rem; /* було дрібніше */
+    color: var(--text-main);
+    margin-bottom: 6px;
+
+    white-space: nowrap; 
+    overflow: hidden;  
+    text-overflow: ellipsis; 
+    max-width: 100%;          
+}
+
+.playerScore {
+    color: var(--secondary-color);
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+}
+
+.playerTime {
+    color: var(--text-main);
+    font-size: 0.92rem;
+    font-style: italic;
+}
+
+.incorrectText {
+    color: var(--danger-color);
+    font-style: italic;
+    font-size: 1.3rem;
+    font-family: var(--font-mono);
+}
+
+@media (max-width: 350px) {
+    .playersResultsWrapper {
+        display: block;
+        grid-template-columns:none;
+    }
+    .playerCard {
+        height: auto;
+        margin-bottom: 20px;
+    }
+    .playerAvatar {
+        width: 100px;
+        height: 100px;
+    }
+    .playerName, .playerScore, .noAnswerText {
+        font-size: 1rem;
+    }
+}
+.correctAnswer {
+    border: 2px solid var(--success-color);
+    background: linear-gradient(145deg, rgba(31,156,80,0.15), rgba(31,156,80,0.05));
+}
+
+.incorrectAnswer,
+.noAnswer {
+    border: 2px solid var(--danger-color);
+    background: linear-gradient(145deg, rgba(255,111,97,0.15), rgba(255,111,97,0.05));
+}
+
+.fastestPlayer {
+    border: 2px solid #FFC857; /* тепліший і м’якший */
+    background: linear-gradient(145deg, rgba(255,200,87,0.25), rgba(255,200,87,0.1));
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.currentPlayer .playerName {
+    color: var(--primary-color);
+    font-family: var(--font-title);
+    font-size: 2.5rem;
+}
+
+.currentPlayer .playerAvatar {
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 10px rgba(241, 91, 181, 0.5);
+    padding: 2px;
+}

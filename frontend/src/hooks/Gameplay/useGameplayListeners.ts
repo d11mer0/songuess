@@ -4,15 +4,27 @@ import { Room, RoomState } from '../../types/roomTypes';
 import { useNavigate } from 'react-router-dom';
 
 import { GameRoundPublicData} from '../../types/gameTypes';
+import { GameEndedPayload } from '../../types/gameEndedTypes';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+
 import {
     setCurrentRoom,
     setRoundResult,
     endGame,
     startRound,
-    reconnectToRound
+    reconnectToRound,
+    setGameEndedData,
+    changeRoomState
 } from '../../store/gameplay/gameplaySlice';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
+import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
+
+interface RoundTrackWithoutPreview {
+    id: string;
+    title: string;
+    artistName?: string;
+    albumName?: string;
+}
 
 export const useGameplayListeners = () => {
 
@@ -46,23 +58,35 @@ export const useGameplayListeners = () => {
     const handleRoundEnded = useCallback(
         (data: {
             correctAnswer: string;
-            answer: string;
-            timeTaken: number;
+            results: {
+                playerId: number;
+                answer: string;
+                score: number;
+                totalScore: number;
+                timeTaken: number;
+            }[];
         }) => {
-            const { correctAnswer, answer, timeTaken } = data;
-
+            const { correctAnswer, results } = data;
+            const mappedResults = results.map(r => ({
+                ...r,
+                isCorrect: r.answer === correctAnswer
+            }));
+            const myResult = mappedResults.find(r => r.playerId === user?.id);
+            if(!myResult) { return };
             dispatch(setRoundResult({
                 correctAnswer,
-                answer,
-                timeTaken,
-                isCorrect: answer === correctAnswer,
+                results: mappedResults,
+                myResult
             }));
         },
         [dispatch],
     );
 
     const handleGameEnded = useCallback(
-        () => { dispatch(endGame())},
+        (resultPayload: GameEndedPayload) => { 
+            dispatch(setGameEndedData(resultPayload)); // ✅ зберігаємо в стейт
+            dispatch(endGame()); // змінюємо статус кімнати
+        },
         [dispatch],
     );
 
@@ -71,7 +95,10 @@ export const useGameplayListeners = () => {
             const wasKicked = !room.players.some(
                 (player) => player.id === user?.id,
             );
-            dispatch(setCurrentRoom(wasKicked ? null : room));
+            wasKicked 
+                ? dispatch(setCurrentRoom(null)) 
+                : dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+            
             if (wasKicked) {
                 socketOffMany([
                     'playerDisconnected', 
@@ -80,7 +107,7 @@ export const useGameplayListeners = () => {
                     'roundStarted', 
                     'roundResult'
                 ]);
-
+                
                 navigate('/game');
             }
         },
@@ -88,15 +115,16 @@ export const useGameplayListeners = () => {
     );
 
     const handleJoinedRoom = useCallback(
-        (data: Room) => {
-            if (data && data.state !== RoomState.ADDING) {
-                dispatch(setCurrentRoom(data));
+        (room: Room) => {
+
+            if (room && room.state !== RoomState.ADDING) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
                 socketHandlers.on('gameEnded', handleGameEnded);
                 socketHandlers.on('roundResult', handleRoundEnded);
                 socketHandlers.on('playerLeft', handlePlayerLeft);
-                socketHandlers.on('playerDisconnected', (room) =>
-                    dispatch(setCurrentRoom(room))
-                );
+                socketHandlers.on('playerDisconnected', (room) => {
+                    dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+            });
                 socketHandlers.on('roomDeleted', handleRoomDeleted);
             } else {
                 navigate('/game');
@@ -105,12 +133,19 @@ export const useGameplayListeners = () => {
         [navigate, dispatch],
     );
 
+    const handleGameRestarted = useCallback((room: Room) => {
+        dispatch(setGameEndedData(null));          // ✅ очистка результатів
+        dispatch(changeRoomState(RoomState.CREATING)); // ✅ оновлюємо стан кімнати
+        dispatch(setCurrentRoom(room));            // оновлюємо інформацію про кімнату (гравці ті самі)
+    }, [dispatch]);
+
     useEffect(() => {
         socketHandlers.on('roundStarted', handleSetTrackInfo);
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
+        socketHandlers.on('gameRestarted', handleGameRestarted);
         return () => {
-            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound']);
+            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted']);
         };
     }, [handleJoinedRoom]);
 };

@@ -36,11 +36,12 @@ export function createPlayerRoundResult(
 ): PlayerRoundResult {
     const timeTaken = Date.now() - round.startedAt;
     const isCorrect = answer === round.track.title;
-
+    const score = 0; //ТУТ ТРЕБА ПОРАХУВАТИ СКОР ПО ФОРМУЛІ
     return {
         answer,
         isCorrect,
         timeTaken,
+        score
     };
 }
 
@@ -68,6 +69,7 @@ export function assignMissedAnswers(
                 answer: null,
                 isCorrect: false,
                 timeTaken: null,
+                score: 0
             };
         }
     }
@@ -122,4 +124,22 @@ export function buildGameRound(
         options,
         startedAt: Date.now(),
     };
+}
+
+export function calculateScore(
+    timeTaken: number,
+    isCorrect: boolean,
+    isFirst: boolean
+): number {
+    if (!isCorrect || timeTaken === null) return 0;
+    const rawScore = Math.max(0, 25000 - timeTaken) / 10; // кожна 0.01 секунда = 1 очко
+
+    const normalizedScore = parseFloat((rawScore / 25).toFixed(2)); // шкала до 100
+    let finalScore = normalizedScore + 100; // бонус за правильну відповідь
+
+    if (isFirst) {
+        finalScore += 20; // бонус за першість
+    }
+
+    return parseFloat(finalScore.toFixed(2));
 }

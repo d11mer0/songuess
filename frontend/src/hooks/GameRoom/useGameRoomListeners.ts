@@ -64,7 +64,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 }
                 dispatch(setCurrentRoom(data));
                 //updateSearchParams(data.id);
-
+                
                 socketHandlers.on('playerDisconnected', (room) =>
                     dispatch(setCurrentRoom(room))
                 );

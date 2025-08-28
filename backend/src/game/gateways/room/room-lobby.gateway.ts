@@ -64,8 +64,6 @@ export class RoomLobbyGateway {
         );
         if (room) {
             await client.join(room.id);
-            console.log("ЗВИЧАЙНИЙ JOIN!");
-            console.log(room);
             this.server.to(room.id).emit('joinedRoom', room);
         } else {
             client.emit('joinedRoom', null);

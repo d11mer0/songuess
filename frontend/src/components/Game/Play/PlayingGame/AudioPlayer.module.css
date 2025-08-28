@@ -1,0 +1,138 @@
+.volumeContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    bottom: -80px;
+    padding-bottom: 40px; /* ✅ додаємо відступ вниз, щоб охопити зону ховера */
+}
+
+
+.volumeIcon {
+    font-size: 24px;
+    color: var(--text-main);
+    transition: transform 0.3s ease;
+}
+
+.volumeContainer:hover .volumeIcon {
+    transform: scale(1.1);
+}
+
+.volumeSlider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+}
+
+/* Трек (фон) */
+.volumeSliderDynamicTrack::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--slider-track-fill, var(--primary-color));
+    border: none;
+}
+
+.volumeSliderDynamicTrack::-moz-range-track {
+    height: 6px;
+    border-radius: 4px;
+    background: var(--slider-track-fill, var(--primary-color));
+    border: none;
+}
+/* Повзунок (handle) */
+.volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--text-main), var(--text-hover));
+    border: 2px solid rgba(var(--primary-color));
+    margin-top: -5px; /* центрований по новому треку */
+    box-shadow: 0 0 4px rgba(var(--primary-color));
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.volumeSlider::-webkit-slider-thumb:hover {
+    background: radial-gradient(circle at 30% 30%, var(--text-hover), var(--text-main));
+    transform: scale(1.2);
+    box-shadow: 0 0 6px rgba(var(--primary-color));
+}
+
+.volumeSlider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--text-main), var(--text-hover));
+    border: 2px solid rgba(var(--primary-color));
+    box-shadow: 0 0 4px rgba(var(--primary-color));
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.volumeSlider::-moz-range-thumb:hover {
+    background: radial-gradient(circle at 30% 30%, var(--text-hover), var(--text-main));
+    transform: scale(1.2);
+    box-shadow: 0 0 6px rgba(var(--primary-color));
+}
+
+.volumeSlider:focus,
+.volumeSlider:active {
+    outline: none;
+    box-shadow: none;
+    border: none; /* або просто border: none; */
+}
+
+
+.sliderPopup {
+    position: absolute;
+    bottom: 36px;
+    left: -15px;
+    background-color: var(--background-secondary);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--primary-box-shadow-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 180px;
+    max-width: 200px;
+    z-index: 10;
+}
+
+.sliderRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.sideIcon {
+    font-size: 32px;
+    color: var(--text-secondary);
+}
+
+.sliderLabel {
+    color: var(--text-main);
+    font-weight: bold;
+    margin-bottom: 0px;
+    font-size: 18px;
+    align-self: flex-start;
+    text-align: left;
+    width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}

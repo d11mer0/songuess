@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Room, RoomState } from '../../types/roomTypes';
 import { GameRoundPublicData } from '../../types/gameTypes';
 import { GameplayState, RoundResult } from './types';
+import { GameEndedPayload } from '../../types/gameEndedTypes';
 
 const initialState: GameplayState = {
     currentRoom: null,
@@ -9,6 +10,7 @@ const initialState: GameplayState = {
     trackInfo: null,
     roundResult: null,
     initialAnswer: null,
+    gameEndedData: null
 };
 
 const gameplaySlice = createSlice({
@@ -24,6 +26,18 @@ const gameplaySlice = createSlice({
         },
         setRoundResult(state, action: PayloadAction<RoundResult | null>) {
             state.roundResult = action.payload;
+
+            if (action.payload && state.currentRoom) {
+                const resultsMap = new Map<number, number>();
+                for (const r of action.payload.results) {
+                    resultsMap.set(r.playerId, r.totalScore ?? 0);
+                }
+
+                state.currentRoom.players = state.currentRoom.players.map(p => ({
+                    ...p,
+                    totalScore: resultsMap.has(p.id) ? resultsMap.get(p.id) : (p.totalScore ?? 0),
+                }));
+            }
         },
         setInitialAnswer(state, action: PayloadAction<string | null>) {
             state.initialAnswer = action.payload;
@@ -50,6 +64,9 @@ const gameplaySlice = createSlice({
             state.roundResult = null;
         },
 
+        setGameEndedData(state, action: PayloadAction<GameEndedPayload | null>) {
+            state.gameEndedData = action.payload;
+        },
         endGame(state) {
             state.trackInfo = null;
             state.roundResult = null;
@@ -74,6 +91,7 @@ export const {
     changeRoomState,
     startRound,
     reconnectToRound,
+    setGameEndedData,
     endGame,
     setRooms
 } = gameplaySlice.actions;

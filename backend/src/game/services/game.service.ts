@@ -47,7 +47,8 @@ export class GameService {
                 const isClear = this.roomHelperService.cleanUpRoomById(room.id);
                 if (isClear === false) {
                     this.roomHelperService.assignNewLeader(room.id);
-                    this.server?.to(room.id).emit('playerDisconnected', room);
+                   
+                    this.server?.to(room.id).emit('playerDisconnected', room.state === GameRoomState.ADDING ? room : sanitizeRoom(room));
                     this.roomManagerService.broadcastRoomsList();
                 }
 
@@ -92,7 +93,21 @@ export class GameService {
         client.join(room.id);
         this.roomManagerService.broadcastRoomsList(); // ← додай це
         this.server?.to(room.id).emit('joinedRoom', sanitizeRoom(room));
-        
+        if (room.state === GameRoomState.ENDED) {
+            const userId = client.data.user.id;
+            const { playerResults, rounds } = room.gameProgress!;
+            const myResults = rounds.map((round, roundIndex) => {
+                const playerResult = playerResults[userId][roundIndex];
+                const { preview, ...trackWithoutPreview } = round.track;
+                return {
+                    roundNumber: round.roundNumber,
+                    isCorrect: playerResult.isCorrect,
+                    track: trackWithoutPreview,
+                };
+            });
+
+            client.emit('gameEnded', { myResults });
+        }
         return room;
     }
 

@@ -1,0 +1,47 @@
+/*Анімації конфетті*/
+.confettiWrapper {
+    position: relative;
+    height: 80px;    
+    overflow: visible;
+}
+
+.confetti {
+    position: absolute;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.8;
+    background: var(--primary-color);
+    animation: fall 3s linear infinite;
+    border-radius: 2px;
+}
+
+.confetti:nth-child(5n) {
+    background: var(--secondary-color);
+}
+.confetti:nth-child(3n) {
+    background: var(--success-color);
+}
+.confetti:nth-child(2n) {
+    background: gold;
+}
+
+.confetti:nth-child(odd) {
+    transform: rotate(20deg);
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.confetti {
+    left: calc(var(--i, 0) * 3%);
+    animation-delay: calc(var(--i, 0) * -0.1s);
+}

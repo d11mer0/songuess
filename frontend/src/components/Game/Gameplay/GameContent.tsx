@@ -10,9 +10,10 @@ type Props = {
     state: RoomState;
     onStart: (selectedTracks: SelectedTracks) => void;
     onSubmitAnswer: (answer: string) => void;
+    onRestartGame: ()=> void;
 };
 
-const GameContent: FC<Props> = ({ state, onStart, onSubmitAnswer }) => {
+const GameContent: FC<Props> = ({ state, onStart, onSubmitAnswer, onRestartGame }) => {
   return (
         <div className={styles.gameContent}>
             {(() => {
@@ -22,7 +23,7 @@ const GameContent: FC<Props> = ({ state, onStart, onSubmitAnswer }) => {
                     case RoomState.STARTED:
                         return <PlayingGame onSubmitAnswer={onSubmitAnswer} />;
                     case RoomState.ENDED:
-                        return <GameFinished />;
+                        return <GameFinished onRestartGame={onRestartGame}/>;
                     default:
                         return <p>Unknown state</p>;
                 }

@@ -50,7 +50,7 @@ export class RoomManagerService {
                 id: playerId, 
                 login, 
                 avatar: userInfo.avatar,
-                isOnline: true 
+                isOnline: true,
             }],
             lobbyOptions: {
                 ...lobbyOptions,
@@ -68,11 +68,13 @@ export class RoomManagerService {
 
     async joinRoom(roomId: string, playerId: number, login: string): Promise<GameRoom | null> {
         const room = this.roomHelperService.findRoom(roomId);
-        if (!room || room.state !== GameRoomState.ADDING) return null;
+        if (!room || room.state !== GameRoomState.ADDING ) return null;
+        
         const userInfo = await this.userService.getUserById(playerId);
         let player = room.players.find((p) => p.id === playerId);
         if (!player) {
-            if (room.players.length < room.lobbyOptions.maxPlayers) {
+            
+            if (room.players.length < room.lobbyOptions.maxPlayers ) {
                 this.roomHelperService.removeUserFromOtherRooms(playerId);
                 player = { id: playerId, login, isOnline: true, avatar: userInfo.avatar };
                 room.players.push(player);

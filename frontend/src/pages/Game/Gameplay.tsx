@@ -15,7 +15,7 @@ import FinishGameModal from '../../components/Game/Gameplay/FinishGameModal';
 const Gameplay = () => {
     const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
-    const { kickMember, deleteRoom, launchGame, submitAnswer } = useGameplay();
+    const { kickMember, deleteRoom, launchGame, submitAnswer, leaveRoom, restartGame } = useGameplay();
     
     const [showPlayers, setShowPlayers] = useState(false); // 🔹
     const [showFinishModal, setShowFinishModal] = useState(false);
@@ -43,14 +43,19 @@ const Gameplay = () => {
                         state={currentRoom.state}
                         onStart={launchGame}
                         onSubmitAnswer={submitAnswer}
+                        onRestartGame={restartGame}
                     />
-                    {currentRoom?.leaderId === user?.id && (
-                        <div className={styles.finishButtonWrapper}>
-                            <Button width='300px' variant="danger" onClick={() => setShowFinishModal(true)}>
+                    <div className={styles.finishButtonWrapper}>
+                        {currentRoom?.leaderId === user?.id ? (
+                            <Button width="300px" variant="danger" onClick={() => setShowFinishModal(true)}>
                                 Finish Game
                             </Button>
-                        </div>
-                    )}
+                        ) : (
+                            <Button width="300px" variant="danger" onClick={() => leaveRoom()}>
+                                Leave Game
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
             <FinishGameModal

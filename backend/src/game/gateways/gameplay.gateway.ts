@@ -45,4 +45,12 @@ export class GameplayGateway {
             data.selectedTracks,
         );
     }
+
+    @SubscribeMessage('restartGame')
+    handleRestartGame(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { roomId: string },
+    ) {
+        this.gameplayService.handleRestartGame(client, data.roomId);
+    }
 }

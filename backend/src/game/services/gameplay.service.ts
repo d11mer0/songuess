@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { RoomManagerService } from './room/room-manager.service';
 import { GameService } from './game.service';
 import { RoomHelperService } from './room/room-helper.service';
 import { GameRoom, GameRoomState, Player } from '../interfaces/game.interface';
 import { SelectedTracks, TrackItem } from '../interfaces/tracks.interface';
-import { GameRound, PlayerRoundResult } from '../interfaces/game-progress.interface';
+import { GameProgress, GameRound, PlayerRoundResult } from '../interfaces/game-progress.interface';
 import { shuffleArray } from '../../utils/array';
 import {
     createInitialPlayerResults,
@@ -16,18 +15,19 @@ import {
     isGameFinished,
     prepareNextRound,
     formatRoundPayload,
-    buildGameRound
+    buildGameRound,
+    calculateScore
 } from '../../utils/gameplay-utils';
 
 
 const ROUND_DURATION_MS = 25000;
-const ROUND_PAUSE_MS = 3000;
+const ROUND_PAUSE_MS = 5000;
 const ROUNDS_NUMBER = 10;
 @Injectable()
 export class GameplayService {
     private server: Server | null = null;
     private roundTimeouts = new Map<string, NodeJS.Timeout>();
-
+    
     constructor(
         private readonly roomHelperService: RoomHelperService,
         private readonly gameService: GameService
@@ -46,10 +46,18 @@ export class GameplayService {
         const rounds = this.generateGameRounds(selectedTracks.tracks);
         const playerResults = createInitialPlayerResults(room.players);
 
+         const totalScores: Record<number, number> = room.players.reduce(
+            (acc, player) => {
+                acc[player.id] = 0;
+                return acc;
+            },
+            {} as Record<number, number>,
+        );
         room.gameProgress = {
             currentRound: 0,
             rounds,
             playerResults,
+            totalScores,
         };
         const firstRound = rounds[0];
 
@@ -96,7 +104,33 @@ export class GameplayService {
         const { rounds, playerResults } = room.gameProgress;
         const round = rounds[roundNumber];
         assignMissedAnswers(playerResults, room.players, roundNumber);
-        this.emitRoundResults(round, roundNumber, playerResults, room.players);
+        const resultsArray = room.players.map(player => {
+            const res = playerResults[player.id][roundNumber];
+            return { playerId: player.id, ...res };
+        });
+
+
+        const correctSorted = resultsArray
+            .filter(r => r.isCorrect && r.timeTaken !== null)
+            .sort((a, b) => a.timeTaken! - b.timeTaken!);
+
+        const firstCorrectPlayerId = correctSorted[0]?.playerId ?? null;
+
+        for (const { playerId, timeTaken, isCorrect } of resultsArray) {
+            const isFirst = firstCorrectPlayerId !== null && firstCorrectPlayerId === playerId;
+            const score = calculateScore(timeTaken!, isCorrect, isFirst);
+            playerResults[playerId][roundNumber].score = score;
+
+            if (!room.gameProgress!.totalScores) {
+                room.gameProgress!.totalScores = {};
+            }
+            if (!room.gameProgress!.totalScores[playerId]) {
+                room.gameProgress!.totalScores[playerId] = 0;
+            }
+            room.gameProgress!.totalScores[playerId] += score;
+        }
+
+        this.emitRoundResults(round, roundNumber, playerResults, room.players, room.gameProgress, roomId);
 
         setTimeout(() => {
             this.startNextRound(roomId);
@@ -122,11 +156,29 @@ export class GameplayService {
             throw new Error('Not enough tracks to generate round options');
         }
 
-        const selectedTracks = shuffleArray(tracks).slice(0, 9);
+        const selectedTracks = shuffleArray(tracks).slice(0, ROUNDS_NUMBER);
+
         return selectedTracks.map((track, index) =>
             buildGameRound(track, tracks, index)
         );      
     }
+
+    handleRestartGame(client: Socket, roomId: string) {
+        const room = this.roomHelperService.findRoom(roomId);
+        if (!room) return;
+
+        room.state = GameRoomState.CREATING;
+        room.gameData = undefined;
+        room.gameProgress = undefined;
+
+        room.players = room.players.map(player => ({
+            ...player,
+            totalScore: 0,
+        }));
+
+        this.server?.to(roomId).emit('gameRestarted', room);
+    }
+
 
     private startRoundTimeout(roomId: string, roundNumber: number): void {
         const timeout = setTimeout(() => {
@@ -154,22 +206,49 @@ export class GameplayService {
         roundNumber: number,
         playerResults: Record<number, Record<number, PlayerRoundResult>>,
         players: Player[],
-    ) {
-        for (const player of players) {
-            const socket = this.gameService.getClientSocketByUserId(player.id);
+        gameProgress: GameProgress,
+        roomId: string
+    ) {        
+        const roundResults = players.map(player => {
             const result = playerResults[player.id][roundNumber];
-            socket?.emit('roundResult', {
-                correctAnswer: round.track.title,
+            return {
+                playerId: player.id,
                 answer: result.answer,
                 timeTaken: result.timeTaken,
-            });
-        }
+                score: result.score,
+                totalScore: gameProgress.totalScores?.[player.id] ?? 0
+            };
+        });
+
+        this.server?.to(roomId).emit('roundResult', {
+            correctAnswer: round.track.title,
+            results: roundResults
+        });
     }
 
     private finishGame(room: GameRoom): void {
-        this.server?.to(room.id).emit('gameEnded', {
-            results: room.gameProgress!.playerResults,
-        });
+        const { playerResults, rounds } = room.gameProgress!;
+
+        // Формуємо історію гри для кожного гравця окремо
+        for (const player of room.players) {
+            const myResults = rounds.map((round, roundIndex) => {
+                const playerResult = playerResults[player.id][roundIndex];
+                const { preview, ...trackWithoutPreview } = round.track;
+
+                return {
+                    roundNumber: round.roundNumber,
+                    isCorrect: playerResult.isCorrect,
+                    track: trackWithoutPreview
+                };
+            });
+
+            const socket = this.gameService.getClientSocketByUserId(player.id);
+
+            socket?.emit('gameEnded', {
+                myResults    // тільки мінімальна історія цього гравця
+            });
+        }
+
         room.state = GameRoomState.ENDED;
     }
 }

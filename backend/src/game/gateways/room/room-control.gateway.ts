@@ -10,6 +10,7 @@ import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
 import { RoomHelperService } from '../../services/room/room-helper.service';
+import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 
 @WebSocketGateway()
 @Injectable()
@@ -37,7 +38,8 @@ export class RoomControlGateway {
             data.id,
             this.roomManagerService.allRooms,
         );
-        this.server.to(data.id).emit('playerLeft', room);
+
+        this.server.to(data.id).emit('playerLeft', sanitizeRoom(room));
     }
 
     @SubscribeMessage('kickMember')
@@ -58,7 +60,7 @@ export class RoomControlGateway {
                 data.roomId,
                 this.roomManagerService.allRooms,
             );
-            this.server.to(data.roomId).emit('playerLeft', room);
+            this.server.to(data.roomId).emit('playerLeft', sanitizeRoom(room));
 
             for (const [_, socket] of this.server.sockets.sockets) {
                 if (socket.data?.user?.id === data.memberId) {

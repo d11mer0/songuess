@@ -1,15 +1,19 @@
 import { useCallback, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { socketInstance, socketEmitter } from '../../services/socket';
+import { useNavigate, useParams } from 'react-router-dom';
+import { socketInstance, socketEmitter, socketHandlers } from '../../services/socket';
 import { useGameplayListeners } from './useGameplayListeners';
 import { } from '../../types/roomTypes';
 import { SelectedTracks } from '../../types/gameTypes';
 import { selectCurrentRoom, selectTrackInfo } from '../../store/gameplay/gameplaySelectors';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createKickMember } from '../../utils/socketUtils/createKickMember';
 import { useSocketConnection } from '../common/useSocketConnection';
+import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
+import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 
 export const useGameplay = () => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { id: roomId } = useParams<{ id?: string }>();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const trackInfo = useAppSelector(selectTrackInfo);
@@ -48,10 +52,40 @@ export const useGameplay = () => {
         [currentRoom, trackInfo],
     );
 
+    const leaveRoom = useCallback(() => {
+        if (currentRoom) {                   
+            socketEmitter.emit('leaveRoom', { id: currentRoom.id });
+            dispatch(setCurrentRoom(null));
+            socketOffMany([
+                'playerDisconnected', 
+                'message', 
+                'roomDeleted', 
+                'roundStarted', 
+                'roundResult', 
+                'gameRestarted' 
+            ]);
+            
+            socketHandlers.on('roomsList', (rooms) => {
+                dispatch(setRooms(rooms));
+            });
+            navigate('/game');
+            socketEmitter.emit('getRooms');
+            
+        }
+    }, [currentRoom]);
+
+    const restartGame = () => {
+        if (roomId) {
+            socketEmitter.emit('restartGame', { roomId });
+        }
+    };
+
     return {
         kickMember,
         deleteRoom,
         launchGame,
-        submitAnswer
+        submitAnswer,
+        leaveRoom,
+        restartGame
     };
 };

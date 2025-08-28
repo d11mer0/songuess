@@ -1,0 +1,461 @@
+.gameFinishedContainer {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px;
+    background: var(--background-secondary);
+    color: var(--text-main);
+    border-radius: 14px;
+    box-shadow: 0 6px 24px var(--primary-box-shadow-color);
+    font-family: var(--font-main);
+}
+
+/*Анімації конфетті*/
+.confettiWrapper {
+    position: relative;
+    height: 80px;    
+    overflow: visible;
+}
+
+.confetti {
+    position: absolute;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.8;
+    background: var(--primary-color);
+    animation: fall 3s linear infinite;
+    border-radius: 2px;
+}
+
+.confetti:nth-child(5n) {
+    background: var(--secondary-color);
+}
+.confetti:nth-child(3n) {
+    background: var(--success-color);
+}
+.confetti:nth-child(2n) {
+    background: gold;
+}
+
+.confetti:nth-child(odd) {
+    transform: rotate(20deg);
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.confetti {
+    left: calc(var(--i, 0) * 3%);
+    animation-delay: calc(var(--i, 0) * -0.1s);
+}
+
+/*Загальні стилі результатів користувачів*/
+
+.gameFinishedTitle {
+    text-align: center;
+    font-family: var(--font-title);
+    font-size: 3rem;
+    letter-spacing: 5px;
+    margin-bottom: 24px;
+    color: var(--primary-color);
+    text-shadow: 1px 1px 4px var(--text-shadow-color);
+}
+
+.gameFinishedSection {
+    margin-top: 32px;
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 2rem;
+    font-family: var(--font-title);
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--background-highlight);
+    color: var(--text-hover);
+    letter-spacing: 1px;
+}
+
+.sectionIcon {
+    margin-bottom: 5px;
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.playerList {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/*Топ 3 користувача*/
+.podium {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.8s ease forwards;
+    align-items: flex-start;   /* ✅ */
+    padding-bottom: 60px;      /* щоб зсуви вниз не злипалися з контентом нижче */
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.podiumCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--background-tertiary);
+    padding: 16px;
+    border-radius: 12px;
+    min-width: 120px;
+    animation: popIn 0.5s ease forwards;
+    height: 310px;                         /* однакова висота */
+    position: relative;
+    top: var(--offset, 0);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+
+.podiumAvatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--background-secondary);
+    margin-bottom: 10px;
+    border: 3px solid var(--primary-color);
+}
+
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--text-main);
+    font-size: 1.2rem;
+}
+
+.playerInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.podiumName {
+    font-size: 1.7rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.podiumScore {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    font-family: var(--font-title);
+}
+
+.podium1 .podiumName,
+.podium2 .podiumName,
+.podium3 .podiumName {
+    color: var(--primary-color);
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5); 
+}
+
+.podium1 .podiumScore,
+.podium2 .podiumScore,
+.podium3 .podiumScore {
+    color: var(--secondary-color);
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+}
+
+/* трохи більш контрастні градієнти */
+.podium1 {
+    border: 3px solid gold;
+    background: linear-gradient(145deg, #e6c200, #ffec80);
+    --offset: 0px;
+    order: 2; 
+}
+
+.podium2 {
+    border: 3px solid silver;
+    background: linear-gradient(145deg, #a8a8a8, #e0e0e0);
+    --offset: 40px;
+    order: 1; 
+}
+
+.podium3 {
+    border: 3px solid #b87333; /* глибша бронза */
+    background: linear-gradient(145deg, #b87333, #d9a066);
+    --offset: 80px;
+    order: 3; 
+}
+
+/*КОНКРЕТНІ ГРАВЦІ(4-9)*/
+
+.playerCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--background-tertiary);
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: background 0.2s ease;
+    gap: 12px;
+}
+
+.rankNumber {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    min-width: 32px;     
+    margin-left: 10px;
+}
+
+.playerAvatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--background-secondary);
+    border: 2px solid var(--primary-color);
+    flex-shrink: 0;
+}
+
+.playerName {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    flex: 1;
+    min-width: 0;  
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: unset;
+}
+
+.playerScore {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.gameFinishedMessage {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.youHighlight {
+    box-shadow: 0 0 15px var(--primary-color);
+    border: 3px solid var(--primary-color);
+}
+
+/*Інформація про треки*/
+
+.resultsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resultItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--background-tertiary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.2s ease, transform 0.1s ease;
+    gap: 12px;
+}
+
+.resultItem:hover {
+    background: var(--background-highlight);
+    transform: translateX(2px);
+}
+
+.roundNumber {
+    font-size: 1.7rem;
+    font-family: var(--font-title);
+    color: var(--secondary-color);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.correct {
+    color: var(--success-color);
+}
+
+.incorrect {
+    color: var(--danger-color);
+}
+
+.trackBlock {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.trackTitle {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trackArtist {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.resultMark {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.newGameButtonContainer {
+    margin-top: 30px;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .gameFinishedContainer {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .gameFinishedTitle {
+        font-size: 2rem;
+        letter-spacing: 2px;
+    }
+
+    .podium {
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 20px;
+    }
+
+    .podium1,
+    .podium2,
+    .podium3 {
+        order: unset;
+    }
+
+    .podiumCard {
+        width: 100%;
+        height: auto;
+        min-width: unset;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        top: 0 !important; /* прибираємо зміщення */
+    }
+
+    .podiumAvatar {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 0;
+    }
+
+    .podiumName {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+        text-align: left;
+    }
+
+    .podiumScore {
+        font-size: 1.4rem;
+    }
+
+    /* Картки гравців */
+    .playerCard {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .rankNumber {
+        font-size: 1.2rem;
+        margin-left: 0;
+    }
+
+    .playerName, .playerScore {
+        font-size: 1rem;
+    }
+
+    .trackTitle, .trackArtist {
+        font-size: 0.9rem;
+    }
+
+}
+
+@media (max-width: 320px) {
+    .gameFinishedContainer {
+        padding: 12px;
+    }
+
+    .gameFinishedTitle {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    .sectionTitle {
+        font-size: 1.1rem;
+        gap: 6px;
+    }
+
+    .podiumCard {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+        gap: 6px;
+    }
+    .podiumName {
+        text-align: center;
+        max-width: 150px;
+    }
+
+    .playerCard {
+        flex-direction: column;
+        justify-content: center;
+        padding: 8px;
+        gap: 6px;
+        text-align: center;
+    }
+    .playerName {
+        max-width: 60%;
+    }
+}
