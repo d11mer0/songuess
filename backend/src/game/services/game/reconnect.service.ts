@@ -6,7 +6,6 @@ import { RoomManagerService } from '../room/room-manager.service';
 import { GameRoom, GameRoomState } from '../../interfaces/game.interface';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 import { RoundSyncService } from './round-sync.service';
-import { ClientsRegistry } from './clients.registry';
 import { ConnectionService } from './connection.service';
 
 @Injectable()
