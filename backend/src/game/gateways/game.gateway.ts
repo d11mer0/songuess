@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { GameService } from '../services/game.service';
+import { GameService } from '../services/game/game.service';
 
 @WebSocketGateway({
     cors: {

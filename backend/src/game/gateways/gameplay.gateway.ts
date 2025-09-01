@@ -6,7 +6,7 @@ import {
     ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameplayService } from '../services/gameplay.service';
+import { GameplayService } from '../services/gameplay/gameplay.service';
 import { SubmitAnswerDto } from '../dto/submit-answer.dto';
 import { LaunchGameDto } from '../dto/launch-game.dto';
 
