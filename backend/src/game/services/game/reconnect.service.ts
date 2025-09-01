@@ -7,16 +7,17 @@ import { GameRoom, GameRoomState } from '../../interfaces/game.interface';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 import { RoundSyncService } from './round-sync.service';
 import { ClientsRegistry } from './clients.registry';
+import { ConnectionService } from './connection.service';
 
 @Injectable()
 export class ReconnectService {
     private server: Server | null = null;
-    private clients = new ClientsRegistry();
     constructor(
         private readonly userService: UserService,
         private readonly roomHelperService: RoomHelperService,
         private readonly roomManagerService: RoomManagerService,
         private readonly roundSyncService: RoundSyncService,
+        private readonly connectionService: ConnectionService
     ) {}
 
     setServer(server: Server) {
@@ -35,14 +36,13 @@ export class ReconnectService {
 
     private async ensureClientHasUserData(client: Socket) {
         if (!client.data.user) {
-            const userId = this.clients.getClientId(+client.id);
+            const userId = this.connectionService.getClientsMap().get(client.id);
             if (!userId) throw new UnauthorizedException('No user with this id');
-
-            const user = await this.userService.getUserById(+userId);
+ 
+            const user = await this.userService.getUserById(userId);
             if (!user) throw new UnauthorizedException('No user with this id');
 
             client.data.user = { id: user.id, login: user.login };
-            
         }
         
     }
