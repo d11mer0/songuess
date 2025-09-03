@@ -1,12 +1,9 @@
 version: "3.9"
+
 services:
   db:
     image: postgres:16
-    restart: always
-    container_name: postgres_db
-    ports:
-      - "5432:5432"
-
+    restart: unless-stopped
     environment:
       POSTGRES_DB: songuess
       POSTGRES_USER: dimero
@@ -21,36 +18,28 @@ services:
 
   backend:
     build: ./backend
-    container_name: nest_backend
-    restart: always
+    restart: unless-stopped
     depends_on:
       db:
-        condition: service_healthy  # ✅ Чекаємо, поки PostgreSQL буде готовий
-    ports:
-      - "3000:3000"
-      - "5555:5555"  # Prisma Studio
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    environment:
-      DATABASE_URL: "postgresql://dimero:password@db:5432/songuess"
-  frontend-dev:
+        condition: service_healthy
+    env_file:
+      - ./backend/.env
+    expose:
+      - "3000"   # тільки всередині мережі compose
+    # без ports: ми не відкриваємо 3000 в інтернет
+
+  frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
-    container_name: frontend-dev
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - VITE_API_URL=http://localhost:3000
-      - VITE_GOOGLE_CLIENT_ID=877282899502-4jql4rt8rh4o9uh9b2rr9bjft2b36pb1.apps.googleusercontent.com
-      - CHOKIDAR_USEPOLLING=true  # ✅ Включаємо live reload у контейнері
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
     depends_on:
       - backend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "80:80"  # публічно доступний порт
+    # фронт сам проксить /api на backend:3000
 
-    
 volumes:
   postgres_data:
