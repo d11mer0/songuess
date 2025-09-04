@@ -1,4 +1,15 @@
 import { io, Socket } from 'socket.io-client';
+//IF PROD
+
+//this.socket = io("/", {
+//    path: "/socket.io",
+//    transports: ['websocket'],
+//    auth: { token },
+//    reconnection: true,
+//    autoConnect: false,
+//});
+
+
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 class SocketInstance {
