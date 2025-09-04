@@ -16,7 +16,8 @@ const GoogleLoginButton: React.FC = () => {
                 try {
                     if (response.credential) {
                         await googleLogin(response.credential).unwrap();
-                        navigate('/songs');
+                        navigate('/')
+                        
                     } else {
                         throw new Error('No credential received');
                     }

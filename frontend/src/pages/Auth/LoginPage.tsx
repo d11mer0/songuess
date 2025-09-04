@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
         try {
             await loginUser(formData).unwrap();
-            navigate('/songs');
+            navigate('/');
         } catch {}
     };
 

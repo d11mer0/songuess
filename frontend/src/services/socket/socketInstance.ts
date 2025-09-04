@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 class SocketInstance {
     private socket: Socket | null = null;
@@ -7,7 +8,7 @@ class SocketInstance {
         if (!this.socket || this.socket.disconnected) {
             const token = localStorage.getItem('accessToken');
 
-            this.socket = io('http://localhost:3000', {
+            this.socket = io(API_URL, {
                 transports: ['websocket'],
                 auth: { token },
                 reconnection: true,

@@ -7,6 +7,7 @@ import { useGetMeQuery } from '../store/api/userApi';
 import ErrorPage from '../pages/DefaultPages/ErrorPage/ErrorPage';
 import UserRoutes from './modules/users/UserRoutes';
 import GameRoutes from './modules/game/GameRoutes';
+import MainPage from '../pages/DefaultPages/MainPage/MainPage';
 
 const AppRoutes: React.FC = () => {
     const { isLoading } = useGetMeQuery();
@@ -22,7 +23,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/songs/*" element={<SongsRoutes />} />
                 <Route path="/game/*" element={<GameRoutes />} />
                 <Route path="/user/*" element={<UserRoutes />} />
-                <Route path="/" element={<Navigate to="/songs" replace />} />
+                <Route path="/" element={<MainPage />} />
                 <Route path="*" element={<Navigate to="/error" replace />} />
             </Routes>
             <Footer />

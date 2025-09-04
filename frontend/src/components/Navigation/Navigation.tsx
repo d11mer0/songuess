@@ -38,11 +38,8 @@ const Navigation: React.FC = () => {
                 <div className={styles.navTop}>
                     <div className={styles.navLeft}>
                         <Link to="/game" className={styles.logo}>
-                            MusicApp
+                            Songuess
                         </Link>
-                        <div className={styles.navLinks}>
-                            <NavLinks />
-                        </div>
                     </div>
 
                     <div className={styles.navRight}>
