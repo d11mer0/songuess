@@ -78,12 +78,14 @@ export class AuthService {
             return {
                 message:
                     'Registration successful. Please verify your email to activate your account.',
+                requiresVerification: true,
             };
         }
 
         return {
             message:
                 'Registration successful. You can now log in.',
+            requiresVerification: false,
         };
     }
 

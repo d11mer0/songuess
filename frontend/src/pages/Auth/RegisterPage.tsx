@@ -22,8 +22,12 @@ const RegisterPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            await registerUser(formData).unwrap();
-            navigate('/auth/verify');
+            const res: any = await registerUser(formData).unwrap();
+            if (res?.requiresVerification) {
+                navigate('/auth/verify');
+            } else {
+                navigate('/auth/login');
+            }
         } catch {}
     };
 
