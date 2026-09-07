@@ -8,13 +8,15 @@ import {
 
 import { FaMusic } from 'react-icons/fa';
 import { selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
-import styles from '../PlayingGame.module.css'
+import styles from '../PlayingGame.module.css';
+import { useTranslation } from '../../../../i18n/LanguageContext';
+
 type Props = {
     onSubmit: (option: string) => void;
 };
 
 const AnswerOptions = ({ onSubmit }: Props) => {
-
+    const { t } = useTranslation();
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
     const currentRoom = useAppSelector(selectCurrentRoom);
@@ -38,7 +40,7 @@ const AnswerOptions = ({ onSubmit }: Props) => {
 
     return (
         <>
-            <h1><FaMusic className={styles.icon} /> Guess the Track</h1>
+            <h1><FaMusic className={styles.icon} /> {t('gameplay.guessTrack')}</h1>
             <div className={styles.optionsGrid}>
                 {trackInfo.options.map((value, index) => {
                     const isCorrect = result?.correctAnswer === value;

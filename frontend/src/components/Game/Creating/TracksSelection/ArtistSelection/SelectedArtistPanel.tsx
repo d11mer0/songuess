@@ -5,6 +5,7 @@ import { ArtistPlaylists } from '../../../..//deezerFunctions/Artist/ArtistPlayl
 import ArtistTracks from '../../../../deezerFunctions/Artist/ArtistTracks';
 import AlbumOverview from '../../../../deezerFunctions/Album/AlbumOverview';
 import ArtistAlbums from '../../../../deezerFunctions/Artist/ArtistAlbums';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 
 import styles from './SelectedArtistPanel.module.css';
 
@@ -21,6 +22,8 @@ interface Props {
 const SelectedArtistPanel: FC<Props> = ({
     artist, tracksFormat, selectedAlbumId, onSelectAlbum, onSendTracks
 }) => {
+    const { t } = useTranslation();
+
     return (
         <>
             {tracksFormat === 'ALL' && (
@@ -32,7 +35,7 @@ const SelectedArtistPanel: FC<Props> = ({
             )}
             {tracksFormat === 'ALBUM' && (
                 <>
-                    <h3 className={styles.heading}>Select from which album you want select tracks</h3>
+                    <h3 className={styles.heading}>{t('gameCreation.selectAlbumToView')}</h3>
                     <div className={styles.albumLayout}>
                         <div className={styles.leftColumn}>
                             <ArtistAlbums
@@ -52,7 +55,7 @@ const SelectedArtistPanel: FC<Props> = ({
                                 />
                             ) : (
                                 <p className={styles.selectAlbumText}>
-                                    Please select an album to view its tracks.
+                                    {t('gameCreation.pleaseSelectAlbum')}
                                 </p>
                             )}
                         </div>

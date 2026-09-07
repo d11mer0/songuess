@@ -31,6 +31,7 @@ export class GameplayGateway {
             data.roomId,
             data.roundNumber,
             data.answer,
+            data.snippetDurationUsed,
         );
     }
 

@@ -7,5 +7,6 @@ import { DeezerController } from './deezer.controller';
     imports: [HttpModule],
     controllers: [DeezerController],
     providers: [DeezerService],
+    exports: [DeezerService],
 })
 export class DeezerModule {}

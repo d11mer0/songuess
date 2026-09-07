@@ -24,8 +24,15 @@ export interface ServerToClientEvents {
   reconnectToRound: (payload: GameRoundPublicData & { answer: string | null }) => void;
   roundResult: (payload: {
     correctAnswer: string;
-    answer: string;
-    timeTaken: number;
+    results: {
+      playerId: number;
+      answer: string;
+      score: number;
+      totalScore: number;
+      timeTaken: number;
+      streak?: number;
+    }[];
+    streaks?: Record<number, number>;
   }) => void;
   gameEnded: () => void;
 }

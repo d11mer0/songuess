@@ -35,6 +35,10 @@ const RoomPlayerList = ({kickMember}: Props) => {
                                         src={player.avatar || ''}
                                         alt={player.login}
                                         className={styles.avatar}
+                                        style={{
+                                            border: (player as any).isPremium ? '2px solid #ffd700' : 'none',
+                                            boxShadow: (player as any).isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
+                                        }}
                                     />
                                     {user?.id === roomInfo.leaderId && player.id !== roomInfo.leaderId && (
                                         <button
@@ -49,7 +53,16 @@ const RoomPlayerList = ({kickMember}: Props) => {
                                         style={{ backgroundColor: player.isOnline ? '#4caf50' : '#777' }}
                                     />
                                 </div>
-                                <div className={styles.login} title={player.login}>
+                                <div
+                                    className={styles.login}
+                                    title={player.login}
+                                    style={{
+                                        color: (player as any).nameColor || ((player as any).isPremium ? '#ffd700' : 'inherit'),
+                                        textShadow: (player as any).isPremium ? '0 0 8px rgba(255, 215, 0, 0.7)' : 'none',
+                                        fontWeight: (player as any).isPremium ? 800 : 600,
+                                    }}
+                                >
+                                    {(player as any).isPremium && '⭐ '}
                                     {player.login}
                                 </div>
                             </> ) : ( <>

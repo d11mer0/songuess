@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
 import { Server } from 'socket.io';
 import {
     GameRoom,
@@ -9,9 +9,10 @@ import { GameRoomState } from '../../interfaces/game.interface';
 import { RoomQueryService } from './room-query.service';
 import { RoomHelperService } from './room-helper.service';
 import { UserService } from '../../../users/user.service';
+import { RedisService } from '../../../redis/redis.service';
 
 @Injectable()
-export class RoomManagerService {
+export class RoomManagerService implements OnModuleInit {
     private server: Server | null = null;
     private rooms: GameRoom[] = [];
 
@@ -19,9 +20,21 @@ export class RoomManagerService {
         private readonly roomQueryService: RoomQueryService,
         @Inject(forwardRef(() => RoomHelperService))
         private readonly roomHelperService: RoomHelperService,
-        private userService: UserService
-
+        private userService: UserService,
+        private readonly redisService: RedisService,
     ) {}
+
+    async onModuleInit() {
+        try {
+            const restored = await this.redisService.getAllActiveRooms();
+            if (restored && restored.length > 0) {
+                this.rooms = restored;
+                console.log('[RoomManagerService] Відновлено ' + restored.length + ' активних кімнат із Redis');
+            }
+        } catch (err) {
+            console.warn('[RoomManagerService] Помилка відновлення кімнат із Redis:', err);
+        }
+    }
 
     setServer(server: Server) {
         this.server = server;
@@ -35,22 +48,31 @@ export class RoomManagerService {
         return this.server;
     }
 
+    async syncRoom(room: GameRoom): Promise<void> {
+        await this.redisService.saveRoom(room);
+    }
+
     async createRoom(
         playerId: number,
         login: string,
         lobbyOptions: LobbyOptions,
     ): Promise<string> {
         const id = this.roomHelperService.generateRoomId();
+        const shortCode = this.roomHelperService.generateShortCode();
         this.roomHelperService.removeUserFromOtherRooms(playerId);
         const userInfo = await this.userService.getUserById(playerId);
 
         const newRoom: GameRoom = {
             id,
+            shortCode,
             players: [{ 
                 id: playerId, 
                 login, 
                 avatar: userInfo.avatar,
                 isOnline: true,
+                isPremium: userInfo.isPremium || false,
+                customTitle: userInfo.customTitle || null,
+                nameColor: userInfo.nameColor || null,
             }],
             lobbyOptions: {
                 ...lobbyOptions,
@@ -62,6 +84,7 @@ export class RoomManagerService {
             state: GameRoomState.ADDING,
         };
         this.rooms.push(newRoom);
+        await this.redisService.saveRoom(newRoom);
         this.broadcastRoomsList();
         return id;
     }
@@ -76,13 +99,23 @@ export class RoomManagerService {
             
             if (room.players.length < room.lobbyOptions.maxPlayers ) {
                 this.roomHelperService.removeUserFromOtherRooms(playerId);
-                player = { id: playerId, login, isOnline: true, avatar: userInfo.avatar };
+                player = {
+                    id: playerId,
+                    login,
+                    isOnline: true,
+                    avatar: userInfo.avatar,
+                    isPremium: userInfo.isPremium || false,
+                    customTitle: userInfo.customTitle || null,
+                    nameColor: userInfo.nameColor || null,
+                };
                 room.players.push(player);
+                await this.redisService.saveRoom(room);
                 this.broadcastRoomsList();
                 return room;
             }
             return null;
         }
+        await this.redisService.saveRoom(room);
         return room;
     }
 
@@ -92,7 +125,10 @@ export class RoomManagerService {
 
         room.players = room.players.filter((player) => player.id !== playerId);
         const isClear = this.roomHelperService.cleanUpRoomById(room.id);
-        if (!isClear) this.roomHelperService.assignNewLeader(room.id);
+        if (!isClear) {
+            this.roomHelperService.assignNewLeader(room.id);
+            this.redisService.saveRoom(room);
+        }
         this.broadcastRoomsList();
     }
 
@@ -107,6 +143,7 @@ export class RoomManagerService {
         if (!memberExists) return false;
 
         this.roomHelperService.removePlayerFromRoomById(roomId, memberId);
+        this.redisService.saveRoom(room);
         return true;
     }
 
@@ -118,6 +155,7 @@ export class RoomManagerService {
         if (room.players.length === 0) return null;
 
         room.state = GameRoomState.CREATING;
+        this.redisService.saveRoom(room);
         this.broadcastRoomsList();
         return room;
     }
@@ -130,6 +168,7 @@ export class RoomManagerService {
         if (room.leaderId !== userId) return false;
 
         this.rooms.splice(roomIndex, 1);
+        this.redisService.deleteRoom(roomId);
         this.broadcastRoomsList();
         return true;
     }

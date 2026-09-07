@@ -101,13 +101,31 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         [dispatch, updateSearchParams, user?.id],
     );
 
+    const handleDuelMatchFound = useCallback(
+        (data: { roomId: string; room: Room }) => {
+            dispatch(setCurrentRoom(data.room));
+            navigate(`/game/${data.roomId}`);
+            socketOffMany([
+                'playerDisconnected',
+                'playerLeft',
+                'gameStarted',
+                'roomCreated',
+                'joinedRoom',
+                'roomsList',
+                'duelMatchFound',
+            ]);
+        },
+        [navigate, dispatch],
+    );
+
     useEffect(() => {
         socketHandlers.on('roomCreated', handleRoomCreated);
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('roomsList', handleRoomsUpdate);
+        socketHandlers.on('duelMatchFound', handleDuelMatchFound);
 
         return () => {
-            socketOffMany(['roomCreated', 'joinedRoom', 'roomsList']);
+            socketOffMany(['roomCreated', 'joinedRoom', 'roomsList', 'duelMatchFound']);
         };
-    }, [handleRoomCreated, handleJoinedRoom, handleRoomsUpdate]);
+    }, [handleRoomCreated, handleJoinedRoom, handleRoomsUpdate, handleDuelMatchFound]);
 };

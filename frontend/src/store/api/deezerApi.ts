@@ -4,6 +4,7 @@ import customBaseQuery from './customBaseQuery';
 export const deezerApi = createApi({
     reducerPath: 'deezerApi',
     baseQuery: customBaseQuery,
+    keepUnusedDataFor: 300,
     endpoints: (builder) => ({
         // 🔹 Отримати трек за ID
         getTrackById: builder.query({
@@ -46,6 +47,18 @@ export const deezerApi = createApi({
             query: ({ query, type }) =>
                 `/deezer/search?query=${query}&type=${type}`,
         }),
+
+        getCuratedThemes: builder.query<any[], void>({
+            query: () => `/deezer/curated-themes`,
+        }),
+
+        getThemeTracks: builder.query<any, string>({
+            query: (themeId) => `/deezer/theme/${themeId}`,
+        }),
+
+        parsePlaylistUrl: builder.query<any, string>({
+            query: (url) => `/deezer/parse-url?url=${encodeURIComponent(url)}`,
+        }),
     }),
 });
 
@@ -57,6 +70,9 @@ export const {
     useGetPlaylistByIdQuery,
     useGetTopTracksByArtistQuery,
     useSearchDeezerQuery,
-    useGetAllTracksByArtistQuery, // Додаємо новий хук
+    useGetAllTracksByArtistQuery,
     useSearchPlaylistsByArtistQuery,
+    useGetCuratedThemesQuery,
+    useGetThemeTracksQuery,
+    useLazyParsePlaylistUrlQuery,
 } = deezerApi;

@@ -4,12 +4,14 @@ import AlbumSearch from '../../../deezerFunctions/Album/AlbumSearch';
 import AlbumOverview from '../../../deezerFunctions/Album/AlbumOverview';
 import { SelectedTracks } from '../../../../types/gameTypes';
 import ClearSelectionButton from './components/ClearSelectionButton';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
 }
 
 const AlbumSelection: FC<Props> = ({ handleStart }: Props) => {
+    const { t } = useTranslation();
     const [albumName, setAlbumName] = useState('');
     const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
 
@@ -20,7 +22,7 @@ const AlbumSelection: FC<Props> = ({ handleStart }: Props) => {
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>Type name of an album</h2>
+            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchAlbumTitle')}</h2>
 
             <AlbumSearch
                 albumName={albumName}

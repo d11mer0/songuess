@@ -49,7 +49,7 @@ export class RoomQueryService {
         return rooms.find(
             (room) =>
                 room.lobbyOptions.allowAutoJoin &&
-                room.players.length < room.lobbyOptions.maxPlayers &&
+                room.players.filter((p) => p.isOnline).length < room.lobbyOptions.maxPlayers &&
                 room.state === GameRoomState.ADDING,
         );
     }

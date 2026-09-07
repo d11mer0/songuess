@@ -1,4 +1,4 @@
-export type GameType = 'ARTIST' | 'PLAYLIST' | 'ALBUM';
+export type GameType = 'ARTIST' | 'PLAYLIST' | 'ALBUM' | 'THEME' | 'URL';
 
 export interface GameRoundPublicData {
     options: string[]; // 4 варіанти відповіді (тільки назви треків)

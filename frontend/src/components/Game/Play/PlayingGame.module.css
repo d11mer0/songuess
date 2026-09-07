@@ -1,18 +1,17 @@
-.layout {
+﻿.layout {
   display: grid;
-  grid-template-columns: auto 1fr; /* ліва авто, центр займає все інше */
+  grid-template-columns: auto 1fr;
   gap: 16px;
   align-items: start;
 }
 
-
-.leftCol,
-.centerCol {
-
-
+.leftCol {
+  min-width: 260px;
 }
 
-
+.centerCol {
+  flex: 1;
+}
 
 .playingWrapper {
     max-width: 900px;
@@ -28,16 +27,16 @@
 
 .roundTitle {
     font-family: var(--font-title);
-    font-size: 42px;
+    font-size: 38px;
     color: var(--primary-color);
     text-shadow: 1px 1px var(--text-shadow-color);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     letter-spacing: 2px;
 }
 
 .gameTitle {
     font-size: 24px;
-    color: var(--text-main); /* ← змінено з --primary-color */
+    color: var(--text-main);
     margin-bottom: 24px;
     display: flex;
     align-items: center;
@@ -52,27 +51,32 @@
 
 @media (max-width: 960px) {
   .layout {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .leftCol,
   .centerCol {
-    justify-content: center;
+    order: 1;
     width: 100%;
+  }
+
+  .leftCol {
+    order: 2;
+    width: 100%;
+    min-width: unset;
+    margin-top: 16px;
   }
 }
 
-
-/*Components.tsx:*/
-/*AnswerOptions.tsx:*/
+/* Options Grid */
 .optionsGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
     justify-items: center;
     margin-top: 16px;
+    width: 100%;
 }
 
 @media (min-width: 600px) {
@@ -81,41 +85,40 @@
     }
 }
 
-
 .answerButton {
     background-color: var(--background-tertiary);
     color: var(--text-hover);
-    
     border: 2px solid var(--primary-color);
-    padding: 10px 16px;
+    padding: 12px 18px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     width: 100%;
-    max-width: 300px;
+    min-height: 52px;
     cursor: pointer;
     transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        border-color 0.3s ease,
-        transform 0.2s ease,
-        box-shadow 0.3s ease;
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
     box-shadow: 0 4px 12px var(--primary-box-shadow-color);
 
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-    line-height: 1.3;
-    max-height: calc(1.3em * 2 + 18px); /* 2 рядки + падінги */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    line-height: 1.3;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
-
 
 .answerButton:hover:enabled {
     background-color: var(--primary-hover);
-    transform: scale(1.02);
+    transform: translateY(-2px);
+}
+
+.answerButton:active:enabled {
+    transform: scale(0.97);
 }
 
 .answerButton:disabled {
@@ -129,9 +132,9 @@
     border-color: #5a5a5a;
 }
 
-/*RoundResult.tsx*/
+/* RoundResult.tsx */
 .roundResultWrapper {
-    margin-top: 24px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -144,8 +147,6 @@
     vertical-align: middle;
 }
 
-
-/* Стан відповіді */
 .correct {
     background-color: #28a745 !important;
     color: #fff !important;
@@ -158,15 +159,14 @@
     border-color: #dc3545 !important;
 }
 
-/* Анімації */
 .resultAnimation {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: popIn 0.5s ease-out;
-    padding: 10px 16px;
+    animation: popIn 0.4s ease-out;
+    padding: 10px 18px;
     border-radius: 8px;
     box-shadow: 0 4px 8px var(--primary-box-shadow-color);
 }
@@ -187,15 +187,36 @@
 }
 
 .responseTime {
-    font-size: 16px;
+    font-size: 15px;
     font-style: italic;
     color: var(--text-secondary-hover);
-    animation: fadeInUp 0.6s ease-in-out;
+    animation: fadeInUp 0.4s ease-in-out;
+}
+
+.streakAlert {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #ff5500, #ff0055);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 15px rgba(255, 85, 0, 0.6);
+    animation: popIn 0.4s ease-out;
+}
+
+.streakFlameIcon {
+    color: #ffd700;
+    font-size: 1.3rem;
+    animation: flamePulse 1s infinite alternate;
 }
 
 @keyframes popIn {
     0% {
-        transform: scale(0.9);
+        transform: scale(0.85);
         opacity: 0;
     }
     100% {
@@ -215,10 +236,54 @@
     }
 }
 
+@keyframes flamePulse {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.15);
+    }
+}
+
 .audioControl {
-    position: relative; /* ← залишаємо відносне позиціонування */
+    position: relative;
     display: flex;
     justify-content: flex-start;
     align-items: flex-end;
-    height: 60px; /* або скільки потрібно */
+    height: 60px;
+}
+
+/* Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+    .playingWrapper {
+        padding: 16px 12px;
+        border-radius: 8px;
+    }
+
+    .roundTitle {
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .optionsGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .answerButton {
+        min-height: 56px;
+        font-size: 17px;
+        padding: 14px 16px;
+        border-radius: 12px;
+    }
+
+    .resultAnimation {
+        font-size: 18px;
+        padding: 8px 14px;
+    }
+
+    .streakAlert {
+        font-size: 0.95rem;
+        padding: 6px 14px;
+    }
 }

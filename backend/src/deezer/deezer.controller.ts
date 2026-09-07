@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { DeezerService } from './deezer.service';
+import { Throttle } from '@nestjs/throttler';
 
+@Throttle({ default: { limit: 30, ttl: 60000 } })
 @Controller('deezer')
 export class DeezerController {
     constructor(private readonly deezerService: DeezerService) {}
@@ -57,5 +59,20 @@ export class DeezerController {
     @Get('artist-playlists')
     async searchPlaylistsByArtist(@Query('query') query: string) {
         return this.deezerService.searchPlaylistsByArtist(query);
+    }
+
+    @Get('curated-themes')
+    getCuratedThemes(@Query('lang') lang?: string) {
+        return this.deezerService.getCuratedThemes(lang);
+    }
+
+    @Get('theme/:themeId')
+    async getThemeTracks(@Param('themeId') themeId: string) {
+        return this.deezerService.getThemeTracks(themeId);
+    }
+
+    @Get('parse-url')
+    async parsePlaylistUrl(@Query('url') url: string) {
+        return this.deezerService.parsePlaylistUrl(url);
     }
 }

@@ -3,10 +3,12 @@ import {
     NotFoundException,
     BadRequestException,
     InternalServerErrorException,
+    ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ImageService } from '../common/image/image.service';
 import { Prisma } from '@prisma/client';
+import { PRESET_AVATARS } from './preset-avatars';
 
 
 @Injectable()
@@ -44,11 +46,22 @@ export class UserService {
             email: true,
             avatar: true,
             record: true,
+            isPremium: true,
+            nameColor: true,
+            customTitle: true,
+            dailyStreak: true,
+            maxDailyStreak: true,
         });
     }
 
     async getUserById(userId: number) {
-        return this.findUserOrThrow(userId, { avatar: true, record: true });
+        return this.findUserOrThrow(userId, {
+            avatar: true,
+            record: true,
+            isPremium: true,
+            nameColor: true,
+            customTitle: true,
+        });
     }
 
     async updateProfile(userId: number, login: string) {
@@ -102,5 +115,45 @@ export class UserService {
         } catch (error) {
             throw new InternalServerErrorException('Не вдалося оновити аватар');
         }
+    }
+
+    async setPresetAvatar(userId: number, presetId: string) {
+        const preset = PRESET_AVATARS.find((p) => p.id === presetId);
+        const avatarUrl = preset ? preset.svgDataUri : presetId;
+
+        if (!avatarUrl.startsWith('data:image/svg+xml')) {
+            throw new BadRequestException('Невалідний пресет аватара');
+        }
+
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { avatar: avatarUrl },
+        });
+
+        return { avatar: avatarUrl };
+    }
+
+    async updateCosmetics(userId: number, nameColor?: string, customTitle?: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new NotFoundException('Користувача не знайдено');
+        }
+
+        if (!user.isPremium) {
+            throw new ForbiddenException('Кастомізація доступна тільки для VIP користувачів');
+        }
+
+        const updated = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                nameColor: nameColor !== undefined ? nameColor : user.nameColor,
+                customTitle: customTitle !== undefined ? customTitle : user.customTitle,
+            },
+        });
+
+        return {
+            nameColor: updated.nameColor,
+            customTitle: updated.customTitle,
+        };
     }
 }

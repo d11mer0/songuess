@@ -1,6 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL_DEV || '/';
+const API_URL = import.meta.env.PROD
+    ? '/'
+    : (import.meta.env.VITE_API_URL_DEV || import.meta.env.VITE_API_URL || 'http://localhost:3000');
 
 class SocketInstance {
     private socket: Socket | null = null;
@@ -18,6 +20,7 @@ class SocketInstance {
 
             this.socket.on('connect', () => {
                 console.log('✅ WebSocket підключено:', this.socket?.id);
+                this.socket?.emit('reconnectRoom');
             });
 
             this.socket.on('disconnect', (reason) => {
@@ -30,6 +33,7 @@ class SocketInstance {
 
             this.socket.on('reconnect', () => {
                 console.log('✅ WebSocket успішно перепідключено');
+                this.socket?.emit('reconnectRoom');
             });
         }
 

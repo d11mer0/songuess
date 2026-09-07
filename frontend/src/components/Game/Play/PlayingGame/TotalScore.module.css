@@ -1,4 +1,4 @@
-.wrapper {
+﻿.wrapper {
     background-color: var(--background-secondary);
     border-radius: 12px;
     box-shadow: 0 4px 12px var(--primary-box-shadow-color);
@@ -35,18 +35,67 @@
     margin-top: 8px; 
 }
 
+.onStreakItem {
+    border: 1px solid rgba(255, 85, 0, 0.4);
+    background: linear-gradient(90deg, rgba(255, 85, 0, 0.12), transparent);
+}
+
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+}
+
 .avatar {
     width: 48px; 
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary-color);
+    display: block;
+}
+
+.flameAvatar .avatar {
+    border-color: #ff5500;
+    box-shadow: 0 0 12px #ff5500, 0 0 20px rgba(255, 136, 0, 0.8);
+    animation: flamePulse 1.2s infinite alternate;
+}
+
+.flameIconMini {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 14px;
+    filter: drop-shadow(0 0 4px #ff5500);
 }
 
 .nameBlock {
     display: flex;
     align-items: center;
     gap: 12px; 
+}
+
+.playerInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.streakPill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #ff5500, #ffaa00);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 6px rgba(255, 85, 0, 0.5);
+    white-space: nowrap;
+}
+
+.superStreakPill {
+    background: linear-gradient(90deg, #ff0055, #ff5500);
+    box-shadow: 0 0 8px rgba(255, 0, 85, 0.7);
 }
 
 .name {
@@ -91,7 +140,7 @@
 }
 
 .top3 {
-    background-color: #cd7f32; /* бронза */
+    background-color: #cd7f32;
     color: #fff;
 }
 
@@ -110,7 +159,16 @@
     text-transform: uppercase;
 }
 
-@media (max-width: 400px) {
+@keyframes flamePulse {
+    from {
+        box-shadow: 0 0 8px #ff5500, 0 0 14px #ff9900;
+    }
+    to {
+        box-shadow: 0 0 16px #ff0055, 0 0 24px #ffaa00;
+    }
+}
+
+@media (max-width: 600px) {
     .wrapper {
         padding: 12px;
     }
@@ -149,41 +207,4 @@
         font-size: 12px;
         padding: 2px 4px;
     }
-}
-@media (max-width: 280px) {
-  .item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px;
-    gap: 6px;
-  }
-
-  .rank {
-    width: 100%;
-    text-align: center;
-    font-size: 14px;
-    padding: 4px 0;
-    border-radius: 4px;
-  }
-
-  .nameBlock {
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .avatar {
-    width: 40px;
-    height: 40px;
-  }
-
-  .name {
-    font-size: 0.9rem;
-    max-width: 14ch;
-  }
-
-  .score {
-    font-size: 1rem;
-  }
 }

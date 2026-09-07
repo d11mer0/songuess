@@ -2,7 +2,8 @@ export interface GameProgress {
     currentRound: number;
     rounds: GameRound[]; // масив усіх раундів
     playerResults: Record<number, Record<number, PlayerRoundResult>>;
-    totalScores: Record<number, number>; // ✅ додати це поле
+    totalScores: Record<number, number>;
+    streaks?: Record<number, number>; // поточні серії правильних відповідей
 }
 
 export interface GameRound {
@@ -25,4 +26,7 @@ export interface PlayerRoundResult {
     isCorrect: boolean;
     timeTaken: number | null;
     score: number;
+    snippetDurationUsed?: number;
+    matchSimilarity?: number;
+    streak?: number;
 }

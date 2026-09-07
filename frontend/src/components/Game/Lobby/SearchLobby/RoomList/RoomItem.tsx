@@ -11,10 +11,24 @@ interface Props {
 const RoomItem = ({ room, onJoin }: Props) => {
     return (
         <li className={styles.roomItem}>
-            <p className={styles.roomTitle}>Room №{room.id}</p>
-            <p className={styles.playersHeader}>
-                Players ({room.players.length}/{room.lobbyOptions.maxPlayers})
-            </p>
+            <div>
+                <p className={styles.roomTitle}>
+                    Room №{room.id}
+                    {room.lobbyOptions?.gameMode === 'HEARDLE' && (
+                        <span style={{ marginLeft: '8px', fontSize: '12px', background: 'rgba(0,243,255,0.2)', color: '#00f3ff', padding: '2px 8px', borderRadius: '10px', border: '1px solid #00f3ff', fontWeight: 700 }}>
+                            ⏱️ Heardle
+                        </span>
+                    )}
+                    {room.lobbyOptions?.answerMode === 'TYPE_IN' && (
+                        <span style={{ marginLeft: '6px', fontSize: '12px', background: 'rgba(241,91,181,0.2)', color: '#f15bb5', padding: '2px 8px', borderRadius: '10px', border: '1px solid #f15bb5', fontWeight: 700 }}>
+                            ⌨️ Hardcore
+                        </span>
+                    )}
+                </p>
+                <p className={styles.playersHeader}>
+                    Players ({room.players.length}/{room.lobbyOptions.maxPlayers})
+                </p>
+            </div>
 
             <PlayerList players={room.players} />
 

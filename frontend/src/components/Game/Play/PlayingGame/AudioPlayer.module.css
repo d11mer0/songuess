@@ -1,21 +1,63 @@
+﻿.controlsRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    bottom: -80px;
+}
+
 .volumeContainer {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    bottom: -80px;
-    padding-bottom: 40px; /* ✅ додаємо відступ вниз, щоб охопити зону ховера */
+    padding-bottom: 40px;
 }
-
 
 .volumeIcon {
     font-size: 24px;
     color: var(--text-main);
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .volumeContainer:hover .volumeIcon {
     transform: scale(1.1);
+}
+
+.sfxButton {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    margin-bottom: 40px;
+}
+
+.sfxButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+.sfxIcon {
+    font-size: 16px;
+    color: var(--secondary-color);
+}
+
+.sfxIconMuted {
+    font-size: 16px;
+    color: var(--danger-color);
+}
+
+.sfxLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .volumeSlider {
@@ -44,6 +86,7 @@
     background: var(--slider-track-fill, var(--primary-color));
     border: none;
 }
+
 /* Повзунок (handle) */
 .volumeSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -53,7 +96,7 @@
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, var(--text-main), var(--text-hover));
     border: 2px solid rgba(var(--primary-color));
-    margin-top: -5px; /* центрований по новому треку */
+    margin-top: -5px;
     box-shadow: 0 0 4px rgba(var(--primary-color));
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -84,9 +127,8 @@
 .volumeSlider:active {
     outline: none;
     box-shadow: none;
-    border: none; /* або просто border: none; */
+    border: none;
 }
-
 
 .sliderPopup {
     position: absolute;
@@ -124,15 +166,4 @@
     align-self: flex-start;
     text-align: left;
     width: 100%;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-    }
 }

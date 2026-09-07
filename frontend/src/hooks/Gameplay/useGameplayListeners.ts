@@ -64,9 +64,11 @@ export const useGameplayListeners = () => {
                 score: number;
                 totalScore: number;
                 timeTaken: number;
+                streak?: number;
             }[];
+            streaks?: Record<number, number>;
         }) => {
-            const { correctAnswer, results } = data;
+            const { correctAnswer, results, streaks } = data;
             const mappedResults = results.map(r => ({
                 ...r,
                 isCorrect: r.answer === correctAnswer
@@ -76,10 +78,11 @@ export const useGameplayListeners = () => {
             dispatch(setRoundResult({
                 correctAnswer,
                 results: mappedResults,
-                myResult
+                myResult,
+                streaks,
             }));
         },
-        [dispatch],
+        [dispatch, user?.id],
     );
 
     const handleGameEnded = useCallback(

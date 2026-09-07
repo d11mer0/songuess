@@ -1,5 +1,6 @@
-import { Player } from '../../game/interfaces/game.interface';
+import { Player, AnswerMode } from '../../game/interfaces/game.interface';
 import { PlayerRoundResult, GameRound } from '../../game/interfaces/game-progress.interface';
+import { isFuzzyMatch } from './fuzzy-match.util';
 
 export function createInitialPlayerResults(
     players: Player[],
@@ -25,10 +26,30 @@ export function validateAnswerSubmission(
 export function createPlayerRoundResult(
     round: GameRound,
     answer: string,
+    answerMode: AnswerMode = 'MULTIPLE_CHOICE',
+    snippetDurationUsed?: number,
 ): PlayerRoundResult {
     const timeTaken = Date.now() - round.startedAt;
-    const isCorrect = answer === round.track.title;
-    return { answer, isCorrect, timeTaken, score: 0 };
+    let isCorrect = false;
+    let matchSimilarity = 0;
+
+    if (answerMode === 'TYPE_IN') {
+        const match = isFuzzyMatch(answer, round.track.title, round.track.artistName);
+        isCorrect = match.isMatch;
+        matchSimilarity = match.similarity;
+    } else {
+        isCorrect = answer === round.track.title;
+        matchSimilarity = isCorrect ? 1 : 0;
+    }
+
+    return {
+        answer,
+        isCorrect,
+        timeTaken,
+        score: 0,
+        snippetDurationUsed,
+        matchSimilarity,
+    };
 }
 
 export function assignMissedAnswers(
@@ -47,4 +68,3 @@ export function assignMissedAnswers(
         }
     }
 }
-

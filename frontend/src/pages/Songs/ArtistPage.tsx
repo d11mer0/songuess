@@ -33,6 +33,7 @@ const ArtistPage: React.FC = () => {
                     <ArtistAlbums
                         artistId={selectedArtist.id}
                         onSelectAlbum={setSelectedAlbumId}
+                        selectedAlbumId={selectedAlbumId}
                     />
                     {selectedAlbumId && (
                         <AlbumOverview

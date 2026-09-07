@@ -1,4 +1,5 @@
 import styles from '../LobbyControls.module.css';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 
 interface Props {
     maxPlayers: number;
@@ -6,6 +7,8 @@ interface Props {
 }
 
 const MaxPlayersInput = ({ maxPlayers, onChange }: Props) => {
+    const { t } = useTranslation();
+
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         if (/^[3-9]$/.test(val)) return onChange(Number(val));
@@ -17,7 +20,7 @@ const MaxPlayersInput = ({ maxPlayers, onChange }: Props) => {
     return (
         <div className={styles.playerCountContainer}>
             <label htmlFor="maxPlayers" className={styles.inputLabel}>
-                Maximum number of players
+                {t('lobby.maxPlayers')}
             </label>
             <div className={styles.counterWrapper}>
                 <button

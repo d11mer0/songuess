@@ -21,12 +21,25 @@ export class JwtAuthGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean | Promise<boolean> {
         const request = context.switchToHttp().getRequest<AuthRequest>();
 
-        // 👇 Дозволяємо запит, якщо роут має декоратор @Public()
         const isPublic = this.reflector.get<boolean>(
             IS_PUBLIC_KEY,
             context.getHandler(),
         );
         if (isPublic) {
+            const authHeader = request.headers.authorization;
+            if (authHeader) {
+                const token = authHeader.split(' ')[1];
+                if (token) {
+                    try {
+                        const payload = this.jwtService.verify(token, {
+                            secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+                        });
+                        request.user = payload;
+                    } catch {
+                        // ignore invalid/expired token for public routes
+                    }
+                }
+            }
             return true;
         }
 

@@ -1,4 +1,4 @@
-.playersResultsWrapper {
+﻿.playersResultsWrapper {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 16px;
@@ -12,38 +12,78 @@
     padding: 16px;
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    /* Нове */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    height: 320px; /* Фіксована висота */
+    min-height: 320px;
+    position: relative;
+}
+
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.flameAura {
+    box-shadow: 0 0 15px #ff5500, 0 0 25px #ff9900;
+    animation: flamePulse 1.2s infinite alternate;
+}
+
+.flameIcon {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    font-size: 24px;
+    filter: drop-shadow(0 0 6px #ff5500);
+    animation: flameBounce 0.8s infinite alternate ease-in-out;
 }
 
 .playerAvatar {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    display: block;
 }
 
 .playerName {
     font-weight: bold;
-    font-size: 1.7rem; /* було дрібніше */
+    font-size: 1.5rem;
     color: var(--text-main);
-    margin-bottom: 6px;
-
+    margin-bottom: 4px;
     white-space: nowrap; 
     overflow: hidden;  
     text-overflow: ellipsis; 
     max-width: 100%;          
 }
 
+.streakBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #ff5500, #ff8800);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+    margin-bottom: 4px;
+    animation: flamePulse 1.2s infinite alternate;
+}
+
+.superStreak {
+    background: linear-gradient(135deg, #ff0055, #ff5500, #ffcc00);
+    box-shadow: 0 0 14px rgba(255, 0, 85, 0.7);
+    font-size: 0.95rem;
+}
+
 .playerScore {
     color: var(--secondary-color);
-    font-size: 1.8rem;
+    font-size: 1.7rem;
     margin-bottom: 4px;
 }
 
@@ -56,27 +96,10 @@
 .incorrectText {
     color: var(--danger-color);
     font-style: italic;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-family: var(--font-mono);
 }
 
-@media (max-width: 350px) {
-    .playersResultsWrapper {
-        display: block;
-        grid-template-columns:none;
-    }
-    .playerCard {
-        height: auto;
-        margin-bottom: 20px;
-    }
-    .playerAvatar {
-        width: 100px;
-        height: 100px;
-    }
-    .playerName, .playerScore, .noAnswerText {
-        font-size: 1rem;
-    }
-}
 .correctAnswer {
     border: 2px solid var(--success-color);
     background: linear-gradient(145deg, rgba(31,156,80,0.15), rgba(31,156,80,0.05));
@@ -89,19 +112,60 @@
 }
 
 .fastestPlayer {
-    border: 2px solid #FFC857; /* тепліший і м’якший */
+    border: 2px solid #FFC857;
     background: linear-gradient(145deg, rgba(255,200,87,0.25), rgba(255,200,87,0.1));
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.onStreakCard {
+    border-color: #ff5500;
 }
 
 .currentPlayer .playerName {
     color: var(--primary-color);
     font-family: var(--font-title);
-    font-size: 2.5rem;
+    font-size: 2.2rem;
 }
 
 .currentPlayer .playerAvatar {
     border: 3px solid var(--primary-color);
     box-shadow: 0 0 10px rgba(241, 91, 181, 0.5);
     padding: 2px;
+}
+
+@keyframes flamePulse {
+    from {
+        box-shadow: 0 0 10px #ff5500, 0 0 18px #ff9900;
+        transform: scale(1);
+    }
+    to {
+        box-shadow: 0 0 20px #ff0033, 0 0 32px #ff8800;
+        transform: scale(1.02);
+    }
+}
+
+@keyframes flameBounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-4px); }
+}
+
+@media (max-width: 600px) {
+    .playersResultsWrapper {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .playerCard {
+        min-height: auto;
+        padding: 12px;
+    }
+    .playerAvatar {
+        width: 90px;
+        height: 90px;
+    }
+    .playerName {
+        font-size: 1.2rem;
+    }
+    .playerScore {
+        font-size: 1.4rem;
+    }
 }

@@ -4,6 +4,7 @@ import InviteLink from './InviteLink';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import Button from '../../../UI/Button/Button';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface Props {
     startGame: () => void;
@@ -12,25 +13,26 @@ interface Props {
 }
 
 const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
+    const { t } = useTranslation();
     const { user } = useAppSelector(state => state.user);
     const roomInfo = useAppSelector(selectCurrentRoom);
 
-    if(!roomInfo) return<div>No room info here</div>;
+    if(!roomInfo) return <div>{t('gameplay.noRoomsAvailable')}</div>;
     return (
         <div className={styles.roomContainer}>
-            <h3 className={styles.roomTitle}>Кімната №{roomInfo.id}</h3>
+            <h3 className={styles.roomTitle}>{t('gameplay.roomNumber')}{roomInfo.id}</h3>
             <RoomPlayerList
                 kickMember={kickMember}
             />
             <div className={styles.buttonGroup}>
                 <InviteLink roomId={roomInfo.id} />
                 <Button variant="danger" onClick={leaveRoom} width='30%'>
-                    Leave room
+                    {t('gameplay.leaveRoom')}
                 </Button>
 
                 {roomInfo.leaderId === user?.id && (
                     <Button variant="primary" onClick={startGame} width='35%'>
-                        Start game
+                        {t('gameplay.startGame')}
                     </Button>
                 )}
             </div>

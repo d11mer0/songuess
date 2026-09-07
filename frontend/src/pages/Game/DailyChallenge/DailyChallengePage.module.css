@@ -1,0 +1,436 @@
+.container {
+    max-width: 680px;
+    margin: 30px auto;
+    padding: 24px;
+    background: var(--background-secondary, #1a1528);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    color: var(--text-main, #ffffff);
+    text-align: center;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary-color, #f15bb5);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+.dateRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    color: #a0a0b0;
+}
+
+.streakPill {
+    background: linear-gradient(135deg, #ff5500, #ff8800);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.4);
+}
+
+.playerSection {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.progressBarTrack {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progressBarFill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f3ff, #7928ca, #f15bb5);
+    border-radius: 5px;
+    transition: width 0.1s linear;
+}
+
+.audioControlsRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.playBtn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00f3ff, #0077ff);
+    color: #000;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.playBtn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.6);
+}
+
+.snippetDurationLabel {
+    font-family: var(--font-mono, monospace);
+    font-size: 14px;
+    color: #00f3ff;
+    font-weight: 600;
+}
+
+/* Attempts grid */
+.attemptsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.attemptRow {
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.attemptRow.correct {
+    background: rgba(40, 167, 69, 0.25);
+    border-color: #28a745;
+    color: #a8f0b5;
+}
+
+.attemptRow.wrong {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #f8a5ad;
+}
+
+.attemptRow.empty {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #555;
+}
+
+.inputSection {
+    margin-bottom: 24px;
+}
+
+.typeInRow {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.textInput {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.35);
+    border: 2px solid rgba(241, 91, 181, 0.4);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.textInput:focus {
+    border-color: #f15bb5;
+    box-shadow: 0 0 12px rgba(241, 91, 181, 0.4);
+}
+
+.submitBtn {
+    background: linear-gradient(135deg, #f15bb5, #7928ca);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+}
+
+.submitBtn:hover:enabled {
+    transform: scale(1.03);
+}
+
+.submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.actionRow {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.skipBtn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ccc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.skipBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.optionsTitle {
+    font-size: 13px;
+    color: #bbb;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.optionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.optionBtn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #eee;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.optionBtn:hover {
+    background: rgba(241, 91, 181, 0.2);
+    border-color: #f15bb5;
+}
+
+/* Result modal / Card */
+.resultCard {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid;
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 20px;
+    animation: popIn 0.3s ease-out;
+}
+
+.resultCard.solved {
+    border-color: #28a745;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
+}
+
+.resultCard.failed {
+    border-color: #dc3545;
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+}
+
+.resultHeader {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.trackInfoBox {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px;
+    margin: 16px 0;
+}
+
+.trackTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00f3ff;
+}
+
+.trackArtist {
+    font-size: 15px;
+    color: #ccc;
+    margin-top: 4px;
+}
+
+.shareBtn {
+    background: linear-gradient(135deg, #00f3ff, #0077ff);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s;
+}
+
+.shareBtn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.5);
+}
+
+.toast {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #00ff88;
+    font-weight: 600;
+}
+
+/* Unlocked tiers styles */
+.unlockedNotice {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(155, 93, 229, 0.15));
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: popIn 0.3s ease;
+}
+
+.unlockedIcon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.unlockedTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #00f3ff;
+    margin-bottom: 2px;
+}
+
+.unlockedSubtitle {
+    font-size: 13px;
+    color: #bbb;
+}
+
+.tierPillsRow {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tierPill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #ccc;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    font-family: var(--font-mono, monospace);
+}
+
+.tierPill:hover {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: #00f3ff;
+    color: #00f3ff;
+    transform: translateY(-2px);
+}
+
+.tierPill.activeTierPill {
+    background: linear-gradient(135deg, #00f3ff, #0077ff);
+    border-color: #00f3ff;
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+}
+
+.tierPill.fullTrackPill {
+    background: rgba(155, 93, 229, 0.15);
+    border-color: #9b5de5;
+    color: #d19fff;
+}
+
+.tierPill.fullTrackPill:hover {
+    background: #9b5de5;
+    color: #fff;
+}
+
+.tierPill.fullTrackPill.activeTierPill {
+    background: linear-gradient(135deg, #9b5de5, #f15bb5);
+    border-color: #f15bb5;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(241, 91, 181, 0.5);
+}
+
+.tierPlayBtn {
+    background: rgba(0, 243, 255, 0.15);
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    color: #00f3ff;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: auto;
+    transition: all 0.2s;
+}
+
+.tierPlayBtn:hover {
+    background: #00f3ff;
+    color: #000;
+    transform: scale(1.1);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 12px auto;
+        padding: 16px;
+    }
+    .title {
+        font-size: 26px;
+    }
+    .optionsGrid {
+        grid-template-columns: 1fr;
+    }
+}

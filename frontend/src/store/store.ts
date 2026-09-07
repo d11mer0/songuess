@@ -9,6 +9,10 @@ import {
     userApi,
     spotifyApi,
     deezerApi,
+    dailyApi,
+    leaderboardApi,
+    achievementsApi,
+    liqpayApi,
 } from './api';
 
 const store = configureStore({
@@ -18,6 +22,10 @@ const store = configureStore({
         [userApi.reducerPath]: userApi.reducer,
         [spotifyApi.reducerPath]: spotifyApi.reducer,
         [deezerApi.reducerPath]: deezerApi.reducer,
+        [dailyApi.reducerPath]: dailyApi.reducer,
+        [leaderboardApi.reducerPath]: leaderboardApi.reducer,
+        [achievementsApi.reducerPath]: achievementsApi.reducer,
+        [liqpayApi.reducerPath]: liqpayApi.reducer,
         user: userReducer,
         gameplay: gameplayReducer,
     },

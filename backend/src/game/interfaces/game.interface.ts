@@ -6,12 +6,21 @@ export interface Player {
     login: string;
     isOnline: boolean;
     avatar: string | null;
+    isPremium?: boolean;
+    customTitle?: string | null;
+    nameColor?: string | null;
 }
+
+export type GameMode = 'CLASSIC' | 'HEARDLE' | 'DUEL';
+export type AnswerMode = 'MULTIPLE_CHOICE' | 'TYPE_IN';
 
 export interface LobbyOptions {
     allowAutoJoin: boolean;
     publicLobby: boolean;
     maxPlayers: number;
+    gameMode?: GameMode;
+    answerMode?: AnswerMode;
+    roundsCount?: number;
 }
 
 export enum GameRoomState {
@@ -23,6 +32,7 @@ export enum GameRoomState {
 
 export interface GameRoom {
     id: string;
+    shortCode?: string;
     players: Player[];
     lobbyOptions: LobbyOptions;
     leaderId: number;

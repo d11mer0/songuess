@@ -5,6 +5,7 @@ import { ArtistInfo, SelectedTracks } from '../../../../types/gameTypes';
 import ClearSelectionButton from './components/ClearSelectionButton';
 import TrackTypeSelector from './ArtistSelection/TrackTypeSelector';
 import SelectedArtistPanel from './ArtistSelection/SelectedArtistPanel';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 type TracksFormat = 'ALL' | 'PLAYLIST' | 'ALBUM';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const ArtistSelection: FC<Props> = ({ handleStart }) => { 
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedArtist, setSelectedArtist] = useState<ArtistInfo | null>(
         null,
@@ -43,7 +45,7 @@ const ArtistSelection: FC<Props> = ({ handleStart }) => {
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>Search for an artist</h2>
+            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchArtist')}</h2>
 
             <ArtistSearch
                 searchQuery={searchQuery}

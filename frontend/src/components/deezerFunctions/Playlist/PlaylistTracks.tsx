@@ -1,4 +1,5 @@
 import TrackList from '../Track/TrackList';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface Track {
     id: number;
@@ -18,6 +19,7 @@ const PlaylistTracks: React.FC<PlaylistTracksProps> = ({
     isLoading,
     isList = true,
 }) => {
+    const { t } = useTranslation();
     const formattedTracks = tracks.map((track) => ({
         id: track.id,
         title: track.title,
@@ -27,7 +29,7 @@ const PlaylistTracks: React.FC<PlaylistTracksProps> = ({
 
     return (
         <TrackList
-            title="Tracks in selected playlist"
+            title={t('gameCreation.tracksInSelection')}
             tracks={formattedTracks}
             isLoading={isLoading}
             isList={isList}

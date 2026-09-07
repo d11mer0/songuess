@@ -28,12 +28,13 @@ export class RoundManagerService {
         this.server = server;
     }
 
-    generateGameRounds(tracks: any[]): GameRound[] {
-        if (tracks.length < ROUNDS_NUMBER) {
+    generateGameRounds(tracks: any[], roundsCount: number = ROUNDS_NUMBER): GameRound[] {
+        const count = Math.min(tracks.length, roundsCount);
+        if (count < 3) {
             throw new Error('Not enough tracks to generate round options');
         }
         
-        const selectedTracks = shuffleArray(tracks).slice(0, ROUNDS_NUMBER);
+        const selectedTracks = shuffleArray(tracks).slice(0, count);
         return selectedTracks.map((track, index) => buildGameRound(track, tracks, index));
     }
 

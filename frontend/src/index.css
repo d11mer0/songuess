@@ -51,7 +51,7 @@ body {
     --text-shadow-color: rgba(0, 0, 0, 0.3); /* Тінь для тексту */
 
     /*Font-types */
-    --font-title: 'Bebas Neue', sans-serif;
+    --font-title: 'Oswald', 'Inter', sans-serif;
     --font-main: 'Inter', sans-serif;
     --font-mono: 'Fira Code', monospace;
 }

@@ -1,16 +1,19 @@
 import { FC } from 'react';
 import styles from '../CreatingGame.module.css';
 import WaitingLoader from '../../../UI/Loader/WaitingLoader/WaitingLoader';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 const LeaderWaitingView: FC = () => {
+    const { t } = useTranslation();
+
     return (
         <>
             <h3 className={styles.sectionTitle}>
                 <div className={styles.emptyText}>
-                    <span className={styles.emoji}>🕹️</span> The host is preparing the game
+                    <span className={styles.emoji}>🕹️</span> {t('gameCreation.hostPreparingTitle')}
                 </div>
                 <div className={styles.emptySubtext}>
-                    Sit tight while your leader sets everything up! <span className={styles.emoji}>⏳</span>
+                    {t('gameCreation.hostPreparingSubtext')} <span className={styles.emoji}>⏳</span>
                 </div>
             </h3>
             <WaitingLoader />

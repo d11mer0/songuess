@@ -39,6 +39,7 @@ export class GameEventsService {
                 answer: res.answer,
                 timeTaken: res.timeTaken,
                 score: res.score,
+                streak: res.streak ?? gameProgress.streaks?.[p.id] ?? 0,
                 totalScore: gameProgress.totalScores?.[p.id] ?? 0,
             };
         });
@@ -46,6 +47,7 @@ export class GameEventsService {
         this.server?.to(roomId).emit('roundResult', {
             correctAnswer: round.track.title,
             results: roundResults,
+            streaks: gameProgress.streaks ?? {},
         });
     }
 }

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Room, RoomState } from '../../types/roomTypes';
 import { GameRoundPublicData } from '../../types/gameTypes';
 import { GameplayState, RoundResult } from './types';
@@ -29,13 +29,16 @@ const gameplaySlice = createSlice({
 
             if (action.payload && state.currentRoom) {
                 const resultsMap = new Map<number, number>();
+                const streakMap = new Map<number, number>();
                 for (const r of action.payload.results) {
                     resultsMap.set(r.playerId, r.totalScore ?? 0);
+                    streakMap.set(r.playerId, r.streak ?? (action.payload.streaks?.[r.playerId] ?? 0));
                 }
 
                 state.currentRoom.players = state.currentRoom.players.map(p => ({
                     ...p,
                     totalScore: resultsMap.has(p.id) ? resultsMap.get(p.id) : (p.totalScore ?? 0),
+                    streak: streakMap.has(p.id) ? streakMap.get(p.id) : (p.streak ?? 0),
                 }));
             }
         },

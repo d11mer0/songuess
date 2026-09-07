@@ -8,12 +8,14 @@ import { SelectedTracks } from '../../../../types/gameTypes';
 import ClearSelectionButton from './components/ClearSelectionButton';
 import StartGameButtonBlock from './components/StartGameButtonBlock';
 import OverviewLoadingPlaceholder from '../../../UI/Loader/OverviewLoading/OverviewLoadingPlaceholder';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
 }
 
 const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(
         null,
@@ -40,14 +42,14 @@ const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>Type name of a playlist</h2>
+            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchPlaylistTitle')}</h2>
 
             <PlaylistSearch
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 onSelect={setSelectedPlaylistId}
             />
-            {(isLoadingTracks || isFetching) && <OverviewLoadingPlaceholder loadingText='Playlist tracks are loading...'/>}
+            {(isLoadingTracks || isFetching) && <OverviewLoadingPlaceholder loadingText={t('gameCreation.loadingPlaylistTracks')} />}
             {(selectedPlaylistId !== null && playlistDetails && !isFetching) && (
                 <>
                     <PlaylistDetails details={playlistDetails} />

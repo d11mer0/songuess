@@ -1,4 +1,5 @@
 import styles from './PlaylistDetails.module.css';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface PlaylistDetailsProps {
     details: {
@@ -10,6 +11,8 @@ interface PlaylistDetailsProps {
 }
 
 const PlaylistDetails: React.FC<PlaylistDetailsProps> = ({ details }) => {
+    const { t } = useTranslation();
+
     return (
         <div className={styles.playlistInfo}>
             <img
@@ -26,7 +29,7 @@ const PlaylistDetails: React.FC<PlaylistDetailsProps> = ({ details }) => {
 
                 {details.fans !== undefined && (
                     <p className={styles.playlistMeta}>
-                        <span>Fans:</span> {details.fans.toLocaleString()}
+                        <span>{t('gameCreation.fansLabel')}:</span> {details.fans.toLocaleString()}
                     </p>
                 )}
             </div>

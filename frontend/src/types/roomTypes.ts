@@ -3,12 +3,20 @@ export interface Player {
     login: string;
     isOnline: boolean;
     avatar: string | null;
+    totalScore?: number;
+    streak?: number;
 }
+
+export type GameMode = 'CLASSIC' | 'HEARDLE' | 'DUEL';
+export type AnswerMode = 'MULTIPLE_CHOICE' | 'TYPE_IN';
 
 export interface LobbyOptions {
     allowAutoJoin: boolean;
     publicLobby: boolean;
     maxPlayers: number;
+    gameMode?: GameMode;
+    answerMode?: AnswerMode;
+    roundsCount?: number;
 }
 
 export enum RoomState {
@@ -20,6 +28,7 @@ export enum RoomState {
 
 export interface Room {
     id: string;
+    shortCode?: string;
     players: Player[];
     lobbyOptions: LobbyOptions;
     leaderId?: number;

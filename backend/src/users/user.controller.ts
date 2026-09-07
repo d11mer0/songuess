@@ -23,6 +23,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { AuthRequest } from '../common/types/exress-request';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiUpdateProfile, ApiUpdateAvatar } from './user.swagger';
+import { PresetAvatarDto, UpdateCosmeticsDto } from './dto/cosmetics.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -84,5 +85,26 @@ export class UserController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         return this.userService.updateAvatar(req.user.id, file);
+    }
+
+    @Patch('preset-avatar')
+    @ApiOperation({ summary: 'Вибрати анімований/SVG аватар із колекції пресетів' })
+    @ApiResponse({ status: 200, description: 'Аватар оновлено' })
+    async updatePresetAvatar(
+        @Req() req: AuthRequest,
+        @Body() dto: PresetAvatarDto,
+    ) {
+        return this.userService.setPresetAvatar(req.user.id, dto.presetId);
+    }
+
+    @Patch('cosmetics')
+    @ApiOperation({ summary: 'Оновити косметику (колір ніку, титул) для VIP' })
+    @ApiResponse({ status: 200, description: 'Косметику оновлено' })
+    @ApiResponse({ status: 403, description: 'Тільки для VIP користувачів' })
+    async updateCosmetics(
+        @Req() req: AuthRequest,
+        @Body() dto: UpdateCosmeticsDto,
+    ) {
+        return this.userService.updateCosmetics(req.user.id, dto.nameColor, dto.customTitle);
     }
 }

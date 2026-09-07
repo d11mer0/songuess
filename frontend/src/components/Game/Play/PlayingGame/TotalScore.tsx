@@ -2,7 +2,6 @@ import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import styles from './TotalScore.module.css';
 
-
 const TotalScore = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { user } = useAppSelector((state) => state.user);
@@ -17,39 +16,57 @@ const TotalScore = () => {
             <h2 className={styles.title}>Total Scores</h2>
             <ul className={styles.list}>
                 {sortedPlayers.map((player, index) => {
-                const playerScore = player.totalScore ?? 0;
-                const rankClass =
-                    index === 0 ? styles.top1 :
-                    index === 1 ? styles.top2 :
-                    index === 2 ? styles.top3 : '';
-                const isMe = player.id === user?.id;
-                return (
-                    <li 
-                        key={player.id}  
-                        className={`${styles.item} ${isMe ? styles.me : ''}`}
-                    >
-                        <span className={`${styles.rank} ${rankClass}`}>{index + 1}</span>
-                        <div className={styles.nameBlock}>
-                            {player.avatar && (
-                            <img
-                                src={player.avatar}
-                                alt={player.login}
-                                className={styles.avatar}
-                            />
-                            )}
-                            <span className={styles.name}>
-                                {isMe ? 'You' : player.login}
-                            </span>
-                        </div>
-                        <span className={styles.score}>{playerScore.toFixed(2)}</span>
-                    </li>
-
-
-                );
+                    const playerScore = player.totalScore ?? 0;
+                    const playerStreak = player.streak ?? 0;
+                    const hasStreak = playerStreak >= 3;
+                    const rankClass =
+                        index === 0 ? styles.top1 :
+                        index === 1 ? styles.top2 :
+                        index === 2 ? styles.top3 : '';
+                    const isMe = player.id === user?.id;
+                    return (
+                        <li 
+                            key={player.id}  
+                            className={`${styles.item} ${isMe ? styles.me : ''} ${hasStreak ? styles.onStreakItem : ''}`}
+                        >
+                            <span className={`${styles.rank} ${rankClass}`}>{index + 1}</span>
+                            <div className={styles.nameBlock}>
+                                {player.avatar && (
+                                    <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAvatar : ''}`}>
+                                        <img
+                                            src={player.avatar}
+                                            alt={player.login}
+                                            className={styles.avatar}
+                                        />
+                                        {hasStreak && <span className={styles.flameIconMini}>🔥</span>}
+                                    </div>
+                                )}
+                                <div className={styles.playerInfo}>
+                                    <span
+                                        className={styles.name}
+                                        style={{
+                                            color: (player as any).nameColor || ((player as any).isPremium ? '#ffd700' : 'inherit'),
+                                            textShadow: (player as any).isPremium ? '0 0 8px rgba(255, 215, 0, 0.7)' : 'none',
+                                            fontWeight: (player as any).isPremium ? 700 : 500,
+                                        }}
+                                    >
+                                        {(player as any).isPremium && '⭐ '}
+                                        {isMe ? 'You' : player.login}
+                                    </span>
+                                    {hasStreak && (
+                                        <span className={`${styles.streakPill} ${playerStreak >= 5 ? styles.superStreakPill : ''}`}>
+                                            🔥 x{playerStreak}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <span className={styles.score}>{playerScore.toFixed(2)}</span>
+                        </li>
+                    );
                 })}
             </ul>
         </div>
-  );
+    );
 };
 
 export default TotalScore;

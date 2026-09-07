@@ -4,10 +4,9 @@ import StartGameButtonBlock from '../../Game/Creating/TracksSelection/components
 import Loader from '../../UI/Loader/Loader/Loader';
 import OverviewLoadingPlaceholder from '../../UI/Loader/OverviewLoading/OverviewLoadingPlaceholder';
 import TrackList from '../Track/TrackList';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 import styles from './AlbumOverview.module.css';
-
-
 
 interface AlbumOverviewProps {
     albumId: number;
@@ -28,6 +27,7 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
     hideAlbumInfo = false,
     isList = true,
 }) => {
+    const { t } = useTranslation();
     const {
         data: albumData,
         isLoading,
@@ -35,7 +35,7 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
         error
     } = useGetAlbumByIdQuery(albumId, { skip: !albumId });
 
-    if (isLoading || isFetching) return <Loader text='Tracks are loading...'/>
+    if (isLoading || isFetching) return <Loader text={t('gameCreation.tracksLoading')} />
     if (!albumData || error) return null;
 
     const handleSendTracks = () => {

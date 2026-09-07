@@ -1,5 +1,6 @@
 import Button from '../../../../UI/Button/Button';
 import styles from '../TrackSelection.module.css';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 
 const MIN_TRACKS = 10;
 
@@ -12,6 +13,7 @@ const StartGameButtonBlock: React.FC<Props> = ({
     trackCount,
     onClick,
 }) => {
+    const { t } = useTranslation();
     const isDisabled = trackCount < MIN_TRACKS;
 
     return (
@@ -22,12 +24,12 @@ const StartGameButtonBlock: React.FC<Props> = ({
                 onClick={onClick}
                 disabled={isDisabled}
             >
-                Start game
+                {t('gameCreation.startGame')}
             </Button>
 
             {isDisabled && (
                 <p className={styles.warningText}>
-                    To start the game, select an album with <strong>at least {MIN_TRACKS} tracks.</strong>.
+                    {t('gameCreation.minTracksWarning', { min: MIN_TRACKS })}
                 </p>
             )}
         </div>

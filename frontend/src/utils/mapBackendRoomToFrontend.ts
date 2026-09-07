@@ -3,6 +3,7 @@ import { Room, RoomState } from '../types/roomTypes';
 export function mapBackendRoomToFrontend(room: any): Room {
     return {
         id: room.id,
+        shortCode: room.shortCode,
         state: room.state as RoomState,
         leaderId: room.leaderId,
         lobbyOptions: room.lobbyOptions,

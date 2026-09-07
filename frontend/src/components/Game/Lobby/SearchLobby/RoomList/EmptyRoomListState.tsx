@@ -1,13 +1,13 @@
 import styles from '../RoomList.module.css';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 
 const EmptyRoomListState = () => {
+    const { t } = useTranslation();
+
     return (
         <h3 className={styles.sectionTitle}>
             <div className={styles.emptyText}>
-                <span className={styles.emoji}>😢</span> No rooms available at the moment
-            </div>
-            <div className={styles.emptySubtext}>
-                Why not create your own lobby and invite friends? <span className={styles.emoji}>🎮</span>
+                <span className={styles.emoji}>😢</span> {t('lobby.noRooms')}
             </div>
         </h3>
     );

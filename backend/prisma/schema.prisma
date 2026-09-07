@@ -9,25 +9,35 @@ datasource db {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  login      String  @unique
-  password   String?
-  email      String  @unique
-  google_id  String? @unique
-  isVerified Boolean @default(false)
-  avatar     String?
-  record     Int     @default(0)
-  tokens     Token[]
+  id             Int           @id @default(autoincrement())
+  login          String        @unique
+  password       String?
+  email          String        @unique
+  google_id      String?       @unique
+  isVerified     Boolean       @default(false)
+  avatar         String?
+  record         Int           @default(0)
+  dailyStreak    Int           @default(0)
+  maxDailyStreak Int           @default(0)
+  lastDailyDate  String?
+  isPremium      Boolean           @default(false)
+  nameColor      String?
+  customTitle    String?
+  tokens         Token[]
+  dailyResults   DailyResult[]
+  gameScores     GameScore[]
+  achievements   UserAchievement[]
+  donations      Donation[]
 }
 
 model Token {
-  id         Int    @id @default(autoincrement())
-  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     Int
-  token      String @unique
-  type       String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  token     String   @unique
+  type      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Song {
@@ -35,4 +45,72 @@ model Song {
   author String
   length Int
   link   String
+}
+
+model DailyResult {
+  id           Int      @id @default(autoincrement())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  date         String
+  dayNumber    Int
+  guessesCount Int
+  isSolved     Boolean
+  score        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, date])
+}
+
+model GameScore {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  score     Float
+  genre     String?  @default("all")
+  gameMode  String?  @default("CLASSIC")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([genre])
+}
+
+model Achievement {
+  id       String            @id
+  titleUk  String
+  titleEn  String
+  descUk   String
+  descEn   String
+  icon     String
+  rarity   String            @default("COMMON")
+  category String            @default("GAMEPLAY")
+  users    UserAchievement[]
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model Donation {
+  id          String   @id @default(uuid())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId      Int?
+  amount      Float
+  currency    String   @default("UAH")
+  orderId     String   @unique
+  status      String   @default("pending")
+  type        String   @default("donation")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }

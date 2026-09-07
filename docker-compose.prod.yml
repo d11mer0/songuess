@@ -16,6 +16,18 @@ services:
       retries: 5
       start_period: 10s
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache_prod
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -23,6 +35,8 @@ services:
     restart: unless-stopped
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     env_file:
       - ./backend/.env
@@ -45,3 +59,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

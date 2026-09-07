@@ -1,7 +1,7 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GameGateway } from './gateways/game.gateway';
 import { GameService } from './services/game/game.service';
-import { UserModule } from '../users/user.module'; // Додаємо UserModule
+import { UserModule } from '../users/user.module';
 
 import { TokenModule } from '../common/services/token/token.module';
 import { GameplayService } from './services/gameplay/gameplay.service';
@@ -19,8 +19,15 @@ import { ConnectionService } from './services/game/connection.service';
 import { ReconnectService } from './services/game/reconnect.service';
 import { RoundSyncService } from './services/game/round-sync.service';
 
+import { DeezerModule } from '../deezer/deezer.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { MatchmakingService } from './services/room/matchmaking.service';
+import { RedisModule } from '../redis/redis.module';
+
+import { AchievementModule } from '../achievements/achievement.module';
+
 @Module({
-    imports: [UserModule, TokenModule, forwardRef(() => GameModule)], // Додаємо UserModule і JwtModule
+    imports: [PrismaModule, UserModule, TokenModule, DeezerModule, RedisModule, AchievementModule],
     providers: [
         GameGateway,
         RoomControlGateway,
@@ -37,7 +44,8 @@ import { RoundSyncService } from './services/game/round-sync.service';
         ScoringService,
         ConnectionService,
         ReconnectService,
-        RoundSyncService
+        RoundSyncService,
+        MatchmakingService,
     ],
     exports: [
         GameService,
@@ -45,7 +53,7 @@ import { RoundSyncService } from './services/game/round-sync.service';
         RoomQueryService,
         RoomHelperService,
         GameplayService,
+        MatchmakingService,
     ],
 })
-
 export class GameModule {}

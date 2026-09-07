@@ -9,7 +9,7 @@ import styles from '../../../pages/Game/Gameplay.module.css';
 type Props = {
     state: RoomState;
     onStart: (selectedTracks: SelectedTracks) => void;
-    onSubmitAnswer: (answer: string) => void;
+    onSubmitAnswer: (answer: string, snippetDurationUsed?: number) => void;
     onRestartGame: ()=> void;
 };
 

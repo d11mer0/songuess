@@ -54,8 +54,17 @@ export class ReconnectService {
             return null;
         }
 
+        this.roomHelperService.cancelRoomCleanup(room.id);
+
         const player = room.players.find((p) => p.id === userId);
-        if (player) player.isOnline = true;
+        if (player) {
+            player.isOnline = true;
+        }
+
+        const currentLeader = room.players.find((p) => p.id === room.leaderId);
+        if (!currentLeader || !currentLeader.isOnline) {
+            this.roomHelperService.assignNewLeader(room.id);
+        }
 
         client.join(room.id);
         this.roomManagerService.broadcastRoomsList();

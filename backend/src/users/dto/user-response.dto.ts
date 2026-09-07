@@ -16,4 +16,13 @@ export class UserResponseDto {
 
     @ApiProperty()
     record: number;
+
+    @ApiProperty({ default: false })
+    isPremium: boolean;
+
+    @ApiProperty({ required: false })
+    nameColor?: string;
+
+    @ApiProperty({ required: false })
+    customTitle?: string;
 }

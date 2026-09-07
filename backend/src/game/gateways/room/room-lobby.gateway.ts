@@ -9,7 +9,9 @@ import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
+import { MatchmakingService } from '../../services/room/matchmaking.service';
 import { LobbyOptions } from '../../interfaces/game.interface';
+
 @WebSocketGateway({
     cors: {
         origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -24,10 +26,12 @@ export class RoomLobbyGateway {
     constructor(
         private readonly roomManagerService: RoomManagerService,
         private readonly roomQueryService: RoomQueryService,
+        private readonly matchmakingService: MatchmakingService,
     ) {}
 
     afterInit() {
         this.roomManagerService.setServer(this.server);
+        this.matchmakingService.setServer(this.server);
     }
     @SubscribeMessage('createRoom')
     async handleCreateRoom(
@@ -68,6 +72,14 @@ export class RoomLobbyGateway {
         } else {
             client.emit('joinedRoom', null);
         }
+    }
+
+    @SubscribeMessage('joinRoomByCode')
+    async handleJoinRoomByCode(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { code: string },
+    ) {
+        return this.handleJoinRoom(client, { id: data.code });
     }
 
     @SubscribeMessage('autoJoinRoom')
@@ -129,5 +141,23 @@ export class RoomLobbyGateway {
                 error: 'Only the leader can delete the room.',
             });
         }
+    }
+
+    @SubscribeMessage('findDuelMatch')
+    handleFindDuelMatch(@ConnectedSocket() client: Socket) {
+        const user = client.data.user;
+        if (!user) return;
+        this.matchmakingService.addToDuelQueue(client, {
+            id: user.id,
+            login: user.login,
+        });
+    }
+
+    @SubscribeMessage('cancelDuelMatch')
+    handleCancelDuelMatch(@ConnectedSocket() client: Socket) {
+        const user = client.data.user;
+        if (!user) return;
+        this.matchmakingService.removeFromDuelQueue(user.id);
+        client.emit('duelQueueStatus', { status: 'IDLE' });
     }
 }

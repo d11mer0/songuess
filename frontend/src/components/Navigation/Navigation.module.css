@@ -30,23 +30,40 @@
 /* Навігаційні посилання */
 .navLinks {
     display: flex;
-    gap: 15px;
+    align-items: center;
+    gap: 16px;
 }
 
 .navLink {
-    color: var(--text-main);
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .navLink:hover {
-    color: var(--text-hover);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.activeNavLink {
+    color: #ffffff !important;
+    background: rgba(155, 93, 229, 0.25) !important;
+    border: 1px solid rgba(155, 93, 229, 0.6);
+    box-shadow: 0 0 12px rgba(155, 93, 229, 0.35);
 }
 
 /* Випадаюче меню */
 .navRight {
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
 .userMenu {
@@ -54,8 +71,9 @@
     align-items: center;
     position: relative;
     cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
 }
 
 .userMenu:hover {
@@ -67,16 +85,17 @@
     height: 40px;
     border-radius: 50%;
     margin-right: 8px;
+    object-fit: cover;
 }
 
 .login {
-    font-size: 20px;
-    margin-right: 10px;
+    font-size: 16px;
+    margin-right: 8px;
     user-select: none;
 }
 
 .arrow {
-    font-size: 18px;
+    font-size: 14px;
     transition: transform 0.2s ease;
 }
 
@@ -86,27 +105,28 @@
 
 .dropdownMenu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     right: 0;
-    background-color: var(--background-tertiary);
-    border-radius: 5px;
+    background: rgba(26, 21, 40, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
     overflow: hidden;
-    min-width: 150px;
-    box-shadow: 0px 4px 8px var(--primary-box-shadow-color);
-    z-index: 10;
-
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(-5px);
-    transition:
-        opacity 0.2s,
-        transform 0.2s ease-in-out;
+    min-width: 170px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(155, 93, 229, 0.2);
+    z-index: 100;
+    animation: dropdownFadeIn 0.18s ease-out;
 }
 
-.userMenu:hover .dropdownMenu {
-    pointer-events: auto;
-    opacity: 1;
-    transform: translateY(0);
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .dropdownItem {

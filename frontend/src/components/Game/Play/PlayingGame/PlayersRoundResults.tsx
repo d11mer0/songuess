@@ -1,11 +1,10 @@
-import { useAppSelector } from '../../../../store/hooks';
+﻿import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import styles from './PlayerRoundResults.module.css';
 
 const PlayersRoundResults = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
     const roundResult = useAppSelector(selectRoundResult);
-
 
     const { user } = useAppSelector((state) => state.user);
 
@@ -37,6 +36,8 @@ const PlayersRoundResults = () => {
                 const isCurrentPlayer = r.playerId === user?.id;
                 const noAnswer = r.timeTaken === null;
                 const isFirstCorrect = r.playerId === firstCorrectId;
+                const playerStreak = r.streak ?? 0;
+                const hasStreak = playerStreak >= 3;
 
                 let statusClass = '';
                 if (r.isCorrect) statusClass = styles.correctAnswer;
@@ -50,15 +51,28 @@ const PlayersRoundResults = () => {
                             ${styles.playerCard} 
                             ${statusClass} 
                             ${isCurrentPlayer ? styles.currentPlayer : ''} 
-                            ${isFirstCorrect ? styles.fastestPlayer : ''}`
+                            ${isFirstCorrect ? styles.fastestPlayer : ''}
+                            ${hasStreak ? styles.onStreakCard : ''}`
                         }
                     >                                        
                         {player.avatar && (
-                            <img src={player.avatar} alt={player.login} className={styles.playerAvatar} />
+                            <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAura : ''}`}>
+                                <img src={player.avatar} alt={player.login} className={styles.playerAvatar} />
+                                {hasStreak && (
+                                    <span className={styles.flameIcon}>🔥</span>
+                                )}
+                            </div>
                         )}
+
                         <p className={styles.playerName}>
-                            {isCurrentPlayer? 'YOU' : player.login}
+                            {isCurrentPlayer ? 'YOU' : player.login}
                         </p>
+
+                        {hasStreak && (
+                            <div className={`${styles.streakBadge} ${playerStreak >= 5 ? styles.superStreak : ''}`}>
+                                🔥 x{playerStreak} {playerStreak >= 5 ? 'ON FIRE! (2x)' : '(1.5x)'}
+                            </div>
+                        )}
 
                         {!noAnswer && r.isCorrect && (
                             <h2 className={styles.playerScore}>

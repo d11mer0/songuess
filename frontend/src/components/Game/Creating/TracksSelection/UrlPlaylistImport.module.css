@@ -1,0 +1,69 @@
+.container {
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.heading {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--primary-color, #9b5de5);
+}
+
+.subHeading {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+}
+
+.inputGroup {
+    display: flex;
+    max-width: 650px;
+    margin: 0 auto 24px auto;
+    gap: 12px;
+}
+
+.urlInput {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.urlInput:focus {
+    border-color: var(--primary-color, #9b5de5);
+}
+
+.loadButton {
+    padding: 12px 24px;
+    background: var(--primary-color, #9b5de5);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.loadButton:hover:not(:disabled) {
+    background: #843bd4;
+}
+
+.loadButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    color: #ff4d6d;
+    background: rgba(255, 77, 109, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 650px;
+    margin: 0 auto 16px auto;
+    font-size: 14px;
+}

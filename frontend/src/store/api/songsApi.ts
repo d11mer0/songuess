@@ -13,6 +13,7 @@ export const songsApi = createApi({
     reducerPath: 'songsApi',
     baseQuery: customBaseQuery,
     tagTypes: ['Songs'],
+    keepUnusedDataFor: 300,
     endpoints: (builder) => ({
         getSongs: builder.query<Song[], void>({
             query: () => '/songs',

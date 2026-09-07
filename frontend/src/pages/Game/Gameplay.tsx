@@ -11,8 +11,10 @@ import GameContent from '../../components/Game/Gameplay/GameContent';
 
 import styles from './Gameplay.module.css';
 import FinishGameModal from '../../components/Game/Gameplay/FinishGameModal';
+import { useTranslation } from '../../i18n/LanguageContext';
 
 const Gameplay = () => {
+    const { t } = useTranslation();
     const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { kickMember, deleteRoom, launchGame, submitAnswer, leaveRoom, restartGame } = useGameplay();
@@ -27,6 +29,7 @@ const Gameplay = () => {
             <div className={styles.pageWrapper}>
                 <GameplayHeader
                     roomId={currentRoom.id}
+                    shortCode={currentRoom.shortCode}
                     showPlayers={showPlayers}
                     togglePlayers={() => setShowPlayers(prev => !prev)}
                 />
@@ -48,11 +51,11 @@ const Gameplay = () => {
                     <div className={styles.finishButtonWrapper}>
                         {currentRoom?.leaderId === user?.id ? (
                             <Button width="300px" variant="danger" onClick={() => setShowFinishModal(true)}>
-                                Finish Game
+                                {t('gameplay.finishGame')}
                             </Button>
                         ) : (
                             <Button width="300px" variant="danger" onClick={() => leaveRoom()}>
-                                Leave Game
+                                {t('gameplay.leaveGame')}
                             </Button>
                         )}
                     </div>

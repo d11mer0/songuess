@@ -40,13 +40,14 @@ export const useGameplay = () => {
     );
 
     const submitAnswer = useCallback(
-        (option: string) => {
+        (option: string, snippetDurationUsed?: number) => {
             if (!currentRoom || !trackInfo) return;
 
             socketEmitter.emit('submitAnswer', {
                 roomId: currentRoom.id,
                 roundNumber: trackInfo.roundNumber,
                 answer: option,
+                snippetDurationUsed,
             });
         },
         [currentRoom, trackInfo],

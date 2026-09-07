@@ -23,6 +23,7 @@ import { GoogleAuthDto, GoogleAuthResponseDto } from './dto/google-auth.dto';
 import { Response, Request, CookieOptions } from 'express';
 import { Public } from '../common/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 const cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -38,6 +39,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Логін користувача' })
@@ -54,6 +56,7 @@ export class AuthController {
     }
 
     @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Реєстрація нового користувача' })
@@ -103,6 +106,7 @@ export class AuthController {
     }
 
     @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('reset-password')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Скидання пароля' })
@@ -117,6 +121,7 @@ export class AuthController {
     }
 
     @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-token-email')
     @ApiOperation({ summary: 'Надіслати токен на email' })
     @ApiResponse({ status: 200, description: 'Лист успішно відправлено' })

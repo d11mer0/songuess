@@ -7,6 +7,8 @@ import { GameRoomState } from '../../interfaces/game.interface';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 import { ClientsRegistry } from './clients.registry';
 
+import { MatchmakingService } from '../room/matchmaking.service';
+
 @Injectable()
 export class ConnectionService {
     private server: Server | null = null;
@@ -16,6 +18,7 @@ export class ConnectionService {
         private readonly tokenService: TokenService,
         private readonly roomHelperService: RoomHelperService,
         private readonly roomManagerService: RoomManagerService,
+        private readonly matchmakingService: MatchmakingService,
     ) {}
 
     setServer(server: Server) {
@@ -37,6 +40,8 @@ export class ConnectionService {
     handleDisconnect(client: Socket) {
         const user = client.data.user;
         if (!user) return;
+
+        this.matchmakingService.removeFromDuelQueue(user.id);
 
         const room = this.roomHelperService.findRoomByPlayerId(user.id);
         if (room) {
