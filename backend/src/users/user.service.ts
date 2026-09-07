@@ -11,6 +11,8 @@ import { Prisma } from '@prisma/client';
 import { PRESET_AVATARS } from './preset-avatars';
 
 
+const DEFAULT_AVATAR_URL = 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg';
+
 @Injectable()
 export class UserService {
     constructor(
@@ -42,7 +44,7 @@ export class UserService {
 
 
     async getProfile(userId: number) {
-        return this.findUserOrThrow(userId, {
+        const user = await this.findUserOrThrow(userId, {
             email: true,
             avatar: true,
             record: true,
@@ -52,16 +54,24 @@ export class UserService {
             dailyStreak: true,
             maxDailyStreak: true,
         });
+        return {
+            ...user,
+            avatar: user.avatar || DEFAULT_AVATAR_URL,
+        };
     }
 
     async getUserById(userId: number) {
-        return this.findUserOrThrow(userId, {
+        const user = await this.findUserOrThrow(userId, {
             avatar: true,
             record: true,
             isPremium: true,
             nameColor: true,
             customTitle: true,
         });
+        return {
+            ...user,
+            avatar: user.avatar || DEFAULT_AVATAR_URL,
+        };
     }
 
     async updateProfile(userId: number, login: string) {

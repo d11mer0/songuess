@@ -31,7 +31,7 @@
 .navLinks {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .navLink {
@@ -39,12 +39,13 @@
     text-decoration: none;
     font-size: 15px;
     font-weight: 600;
-    padding: 6px 14px;
+    padding: 6px 12px;
     border-radius: 8px;
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .navLink:hover {
@@ -92,6 +93,7 @@
     font-size: 16px;
     margin-right: 8px;
     user-select: none;
+    white-space: nowrap;
 }
 
 .arrow {

@@ -10,6 +10,7 @@ import { FaCrown } from 'react-icons/fa';
 import { BsXLg, BsPerson } from 'react-icons/bs';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 
 const RoomPlayerList = ({kickMember}: Props) => {
     const { user } = useSelector((state: RootState) => state.user);
@@ -32,9 +33,12 @@ const RoomPlayerList = ({kickMember}: Props) => {
                                         </span>
                                     )}
                                     <img
-                                        src={player.avatar || ''}
+                                        src={getAvatarUrl(player.avatar)}
                                         alt={player.login}
                                         className={styles.avatar}
+                                        onError={(e) => {
+                                            e.currentTarget.src = DEFAULT_AVATAR;
+                                        }}
                                         style={{
                                             border: (player as any).isPremium ? '2px solid #ffd700' : 'none',
                                             boxShadow: (player as any).isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',

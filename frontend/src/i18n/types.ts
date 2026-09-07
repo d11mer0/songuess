@@ -202,6 +202,7 @@ export interface TranslationDictionary {
         gameFinishedTitle: string;
         startNewGame: string;
         noRoomsAvailable: string;
+        unmuteAlert: string;
     };
     shareModal: {
         title: string;

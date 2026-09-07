@@ -9,6 +9,7 @@ import NavLinks from './NavLinks';
 import { socketInstance } from '../../services/socket';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../assets/avatars/presetAvatars';
 
 const Navigation: React.FC = () => {
     const { isAuthenticated, user } = useSelector(
@@ -74,18 +75,19 @@ const Navigation: React.FC = () => {
                                     setIsDropdownOpen(!isDropdownOpen)
                                 }
                             >
-                                {user?.avatar && (
-                                    <img
-                                        src={user.avatar}
-                                        alt="Avatar"
-                                        className={styles.avatar}
-                                        referrerPolicy="no-referrer"
-                                        style={{
-                                            border: isPremium ? '2px solid #ffd700' : 'none',
-                                            boxShadow: isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
-                                        }}
-                                    />
-                                )}
+                                <img
+                                    src={getAvatarUrl(user?.avatar)}
+                                    alt="Avatar"
+                                    className={styles.avatar}
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                        e.currentTarget.src = DEFAULT_AVATAR;
+                                    }}
+                                    style={{
+                                        border: isPremium ? '2px solid #ffd700' : 'none',
+                                        boxShadow: isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
+                                    }}
+                                />
                                 <span
                                     className={styles.login}
                                     style={{

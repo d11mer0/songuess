@@ -19,7 +19,7 @@ const GameplayHeader = ({ roomId, shortCode, showPlayers, togglePlayers }: Gamep
     return (
         <>
             <div className={styles.headerRow}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                     <h3 className={styles.title}>{t('gameplay.roomNumber')}{roomId}</h3>
                     {shortCode && (
                         <span style={{
@@ -30,16 +30,18 @@ const GameplayHeader = ({ roomId, shortCode, showPlayers, togglePlayers }: Gamep
                             fontSize: '13px',
                             fontWeight: '700',
                             color: '#00f3ff',
-                            letterSpacing: '1px'
+                            letterSpacing: '1px',
+                            whiteSpace: 'nowrap',
                         }}>
                             {t('gameplay.roomCode')}: {shortCode}
                         </span>
                     )}
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
                     <Button
                         variant="primary"
                         onClick={() => setIsShareOpen(true)}
+                        style={{ whiteSpace: 'nowrap', padding: '8px 14px', fontSize: '14px' }}
                     >
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <FaQrcode /> {t('gameplay.qrAndCode')}
@@ -50,6 +52,7 @@ const GameplayHeader = ({ roomId, shortCode, showPlayers, togglePlayers }: Gamep
                         onClick={togglePlayers}
                         aria-expanded={showPlayers}
                         aria-controls="players-section"
+                        style={{ whiteSpace: 'nowrap', padding: '8px 14px', fontSize: '14px' }}
                     >
                         {showPlayers ? t('gameplay.hidePlayers') : t('gameplay.showPlayers')}
                     </Button>

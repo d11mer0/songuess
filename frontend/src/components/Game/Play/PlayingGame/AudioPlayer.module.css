@@ -1,4 +1,4 @@
-﻿.controlsRow {
+.controlsRow {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -166,4 +166,50 @@
     align-self: flex-start;
     text-align: left;
     width: 100%;
+}
+
+.unmuteBanner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #ff0055, #ff5500);
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(255, 0, 85, 0.6);
+    animation: unmutePulse 1.2s infinite alternate ease-in-out;
+    margin-bottom: 40px;
+    white-space: nowrap;
+    transition: transform 0.15s ease;
+}
+
+.unmuteBanner:hover {
+    transform: scale(1.05);
+}
+
+.pulseMuteIcon {
+    font-size: 16px;
+    animation: bounce 0.8s infinite alternate;
+}
+
+@keyframes unmutePulse {
+    from {
+        box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(255, 85, 0, 0.8);
+    }
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-2px);
+    }
 }

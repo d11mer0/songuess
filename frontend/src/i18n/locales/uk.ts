@@ -192,7 +192,7 @@ export const uk: TranslationDictionary = {
         qrAndCode: 'QR & Код',
         hidePlayers: 'Приховати гравців',
         showPlayers: 'Показати гравців',
-        roomCode: 'Код кімнати',
+        roomCode: 'Код',
         leaveRoom: 'Вийти з кімнати',
         startGame: 'Почати гру',
         roomNumber: 'Кімната №',
@@ -202,6 +202,7 @@ export const uk: TranslationDictionary = {
         gameFinishedTitle: 'Гру завершено!',
         startNewGame: 'Почати нову гру',
         noRoomsAvailable: 'Наразі немає відкритих кімнат. Створіть власну або скористайтеся авто-входом!',
+        unmuteAlert: '🔊 Увімкнути звук',
     },
     shareModal: {
         title: 'Запросити у кімнату',

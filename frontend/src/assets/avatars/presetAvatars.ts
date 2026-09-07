@@ -1,3 +1,12 @@
+export const DEFAULT_AVATAR = 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg';
+
+export const getAvatarUrl = (avatar?: string | null): string => {
+    if (!avatar || !avatar.trim()) {
+        return DEFAULT_AVATAR;
+    }
+    return avatar;
+};
+
 export interface PresetAvatar {
     id: string;
     titleUk: string;

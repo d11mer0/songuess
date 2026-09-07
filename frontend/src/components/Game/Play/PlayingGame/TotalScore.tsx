@@ -1,6 +1,7 @@
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import styles from './TotalScore.module.css';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 
 const TotalScore = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
@@ -31,16 +32,17 @@ const TotalScore = () => {
                         >
                             <span className={`${styles.rank} ${rankClass}`}>{index + 1}</span>
                             <div className={styles.nameBlock}>
-                                {player.avatar && (
-                                    <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAvatar : ''}`}>
-                                        <img
-                                            src={player.avatar}
-                                            alt={player.login}
-                                            className={styles.avatar}
-                                        />
-                                        {hasStreak && <span className={styles.flameIconMini}>🔥</span>}
-                                    </div>
-                                )}
+                                <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAvatar : ''}`}>
+                                    <img
+                                        src={getAvatarUrl(player.avatar)}
+                                        alt={player.login}
+                                        className={styles.avatar}
+                                        onError={(e) => {
+                                            e.currentTarget.src = DEFAULT_AVATAR;
+                                        }}
+                                    />
+                                    {hasStreak && <span className={styles.flameIconMini}>🔥</span>}
+                                </div>
                                 <div className={styles.playerInfo}>
                                     <span
                                         className={styles.name}

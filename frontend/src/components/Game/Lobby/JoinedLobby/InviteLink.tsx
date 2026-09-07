@@ -19,7 +19,7 @@ const InviteLink = ({ roomId }: Props) => {
     };
 
     return (
-        <Button variant="neutral" onClick={copyInviteLink} width="30%">
+        <Button variant="neutral" onClick={copyInviteLink}>
             {t('gameplay.inviteFriends')}
         </Button>
     );

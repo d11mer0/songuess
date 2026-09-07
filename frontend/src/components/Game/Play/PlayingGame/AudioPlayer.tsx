@@ -1,4 +1,4 @@
-﻿import { useAppSelector } from '../../../../store/hooks';
+import { useAppSelector } from '../../../../store/hooks';
 import { selectTrackInfo, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import { useAudioPlayer } from '../../../../hooks/useAudioPlayer';
 import { soundEffects } from '../../../../utils/audio/soundEffects';
@@ -7,6 +7,7 @@ import { FaVolumeUp, FaVolumeMute, FaBell, FaBellSlash } from 'react-icons/fa';
 import { MdVolumeOff, MdVolumeUp } from 'react-icons/md';
 import styles from './AudioPlayer.module.css';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface AudioPlayerProps {
     maxPlayDuration?: number;
@@ -14,12 +15,13 @@ interface AudioPlayerProps {
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingChange }) => {
+    const { t } = useTranslation();
     const trackInfo = useAppSelector(selectTrackInfo);
     const roundResult = useAppSelector(selectRoundResult);
     const [showSlider, setShowSlider] = useState(false);
     const [sfxMuted, setSfxMuted] = useState(() => soundEffects.isMuted());
 
-    const { audioRef, volume, setVolume, isPlaying } = useAudioPlayer({
+    const { audioRef, volume, setVolume, isPlaying, isAutoplayBlocked, resumeAudio } = useAudioPlayer({
         previewUrl: trackInfo?.preview ?? null,
         startedAt: trackInfo?.startedAt ?? null,
         initialVolume: 0.1,
@@ -61,6 +63,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
     return (
         <div className={styles.controlsRow}>
             <audio ref={audioRef} style={{ display: 'none' }} />
+
+            {isAutoplayBlocked && (
+                <button
+                    type="button"
+                    onClick={resumeAudio}
+                    className={styles.unmuteBanner}
+                    title={t('gameplay.unmuteAlert')}
+                >
+                    <FaVolumeMute className={styles.pulseMuteIcon} />
+                    <span>{t('gameplay.unmuteAlert')}</span>
+                </button>
+            )}
+
             <div
                 className={styles.volumeContainer}
                 onMouseEnter={() => setShowSlider(true)}

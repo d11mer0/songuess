@@ -8,12 +8,13 @@
 }
 
 .headerRow {
-    width: max(85%, 500px);
-    margin: 0 auto;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 12px auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    gap: 12px;
 }
 
 .title {

@@ -1,6 +1,7 @@
-﻿import { useAppSelector } from '../../../../store/hooks';
+import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import styles from './PlayerRoundResults.module.css';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 
 const PlayersRoundResults = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
@@ -19,23 +20,18 @@ const PlayersRoundResults = () => {
         if (aNoAnswer && !bNoAnswer) return 1;
         if (!aNoAnswer && bNoAnswer) return -1;
 
-        if (typeof a.timeTaken === 'number' && typeof b.timeTaken === 'number') {
-            return a.timeTaken - b.timeTaken;
-        }
-        return 0;
+        return (a.timeTaken ?? 999999) - (b.timeTaken ?? 999999);
     });
-
-    const firstCorrectId = sortedResults.find(r => r.isCorrect)?.playerId;
 
     return (
         <div className={styles.playersResultsWrapper}>
-            {sortedResults.map(r => {
+            {sortedResults.map((r, index) => {
                 const player = currentRoom.players.find(p => p.id === r.playerId);
                 if (!player) return null;
 
                 const isCurrentPlayer = r.playerId === user?.id;
                 const noAnswer = r.timeTaken === null;
-                const isFirstCorrect = r.playerId === firstCorrectId;
+                const isFirstCorrect = index === 0 && r.isCorrect;
                 const playerStreak = r.streak ?? 0;
                 const hasStreak = playerStreak >= 3;
 
@@ -55,14 +51,19 @@ const PlayersRoundResults = () => {
                             ${hasStreak ? styles.onStreakCard : ''}`
                         }
                     >                                        
-                        {player.avatar && (
-                            <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAura : ''}`}>
-                                <img src={player.avatar} alt={player.login} className={styles.playerAvatar} />
-                                {hasStreak && (
-                                    <span className={styles.flameIcon}>🔥</span>
-                                )}
-                            </div>
-                        )}
+                        <div className={`${styles.avatarContainer} ${hasStreak ? styles.flameAura : ''}`}>
+                            <img
+                                src={getAvatarUrl(player.avatar)}
+                                alt={player.login}
+                                className={styles.playerAvatar}
+                                onError={(e) => {
+                                    e.currentTarget.src = DEFAULT_AVATAR;
+                                }}
+                            />
+                            {hasStreak && (
+                                <span className={styles.flameIcon}>🔥</span>
+                            )}
+                        </div>
 
                         <p className={styles.playerName}>
                             {isCurrentPlayer ? 'YOU' : player.login}

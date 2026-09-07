@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { calculateStartTime } from '../utils/calculateStartTime';
 
 interface UseAudioPlayerArgs {
@@ -17,6 +17,31 @@ export const useAudioPlayer = ({
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [volume, setVolume] = useState(initialVolume);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isAutoplayBlocked, setIsAutoplayBlocked] = useState(false);
+
+    const resumeAudio = useCallback(() => {
+        const audio = audioRef.current;
+        if (!audio || !previewUrl || !startedAt) return;
+
+        const currentTargetTime = calculateStartTime(startedAt);
+        if (Number.isFinite(currentTargetTime)) {
+            try {
+                audio.currentTime = currentTargetTime;
+            } catch (e) {
+                console.warn('Could not seek audio on resume', e);
+            }
+        }
+
+        audio.volume = volume;
+        audio.play()
+            .then(() => {
+                setIsPlaying(true);
+                setIsAutoplayBlocked(false);
+            })
+            .catch((err) => {
+                console.warn('Playback still prevented on resume', err);
+            });
+    }, [previewUrl, startedAt, volume]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -38,23 +63,76 @@ export const useAudioPlayer = ({
     }, []);
 
     useEffect(() => {
-        if (audioRef.current && previewUrl && startedAt) {
-            const audio = audioRef.current;
-            const playbackStartTime = calculateStartTime(startedAt);
+        const audio = audioRef.current;
+        if (!audio) return;
 
+        if (!previewUrl || !startedAt) {
             audio.pause();
-            audio.src = previewUrl;
-            audio.currentTime = playbackStartTime;
-            audio.volume = volume;
-
-            audio.play()
-                .then(() => setIsPlaying(true))
-                .catch((err) => {
-                    console.error('Error playing audio', err);
-                    setIsPlaying(false);
-                });
+            setIsPlaying(false);
+            setIsAutoplayBlocked(false);
+            return;
         }
+
+        audio.pause();
+        audio.src = previewUrl;
+        audio.volume = volume;
+
+        const applySeekAndPlay = () => {
+            const playbackStartTime = calculateStartTime(startedAt);
+            if (Number.isFinite(playbackStartTime)) {
+                try {
+                    audio.currentTime = playbackStartTime;
+                } catch (e) {
+                    console.warn('Could not seek audio', e);
+                }
+            }
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        setIsPlaying(true);
+                        setIsAutoplayBlocked(false);
+                    })
+                    .catch((err) => {
+                        console.warn('Autoplay blocked by browser policy:', err);
+                        setIsPlaying(false);
+                        setIsAutoplayBlocked(true);
+                    });
+            }
+        };
+
+        if (audio.readyState >= 1) {
+            applySeekAndPlay();
+        } else {
+            audio.addEventListener('loadedmetadata', applySeekAndPlay, { once: true });
+        }
+
+        return () => {
+            audio.removeEventListener('loadedmetadata', applySeekAndPlay);
+        };
     }, [previewUrl, startedAt]);
+
+    // Автоматичне зняття блокування звуку при першому кліку / взаємодії користувача
+    useEffect(() => {
+        if (!isAutoplayBlocked) return;
+
+        const handleUserGesture = () => {
+            resumeAudio();
+        };
+
+        window.addEventListener('click', handleUserGesture, { once: true, capture: true });
+        window.addEventListener('keydown', handleUserGesture, { once: true, capture: true });
+        window.addEventListener('touchstart', handleUserGesture, { once: true, capture: true });
+        window.addEventListener('pointerdown', handleUserGesture, { once: true, capture: true });
+
+        return () => {
+            window.removeEventListener('click', handleUserGesture, { capture: true });
+            window.removeEventListener('keydown', handleUserGesture, { capture: true });
+            window.removeEventListener('touchstart', handleUserGesture, { capture: true });
+            window.removeEventListener('pointerdown', handleUserGesture, { capture: true });
+        };
+    }, [isAutoplayBlocked, resumeAudio]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -76,13 +154,13 @@ export const useAudioPlayer = ({
     useEffect(() => {
         if (audioRef.current && maxPlayDuration) {
             const audio = audioRef.current;
-            if (audio.paused && audio.currentTime < maxPlayDuration) {
+            if (audio.paused && audio.currentTime < maxPlayDuration && !isAutoplayBlocked) {
                 audio.play()
                     .then(() => setIsPlaying(true))
                     .catch(() => {});
             }
         }
-    }, [maxPlayDuration]);
+    }, [maxPlayDuration, isAutoplayBlocked]);
 
     useEffect(() => {
         if (audioRef.current) {
@@ -95,5 +173,7 @@ export const useAudioPlayer = ({
         volume,
         setVolume,
         isPlaying,
+        isAutoplayBlocked,
+        resumeAudio,
     };
 };

@@ -14,10 +14,10 @@ const ActionButtons = ({ onAutoJoin, onCreateRoom, options }: Props) => {
 
     return (
         <div className={styles.buttonGroup}>
-            <Button variant="neutral" width="75%" onClick={onAutoJoin}>
+            <Button variant="neutral" width="100%" onClick={onAutoJoin}>
                 {t('lobby.autoJoinBtn')}
             </Button>
-            <Button variant="primary" width="90%" onClick={() => onCreateRoom(options)}>
+            <Button variant="primary" width="100%" onClick={() => onCreateRoom(options)}>
                 {t('lobby.createRoomBtn')}
             </Button>
         </div>

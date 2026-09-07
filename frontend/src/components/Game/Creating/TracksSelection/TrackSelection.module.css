@@ -44,7 +44,8 @@
 .buttonGroup {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
     flex-wrap: wrap;
 }

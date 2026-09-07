@@ -1,4 +1,5 @@
 import styles from '../../GameFinished.module.css';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 
 interface Player {
     id: number;
@@ -18,13 +19,14 @@ const PodiumCard = ({ player, rank, isYou }: PodiumCardProps) => {
         <div
             className={`${styles.podiumCard} ${styles[`podium${rank}`]} ${isYou ? styles.youHighlight : ''}`}
         >
-            {player.avatar ? (
-                <img src={player.avatar} alt={player.login} className={styles.podiumAvatar} />
-            ) : (
-                <div className={`${styles.podiumAvatar} ${styles.placeholder}`}>
-                    {player.login[0]}
-                </div>
-            )}
+            <img
+                src={getAvatarUrl(player.avatar)}
+                alt={player.login}
+                className={styles.podiumAvatar}
+                onError={(e) => {
+                    e.currentTarget.src = DEFAULT_AVATAR;
+                }}
+            />
             <div className={styles.playerInfo}>
                 <span className={styles.podiumName}>
                     {isYou ? 'YOU' : player.login}

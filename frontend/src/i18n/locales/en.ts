@@ -202,6 +202,7 @@ export const en: TranslationDictionary = {
         gameFinishedTitle: 'Game Finished!',
         startNewGame: 'Start New Game',
         noRoomsAvailable: 'No public rooms available right now. Create your own or use Auto-Join!',
+        unmuteAlert: '🔊 Enable Audio',
     },
     shareModal: {
         title: 'Invite to Room',

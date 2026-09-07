@@ -26,12 +26,12 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
             />
             <div className={styles.buttonGroup}>
                 <InviteLink roomId={roomInfo.id} />
-                <Button variant="danger" onClick={leaveRoom} width='30%'>
+                <Button variant="danger" onClick={leaveRoom}>
                     {t('gameplay.leaveRoom')}
                 </Button>
 
                 {roomInfo.leaderId === user?.id && (
-                    <Button variant="primary" onClick={startGame} width='35%'>
+                    <Button variant="primary" onClick={startGame}>
                         {t('gameplay.startGame')}
                     </Button>
                 )}
