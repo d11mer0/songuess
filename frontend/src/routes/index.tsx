@@ -15,7 +15,8 @@ const ErrorPage = lazy(() => import('../pages/DefaultPages/ErrorPage/ErrorPage')
 
 const AppRoutes: React.FC = () => {
     // Check current user session in the background without blocking initial app render
-    useGetMeQuery();
+    const hasToken = Boolean(localStorage.getItem('accessToken'));
+    useGetMeQuery(undefined, { skip: !hasToken });
 
     return (
         <>

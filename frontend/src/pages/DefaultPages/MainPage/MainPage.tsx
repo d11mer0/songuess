@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MainPage.module.css';
 import { useTranslation } from '../../../i18n/LanguageContext';
 
-const MainPage: React.FC = () => {
+const MainPage: React.FC = React.memo(() => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    const goToGame = useCallback(() => navigate('/game'), [navigate]);
+    const goToDaily = useCallback(() => navigate('/game/daily'), [navigate]);
+    const goToLeaderboards = useCallback(() => navigate('/game/leaderboards'), [navigate]);
 
     return (
         <div className={styles.container}>
@@ -23,44 +27,44 @@ const MainPage: React.FC = () => {
                 <div className={styles.ctaRow}>
                     <button
                         className={`${styles.ctaBtn} ${styles.primaryCta}`}
-                        onClick={() => navigate('/game')}
+                        onClick={goToGame}
                     >
                         {t('mainPage.btnPlay')}
                     </button>
                     <button
                         className={`${styles.ctaBtn} ${styles.dailyCta}`}
-                        onClick={() => navigate('/game/daily')}
+                        onClick={goToDaily}
                     >
                         {t('mainPage.btnDaily')}
                     </button>
                     <button
                         className={`${styles.ctaBtn} ${styles.leaderboardCta}`}
-                        onClick={() => navigate('/game/leaderboards')}
+                        onClick={goToLeaderboards}
                     >
                         {t('mainPage.btnLeaderboard')}
                     </button>
                 </div>
 
                 <div className={styles.featuresGrid}>
-                    <div className={styles.featureCard} onClick={() => navigate('/game')}>
+                    <div className={styles.featureCard} onClick={goToGame}>
                         <div className={styles.featureIcon}>⚡</div>
                         <h3 className={styles.featureTitle}>{t('mainPage.featureDuelTitle')}</h3>
                         <p className={styles.featureDesc}>{t('mainPage.featureDuelDesc')}</p>
                     </div>
 
-                    <div className={styles.featureCard} onClick={() => navigate('/game')}>
+                    <div className={styles.featureCard} onClick={goToGame}>
                         <div className={styles.featureIcon}>⏱️</div>
                         <h3 className={styles.featureTitle}>{t('mainPage.featureHeardleTitle')}</h3>
                         <p className={styles.featureDesc}>{t('mainPage.featureHeardleDesc')}</p>
                     </div>
 
-                    <div className={styles.featureCard} onClick={() => navigate('/game/daily')}>
+                    <div className={styles.featureCard} onClick={goToDaily}>
                         <div className={styles.featureIcon}>🎵</div>
                         <h3 className={styles.featureTitle}>{t('mainPage.featureDailyTitle')}</h3>
                         <p className={styles.featureDesc}>{t('mainPage.featureDailyDesc')}</p>
                     </div>
 
-                    <div className={styles.featureCard} onClick={() => navigate('/game/leaderboards')}>
+                    <div className={styles.featureCard} onClick={goToLeaderboards}>
                         <div className={styles.featureIcon}>🏆</div>
                         <h3 className={styles.featureTitle}>{t('mainPage.featureRankTitle')}</h3>
                         <p className={styles.featureDesc}>{t('mainPage.featureRankDesc')}</p>
@@ -69,6 +73,6 @@ const MainPage: React.FC = () => {
             </div>
         </div>
     );
-};
+});
 
 export default MainPage;

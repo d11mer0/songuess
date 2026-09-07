@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useGetDailyChallengeQuery, useSubmitDailyGuessMutation } from '../../../store/api/dailyApi';
 import { soundEffects } from '../../../utils/audio/soundEffects';
 import styles from './DailyChallengePage.module.css';
@@ -6,6 +6,163 @@ import { FaPlay, FaPause, FaShareAlt, FaCheck, FaFire, FaMusic } from 'react-ico
 import { useTranslation } from '../../../i18n/LanguageContext';
 
 const TIERS = [1, 2, 4, 7, 11, 16];
+
+interface SnippetPlayerProps {
+    audioRef: React.RefObject<HTMLAudioElement | null>;
+    effectiveDuration: number;
+    isPlaying: boolean;
+    onTogglePlay: () => void;
+    onSnippetFinished: () => void;
+    audioError: boolean;
+    playText: string;
+    playingText: string;
+    audioErrorText: string;
+}
+
+const SnippetPlayer: React.FC<SnippetPlayerProps> = memo(({
+    audioRef,
+    effectiveDuration,
+    isPlaying,
+    onTogglePlay,
+    onSnippetFinished,
+    audioError,
+    playText,
+    playingText,
+    audioErrorText,
+}) => {
+    const fillRef = useRef<HTMLDivElement | null>(null);
+    const timeTextRef = useRef<HTMLDivElement | null>(null);
+    const statusTextRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!isPlaying) {
+            if (fillRef.current) {
+                fillRef.current.style.transform = 'scaleX(0)';
+            }
+            if (timeTextRef.current) {
+                timeTextRef.current.textContent = `0.0s / ${effectiveDuration}s`;
+            }
+            if (statusTextRef.current) {
+                statusTextRef.current.textContent = audioError
+                    ? audioErrorText
+                    : `${playText} (${effectiveDuration}s)`;
+            }
+            return;
+        }
+
+        let animId: number;
+        const tick = () => {
+            const audio = audioRef.current;
+            if (audio) {
+                const current = audio.currentTime;
+                if (current >= effectiveDuration) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    if (fillRef.current) fillRef.current.style.transform = 'scaleX(0)';
+                    if (timeTextRef.current) timeTextRef.current.textContent = `0.0s / ${effectiveDuration}s`;
+                    onSnippetFinished();
+                    return;
+                }
+
+                const ratio = Math.min(1, current / effectiveDuration);
+                if (fillRef.current) {
+                    fillRef.current.style.transform = `scaleX(${ratio})`;
+                }
+                const formattedTime = `${current.toFixed(1)}s / ${effectiveDuration}s`;
+                if (timeTextRef.current) {
+                    timeTextRef.current.textContent = formattedTime;
+                }
+                if (statusTextRef.current) {
+                    statusTextRef.current.textContent = `🎵 ${playingText} (${formattedTime})`;
+                }
+            }
+            animId = requestAnimationFrame(tick);
+        };
+
+        animId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(animId);
+    }, [isPlaying, effectiveDuration, onSnippetFinished, audioError, playText, playingText, audioErrorText, audioRef]);
+
+    return (
+        <div className={styles.playerCard}>
+            <div className={`${styles.vinylDisc} ${isPlaying ? styles.spinning : ''}`}>
+                <div className={styles.vinylHole}>
+                    <FaMusic />
+                </div>
+            </div>
+
+            <button
+                type="button"
+                className={styles.playBtnHero}
+                onClick={onTogglePlay}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
+                {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: '4px' }} />}
+            </button>
+
+            <div ref={statusTextRef} className={styles.playStatusText}>
+                {audioError
+                    ? audioErrorText
+                    : isPlaying
+                    ? `🎵 ${playingText} (0.0s / ${effectiveDuration}s)`
+                    : `${playText} (${effectiveDuration}s)`}
+            </div>
+
+            <div className={styles.progressWrapper}>
+                <div className={styles.progressBarTrack}>
+                    <div ref={fillRef} className={styles.progressBarFill} />
+                </div>
+                <div ref={timeTextRef} className={styles.timeDisplay}>
+                    0.0s / {effectiveDuration}s
+                </div>
+            </div>
+        </div>
+    );
+});
+
+SnippetPlayer.displayName = 'SnippetPlayer';
+
+interface TimelineProps {
+    tiers: number[];
+    attempts: Array<{ text: string; isCorrect: boolean }>;
+    isCompleted: boolean;
+    effectiveDuration: number;
+}
+
+const TimelineGrid: React.FC<TimelineProps> = memo(({
+    tiers,
+    attempts,
+    isCompleted,
+    effectiveDuration,
+}) => {
+    return (
+        <div className={styles.timelineContainer}>
+            <div className={styles.timelineGrid}>
+                {tiers.map((tierSec, idx) => {
+                    const isCurrent = !isCompleted && idx === attempts.length;
+                    const isTierSelected = isCompleted && effectiveDuration === tierSec;
+                    const attempt = attempts[idx];
+
+                    let statusClass = '';
+                    if (attempt?.isCorrect) statusClass = styles.correct;
+                    else if (attempt && !attempt.isCorrect) statusClass = styles.wrong;
+                    else if (isCurrent || isTierSelected) statusClass = styles.active;
+
+                    return (
+                        <div key={idx} className={`${styles.timelineSegment} ${statusClass}`}>
+                            <span>{tierSec}s</span>
+                            <span style={{ fontSize: '10px', marginTop: '2px' }}>
+                                {attempt ? (attempt.isCorrect ? '✓' : '✗') : (isCurrent ? '▶' : '·')}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+});
+
+TimelineGrid.displayName = 'TimelineGrid';
 
 const DailyChallengePage: React.FC = () => {
     const { t } = useTranslation();
@@ -16,7 +173,6 @@ const DailyChallengePage: React.FC = () => {
     const [guessInput, setGuessInput] = useState('');
     const [attempts, setAttempts] = useState<Array<{ text: string; isCorrect: boolean }>>([]);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [playbackTime, setPlaybackTime] = useState(0);
     const [audioError, setAudioError] = useState(false);
     const [copied, setCopied] = useState(false);
     const [selectedTierDuration, setSelectedTierDuration] = useState<number | null>(null);
@@ -48,7 +204,7 @@ const DailyChallengePage: React.FC = () => {
         }
     }, [data, t]);
 
-    const handleTogglePlay = () => {
+    const handleTogglePlay = useCallback(() => {
         const audio = audioRef.current;
         if (!audio) return;
 
@@ -68,11 +224,14 @@ const DailyChallengePage: React.FC = () => {
                     setAudioError(true);
                 });
         }
-    };
+    }, [isPlaying, effectiveDuration]);
 
-    const handleSelectTier = (durationSec: number) => {
+    const handleSnippetFinished = useCallback(() => {
+        setIsPlaying(false);
+    }, []);
+
+    const handleSelectTier = useCallback((durationSec: number) => {
         setSelectedTierDuration(durationSec);
-        setPlaybackTime(0);
         setAudioError(false);
         const audio = audioRef.current;
         if (!audio) return;
@@ -84,27 +243,14 @@ const DailyChallengePage: React.FC = () => {
                 setIsPlaying(false);
                 setAudioError(true);
             });
-    };
+    }, []);
 
-    const handleTimeUpdate = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-
-        setPlaybackTime(audio.currentTime);
-        if (audio.currentTime >= effectiveDuration) {
-            audio.pause();
-            audio.currentTime = 0;
-            setIsPlaying(false);
-            setPlaybackTime(0);
-        }
-    };
-
-    const handleAudioError = () => {
+    const handleAudioError = useCallback(() => {
         setIsPlaying(false);
         setAudioError(true);
-    };
+    }, []);
 
-    const handleGuessSubmit = async (guessText: string) => {
+    const handleGuessSubmit = useCallback(async (guessText: string) => {
         if (!guessText.trim() || isCompleted || isSubmitting) return;
 
         const attemptNum = attempts.length + 1;
@@ -128,14 +274,14 @@ const DailyChallengePage: React.FC = () => {
         } catch (err) {
             console.error('Failed to submit guess', err);
         }
-    };
+    }, [attempts, isCompleted, isSubmitting, submitGuess, refetch]);
 
-    const handleSkip = () => {
+    const handleSkip = useCallback(() => {
         if (isCompleted || isSubmitting) return;
         handleGuessSubmit(t('daily.skip'));
-    };
+    }, [isCompleted, isSubmitting, handleGuessSubmit, t]);
 
-    const handleShare = async () => {
+    const handleShare = useCallback(async () => {
         const textToShare = data?.shareText || `SonGuess Daily #${data?.dayNumber}\nhttps://songuess.app/game/daily`;
 
         if (navigator.share) {
@@ -157,7 +303,7 @@ const DailyChallengePage: React.FC = () => {
         } catch {
             // ignore
         }
-    };
+    }, [data]);
 
     if (isLoading) {
         return (
@@ -168,8 +314,6 @@ const DailyChallengePage: React.FC = () => {
         );
     }
 
-    const progressPercent = Math.min(100, (playbackTime / effectiveDuration) * 100);
-
     return (
         <div className={styles.container}>
             {data?.preview && (
@@ -177,11 +321,7 @@ const DailyChallengePage: React.FC = () => {
                     ref={audioRef}
                     src={data.preview}
                     preload="auto"
-                    onTimeUpdate={handleTimeUpdate}
-                    onEnded={() => {
-                        setIsPlaying(false);
-                        setPlaybackTime(0);
-                    }}
+                    onEnded={handleSnippetFinished}
                     onError={handleAudioError}
                 />
             )}
@@ -199,64 +339,25 @@ const DailyChallengePage: React.FC = () => {
             </div>
 
             {/* 6-Segment Timeline */}
-            <div className={styles.timelineContainer}>
-                <div className={styles.timelineGrid}>
-                    {TIERS.map((tierSec, idx) => {
-                        const isCurrent = !isCompleted && idx === attempts.length;
-                        const isTierSelected = isCompleted && effectiveDuration === tierSec;
-                        const attempt = attempts[idx];
+            <TimelineGrid
+                tiers={TIERS}
+                attempts={attempts}
+                isCompleted={isCompleted}
+                effectiveDuration={effectiveDuration}
+            />
 
-                        let statusClass = '';
-                        if (attempt?.isCorrect) statusClass = styles.correct;
-                        else if (attempt && !attempt.isCorrect) statusClass = styles.wrong;
-                        else if (isCurrent || isTierSelected) statusClass = styles.active;
-
-                        return (
-                            <div key={idx} className={`${styles.timelineSegment} ${statusClass}`}>
-                                <span>{tierSec}s</span>
-                                <span style={{ fontSize: '10px', marginTop: '2px' }}>
-                                    {attempt ? (attempt.isCorrect ? '✓' : '✗') : (isCurrent ? '▶' : '·')}
-                                </span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Hero Player Card */}
-            <div className={styles.playerCard}>
-                <div className={`${styles.vinylDisc} ${isPlaying ? styles.spinning : ''}`}>
-                    <div className={styles.vinylHole}>
-                        <FaMusic />
-                    </div>
-                </div>
-
-                <button
-                    type="button"
-                    className={styles.playBtnHero}
-                    onClick={handleTogglePlay}
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                >
-                    {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: '4px' }} />}
-                </button>
-
-                <div className={styles.playStatusText}>
-                    {audioError
-                        ? t('daily.audioError')
-                        : isPlaying
-                        ? `${t('daily.playingSnippet')} (${playbackTime.toFixed(1)}s / ${effectiveDuration}s)`
-                        : `${t('daily.pressPlay')} (${effectiveDuration}s)`}
-                </div>
-
-                <div className={styles.progressWrapper}>
-                    <div className={styles.progressBarTrack}>
-                        <div className={styles.progressBarFill} style={{ width: `${progressPercent}%` }} />
-                    </div>
-                    <div className={styles.timeDisplay}>
-                        {playbackTime.toFixed(1)}s / {effectiveDuration}s
-                    </div>
-                </div>
-            </div>
+            {/* Hero Player Card - High performance RAF and ScaleX */}
+            <SnippetPlayer
+                audioRef={audioRef}
+                effectiveDuration={effectiveDuration}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+                onSnippetFinished={handleSnippetFinished}
+                audioError={audioError}
+                playText={t('daily.pressPlay')}
+                playingText={t('daily.playingSnippet')}
+                audioErrorText={t('daily.audioError')}
+            />
 
             {/* Guessing controls (if game not finished) */}
             {!isCompleted ? (
@@ -398,4 +499,4 @@ const DailyChallengePage: React.FC = () => {
     );
 };
 
-export default DailyChallengePage;
+export default memo(DailyChallengePage);

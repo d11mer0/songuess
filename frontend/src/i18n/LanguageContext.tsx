@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Language, TranslationDictionary } from './types';
 import { uk } from './locales/uk';
 import { en } from './locales/en';
@@ -19,16 +19,16 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return (saved === 'en' || saved === 'uk') ? saved : 'uk';
     });
 
-    const setLanguage = (lang: Language) => {
+    const setLanguage = useCallback((lang: Language) => {
         setLanguageState(lang);
         localStorage.setItem('songuess_lang', lang);
-    };
+    }, []);
 
     useEffect(() => {
         document.documentElement.lang = language;
     }, [language]);
 
-    const t = (path: string, params?: Record<string, string | number>): string => {
+    const t = useCallback((path: string, params?: Record<string, string | number>): string => {
         const parts = path.split('.');
         let current: any = dictionaries[language];
 
@@ -61,10 +61,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             });
         }
         return result;
-    };
+    }, [language]);
+
+    const value = useMemo(
+        () => ({ language, setLanguage, t }),
+        [language, setLanguage, t],
+    );
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={value}>
             {children}
         </LanguageContext.Provider>
     );

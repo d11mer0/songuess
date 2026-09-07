@@ -8,19 +8,20 @@
                 var(--background-primary);
     text-align: center;
     padding: 40px 20px;
-    animation: fadeIn 0.8s ease-in-out;
+    contain: paint;
 }
 
 .hero {
     max-width: 900px;
     width: 100%;
     padding: 48px 36px;
-    background: rgba(26, 21, 40, 0.75);
-    backdrop-filter: blur(16px);
+    background: rgba(26, 21, 40, 0.94);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(155, 93, 229, 0.15);
-    animation: slideUp 0.6s ease forwards;
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .badgeRow {
@@ -85,10 +86,11 @@
     border-radius: 12px;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transform: translateZ(0);
 }
 
 .primaryCta {
@@ -98,7 +100,7 @@
 }
 
 .primaryCta:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
     box-shadow: 0 8px 25px rgba(241, 91, 181, 0.6);
 }
 
@@ -109,7 +111,7 @@
 }
 
 .dailyCta:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
     box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
 }
 
@@ -121,7 +123,7 @@
 
 .leaderboardCta:hover {
     background: rgba(255, 215, 0, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
     box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
 }
 
@@ -131,6 +133,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
     text-align: left;
+    contain: content;
 }
 
 .featureCard {
@@ -139,13 +142,15 @@
     border-radius: 14px;
     padding: 20px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .featureCard:hover {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(155, 93, 229, 0.4);
-    transform: translateY(-3px);
+    transform: translateY(-3px) translateZ(0);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
@@ -168,15 +173,16 @@
     margin: 0;
 }
 
-/* 🔹 Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
+/* 🔹 Hardware-accelerated entrance animation */
 @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(14px) translateZ(0);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) translateZ(0);
+        opacity: 1;
+    }
 }
 
 /* 🔹 Responsive */
