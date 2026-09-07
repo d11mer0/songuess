@@ -198,14 +198,34 @@ export class DeezerService {
         type: 'track' | 'album' | 'artist' | 'playlist',
     ) {
         const cacheKey = `deezer:search:${type}:${encodeURIComponent(query.toLowerCase().trim())}`;
-        const cached = await this.getCached(cacheKey);
-        if (cached) return cached;
+        const cached = await this.getCached<any>(cacheKey);
+        if (cached) {
+            if (type === 'track' && cached?.data?.length > 0) {
+                const samplePreview = cached.data.find((t: any) => t?.preview)?.preview;
+                if (samplePreview) {
+                    const expMatch = samplePreview.match(/exp=(\d+)/);
+                    const nowSec = Math.floor(Date.now() / 1000);
+                    if (expMatch && Number(expMatch[1]) <= nowSec + 180) {
+                        if (this.redisService) {
+                            await this.redisService.del(cacheKey);
+                        }
+                    } else {
+                        return cached;
+                    }
+                } else {
+                    return cached;
+                }
+            } else {
+                return cached;
+            }
+        }
 
         const limit = type === 'album' ? 5 : 10;
         const res = await this.deezerApi.fetch(
             `/search/${type}?q=${encodeURIComponent(query)}&limit=${limit}`,
         );
-        await this.setCached(cacheKey, res, 7200);
+        const ttl = type === 'track' ? 1800 : 7200;
+        await this.setCached(cacheKey, res, ttl);
         return res;
     }
 
