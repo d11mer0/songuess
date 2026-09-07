@@ -5,10 +5,11 @@ import {
     FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 
-const apiBase = import.meta.env.PROD
-    ? ''
-    : (import.meta.env.VITE_API_URL || 'http://localhost:3000');
-const workLink = apiBase ? `${apiBase.replace(/\/+$/, '')}/api` : '/api';
+const apiBase = (
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.PROD ? '' : 'http://localhost:3000')
+).replace(/\/+$/, '');
+const workLink = apiBase ? `${apiBase}/api` : '/api';
 
 const getToken = () => localStorage.getItem('accessToken');
 

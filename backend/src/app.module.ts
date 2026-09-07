@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AchievementModule } from './achievements/achievement.module';
 import { LiqPayModule } from './liqpay/liqpay.module';
+import { HealthController } from './health/health.controller';
 
 @Module({
     imports: [
@@ -47,6 +48,7 @@ import { LiqPayModule } from './liqpay/liqpay.module';
         AchievementModule,
         LiqPayModule,
     ],
+    controllers: [HealthController],
     providers: [
         {
             provide: APP_GUARD,

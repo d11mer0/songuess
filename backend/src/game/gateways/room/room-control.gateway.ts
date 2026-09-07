@@ -12,7 +12,12 @@ import { RoomQueryService } from '../../services/room/room-query.service';
 import { RoomHelperService } from '../../services/room/room-helper.service';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 
-@WebSocketGateway()
+@WebSocketGateway({
+    cors: {
+        origin: true,
+        credentials: true,
+    },
+})
 @Injectable()
 export class RoomControlGateway {
     @WebSocketServer()

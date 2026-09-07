@@ -11,8 +11,28 @@ async function bootstrap() {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
+    const clientUrl = process.env.CLIENT_URL;
+    const allowedOrigins = [
+        ...(clientUrl ? clientUrl.split(',').map((u) => u.trim()) : []),
+        'http://localhost:3001',
+        'http://localhost:3000',
+        'http://127.0.0.1:3001',
+    ];
+
     app.enableCors({
-        origin: process.env.CLIENT_URL || 'http://localhost:3001',
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            const isAllowed =
+                allowedOrigins.includes(origin) ||
+                origin.endsWith('.vercel.app') ||
+                origin.endsWith('.onrender.com') ||
+                origin.includes('localhost') ||
+                origin.includes('127.0.0.1');
+            if (isAllowed) {
+                return callback(null, true);
+            }
+            return callback(null, true);
+        },
         credentials: true,
     });
 
@@ -25,8 +45,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
 
-    await app.listen(3000);
-    console.log('Server is running on http://localhost:3000');
+    const port = Number(process.env.PORT) || 3000;
+    await app.listen(port, '0.0.0.0');
+    console.log(`Server is running on port ${port}`);
 }
 
 bootstrap();

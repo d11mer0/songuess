@@ -14,27 +14,39 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     private readonly memoryFallback = new Map<string, GameRoom>();
 
     async onModuleInit() {
+        const redisUrl = process.env.REDIS_URL;
         const redisHost = process.env.REDIS_HOST || 'localhost';
         const redisPort = Number(process.env.REDIS_PORT) || 6379;
+        const redisPassword = process.env.REDIS_PASSWORD || undefined;
+
+        const commonOptions = {
+            maxRetriesPerRequest: 1,
+            retryStrategy: (times: number) => {
+                if (times > 3) {
+                    return null;
+                }
+                return Math.min(times * 200, 1000);
+            },
+            lazyConnect: true,
+            enableOfflineQueue: false,
+        };
 
         try {
-            this.client = new Redis({
-                host: redisHost,
-                port: redisPort,
-                maxRetriesPerRequest: 1,
-                retryStrategy: (times) => {
-                    if (times > 3) {
-                        return null;
-                    }
-                    return Math.min(times * 200, 1000);
-                },
-                lazyConnect: true,
-                enableOfflineQueue: false,
-            });
+            this.client = redisUrl
+                ? new Redis(redisUrl, {
+                      ...commonOptions,
+                      tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+                  })
+                : new Redis({
+                      host: redisHost,
+                      port: redisPort,
+                      password: redisPassword,
+                      ...commonOptions,
+                  });
 
             this.client.on('connect', () => {
                 this.isConnected = true;
-                this.logger.log('Connected to Redis at ' + redisHost + ':' + redisPort);
+                this.logger.log(`Connected to Redis at ${redisUrl ? 'REDIS_URL' : `${redisHost}:${redisPort}`}`);
             });
 
             this.client.on('error', (err) => {

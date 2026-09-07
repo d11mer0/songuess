@@ -10,7 +10,12 @@ import { GameplayService } from '../services/gameplay/gameplay.service';
 import { SubmitAnswerDto } from '../dto/submit-answer.dto';
 import { LaunchGameDto } from '../dto/launch-game.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({
+    cors: {
+        origin: true,
+        credentials: true,
+    },
+})
 export class GameplayGateway {
     @WebSocketServer()
     server: Server;
