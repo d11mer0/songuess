@@ -18,12 +18,17 @@ export class UserService {
             'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg',
         );
 
+        const emailConfigured = !!(
+            this.configService.get<string>('EMAIL_USER') &&
+            this.configService.get<string>('EMAIL_PASSWORD')
+        );
+
         return this.prisma.user.create({
             data: {
                 login,
                 email,
                 password: hashedPassword,
-                isVerified: false,
+                isVerified: !emailConfigured,
                 avatar: defaultAvatar,
             },
         });

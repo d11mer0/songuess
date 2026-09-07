@@ -28,7 +28,7 @@ import { Throttle } from '@nestjs/throttler';
 const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 };

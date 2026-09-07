@@ -73,11 +73,17 @@ export class AuthService {
         }
 
         const user = await this.userService.createUser(login, email, password);
-        await this.emailService.sendEmailVerification(user.id, user.email);
+        if (!user.isVerified) {
+            await this.emailService.sendEmailVerification(user.id, user.email);
+            return {
+                message:
+                    'Registration successful. Please verify your email to activate your account.',
+            };
+        }
 
         return {
             message:
-                'Registration successful. Please verify your email to activate your account.',
+                'Registration successful. You can now log in.',
         };
     }
 
