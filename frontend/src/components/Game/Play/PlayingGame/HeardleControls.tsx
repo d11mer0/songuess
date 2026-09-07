@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './HeardleControls.module.css';
 
 interface Props {
@@ -16,6 +17,8 @@ const HeardleControls: React.FC<Props> = ({
     canUnlockMore,
     hasAnswered,
 }) => {
+    const { t } = useTranslation();
+
     const getPotentialPoints = (sec: number) => {
         if (sec <= 1) return 500;
         if (sec <= 2) return 400;
@@ -28,10 +31,10 @@ const HeardleControls: React.FC<Props> = ({
         <div className={styles.container}>
             <div className={styles.heardleHeader}>
                 <span className={styles.heardleTitle}>
-                    ⏱️ Режим Heardle: відкрито {unlockedSeconds} сек
+                    {t('gameplay.heardleModeTitle', { seconds: unlockedSeconds })}
                 </span>
                 <span className={styles.bonusBadge}>
-                    Потенційні бали: {getPotentialPoints(unlockedSeconds)} pts
+                    {t('gameplay.potentialPoints', { points: getPotentialPoints(unlockedSeconds) })}
                 </span>
             </div>
 
@@ -59,8 +62,8 @@ const HeardleControls: React.FC<Props> = ({
                     disabled={!canUnlockMore}
                 >
                     {canUnlockMore
-                        ? `⏩ Розкрити більше звуку (+сек)`
-                        : 'Всі фрагменти розкрито'}
+                        ? t('gameplay.revealMoreAudio')
+                        : t('gameplay.allSnippetsRevealed')}
                 </button>
             )}
         </div>

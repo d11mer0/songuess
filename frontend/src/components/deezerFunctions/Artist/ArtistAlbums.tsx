@@ -1,5 +1,6 @@
 import styles from './Artist.module.css';
 import { useGetAlbumsByArtistQuery } from '../../../store/api/deezerApi';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import Loader from '../../UI/Loader/Loader/Loader';
 
 interface Album {
@@ -21,13 +22,14 @@ const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
     onSelectAlbum,
     selectedAlbumId,
 }) => {
+    const { t } = useTranslation();
     const {
         data: albumsData,
         isLoading,
         error,
     } = useGetAlbumsByArtistQuery(artistId, { skip: !artistId });
 
-    if (isLoading) return <Loader text='Playlists are loading, please wait'/>;
+    if (isLoading) return <Loader text={t('gameplay.loadingAlbums')}/>;
     if (!albumsData?.data?.length) return <></>
 
     return (
@@ -49,7 +51,7 @@ const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
                             />
                             <div className={styles.albumInfo}>
                                 <p className={styles.albumTitle}>{album.title}</p>
-                                <p className={styles.fans}>Fans: {album.fans.toLocaleString()}</p>
+                                <p className={styles.fans}>{t('gameplay.fansCount')} {album.fans.toLocaleString()}</p>
                                 <p className={styles.releaseDate}>
                                     {new Date(album.release_date).toLocaleDateString(undefined, {
                                         year: 'numeric',

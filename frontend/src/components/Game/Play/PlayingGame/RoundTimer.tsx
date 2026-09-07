@@ -1,13 +1,15 @@
-﻿import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectTrackInfo, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import { soundEffects } from '../../../../utils/audio/soundEffects';
 import { FaRegClock } from 'react-icons/fa';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './RoundTimer.module.css';
 
 const TOTAL_ROUND_MS = 25000;
 
 const RoundTimer: React.FC = () => {
+    const { t } = useTranslation();
     const trackInfo = useAppSelector(selectTrackInfo);
     const roundResult = useAppSelector(selectRoundResult);
 
@@ -53,7 +55,7 @@ const RoundTimer: React.FC = () => {
         <div className={styles.timerContainer}>
             <div className={styles.timerInfoRow}>
                 <div className={styles.timeLabel}>
-                    <FaRegClock /> Time Left
+                    <FaRegClock /> {t('gameplay.timeLeft')}
                 </div>
                 <div className={`${styles.secondsNumber} ${isUrgent ? styles.danger : ''}`}>
                     {secondsLeft}s

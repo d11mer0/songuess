@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AnswerOptions from './PlayingGame/AnswerOptions';
 import AudioPlayer from './PlayingGame/AudioPlayer';
 import RoundResult from './PlayingGame/RoundResult';
@@ -11,6 +11,7 @@ import RoundTimer from './PlayingGame/RoundTimer';
 
 import { useAppSelector } from '../../../store/hooks';
 import { selectTrackInfo, selectCurrentRoom } from '../../../store/gameplay/gameplaySelectors';
+import { useTranslation } from '../../../i18n/LanguageContext';
 import Loader from '../../UI/Loader/Loader/Loader';
 import styles from './PlayingGame.module.css';
 
@@ -19,6 +20,7 @@ type PlayingGameProps = {
 };
 
 const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
+    const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const trackInfo = useAppSelector(selectTrackInfo);
 
@@ -63,7 +65,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                     {trackInfo ? (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <h1 className={styles.roundTitle}>Round №{trackInfo.roundNumber + 1}</h1>
+                                <h1 className={styles.roundTitle}>{t('gameplay.round')} №{trackInfo.roundNumber + 1}</h1>
                                 {gameMode === 'DUEL' && (
                                     <div style={{
                                         background: 'linear-gradient(90deg, #ff007f, #7928ca)',
@@ -74,7 +76,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                                         color: '#fff',
                                         letterSpacing: '1px'
                                     }}>
-                                        ⚡ 1v1 BLITZ DUEL
+                                        {t('gameplay.blitzDuel')}
                                     </div>
                                 )}
                             </div>
@@ -111,7 +113,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                             </div>
                         </>
                     ) : (
-                        <Loader text="Next round is loading..." />
+                        <Loader text={t('gameplay.nextRoundLoading')} />
                     )}
                 </div>
             </div>

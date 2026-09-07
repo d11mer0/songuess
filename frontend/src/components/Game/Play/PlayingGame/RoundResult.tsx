@@ -48,9 +48,9 @@ const RoundResult = () => {
                 <div className={styles.streakAlert}>
                     <FaFire className={styles.streakFlameIcon} />
                     {streak >= 5 ? (
-                        <span>SUPER STREAK x{streak}! (x2.0 DOUBLE POINTS!)</span>
+                        <span>{t('gameplay.superStreakBonus', { streak })}</span>
                     ) : (
-                        <span>STREAK x{streak}! (+50% BONUS POINTS!)</span>
+                        <span>{t('gameplay.streakBonus', { streak })}</span>
                     )}
                 </div>
             )}

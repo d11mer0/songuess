@@ -74,14 +74,14 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
                     <div className={styles.albumDetails}>
                         <h3 className={styles.albumTitle}>{albumData.title}</h3>
                         <p className={styles.artistName}>
-                            <span>Singer:</span> {albumData.artist.name}
+                            <span>{t('gameplay.singer')}</span> {albumData.artist.name}
                         </p>
                     </div>
                 </div>
             )}
 
             <TrackList
-                title="Tracks of selected album"
+                title={t('gameplay.albumTracks')}
                 tracks={tracks}
                 isLoading={isLoading}
                 isList={isList}

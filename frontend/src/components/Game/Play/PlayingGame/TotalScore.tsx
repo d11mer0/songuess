@@ -1,9 +1,11 @@
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './TotalScore.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 
 const TotalScore = () => {
+    const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { user } = useAppSelector((state) => state.user);
     if (!currentRoom) return null;
@@ -14,7 +16,7 @@ const TotalScore = () => {
     
     return (
         <div className={styles.wrapper}>
-            <h2 className={styles.title}>Total Scores</h2>
+            <h2 className={styles.title}>{t('gameplay.totalScoresTitle')}</h2>
             <ul className={styles.list}>
                 {sortedPlayers.map((player, index) => {
                     const playerScore = player.totalScore ?? 0;
@@ -53,7 +55,7 @@ const TotalScore = () => {
                                         }}
                                     >
                                         {(player as any).isPremium && '⭐ '}
-                                        {isMe ? 'You' : player.login}
+                                        {isMe ? t('gameplay.you') : player.login}
                                     </span>
                                     {hasStreak && (
                                         <span className={`${styles.streakPill} ${playerStreak >= 5 ? styles.superStreakPill : ''}`}>

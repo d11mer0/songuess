@@ -30,7 +30,7 @@ const GameFinished: FC<Props> = ({ onRestartGame }) => {
             <div className={styles.gameFinishedContainer}>
                 <h2 className={styles.gameFinishedTitle}> {t('gameplay.gameOver')}</h2>
                 <p className={styles.gameFinishedMessage}>
-                    We couldn't retrieve your answers this time. Better luck next round!
+                    {t('gameplay.noAnswersRetrieved')}
                 </p>
             </div>
         );

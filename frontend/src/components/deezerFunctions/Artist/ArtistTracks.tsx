@@ -4,6 +4,7 @@ import { SelectedTracks, TrackItem } from '../../../types/gameTypes';
 import StartGameButtonBlock from '../../Game/Creating/TracksSelection/components/StartGameButtonBlock';
 import Loader from '../../UI/Loader/Loader/Loader';
 import TrackList from '../Track/TrackList';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface ArtistTracksProps {
     artistId: number;
@@ -16,6 +17,7 @@ const ArtistTracks: React.FC<ArtistTracksProps> = ({
     onSendTracks,
     isList = true,
 }) => {
+    const { t } = useTranslation();
     const { data, error, isLoading, isFetching } = useGetAllTracksByArtistQuery(artistId);
 
     const tracks =
@@ -31,13 +33,13 @@ const ArtistTracks: React.FC<ArtistTracksProps> = ({
         })) || [];
 
     if (isFetching || isLoading) {
-        return <Loader text="Loading tracks from the selected artist..." />;
+        return <Loader text={t('gameCreation.tracksLoading')} />;
     }
 
     return (
         <>
             <TrackList
-                title="Artist tracks"
+                title={t('gameCreation.formatAllTracks')}
                 tracks={tracks}
                 isLoading={isLoading}
                 error={error}

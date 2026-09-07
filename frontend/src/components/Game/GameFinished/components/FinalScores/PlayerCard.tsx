@@ -1,5 +1,6 @@
 import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 
 interface Player {
     id: number;
@@ -15,6 +16,7 @@ interface PlayerCardProps {
 }
 
 const PlayerCard = ({ player, rank, isYou }: PlayerCardProps) => {
+    const { t } = useTranslation();
     return (
         <div
             className={`${styles.playerCard} ${isYou ? styles.youHighlight : ''}`}
@@ -29,7 +31,7 @@ const PlayerCard = ({ player, rank, isYou }: PlayerCardProps) => {
                 }}
             />
             <span className={styles.playerName}>
-                {isYou ? 'YOU' : player.login}
+                {isYou ? t('gameplay.youUpper') : player.login}
             </span>
             <span className={styles.playerScore}>
                 {player.totalScore?.toFixed(2) ?? 0} pts

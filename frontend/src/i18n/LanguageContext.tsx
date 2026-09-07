@@ -57,7 +57,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         let result = current;
         if (params) {
             Object.entries(params).forEach(([key, val]) => {
-                result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(val));
+                result = result.replace(new RegExp(`\\{\\{?${key}\\}?\\}`, 'g'), String(val));
             });
         }
         return result;

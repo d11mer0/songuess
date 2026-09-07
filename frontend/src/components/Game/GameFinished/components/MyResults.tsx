@@ -1,4 +1,5 @@
 import { FaChartLine } from 'react-icons/fa';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from '../GameFinished.module.css';
 
 interface Track {
@@ -17,9 +18,10 @@ interface MyResultsProps {
 }
 
 const MyResults = ({ results }: MyResultsProps) => {
+    const { t } = useTranslation();
     return (
         <section className={styles.gameFinishedSection}>
-            <h3 className={styles.sectionTitle}><FaChartLine className={styles.sectionIcon} /> Your Performance</h3>
+            <h3 className={styles.sectionTitle}><FaChartLine className={styles.sectionIcon} /> {t('gameplay.yourPerformance')}</h3>
             <ul className={styles.resultsList}>
                 {results.map((res, i) => (
                     <li key={i} className={styles.resultItem}>

@@ -1,4 +1,5 @@
 import SearchDropdown from '../../SearchDropdown/SearchDropdown';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface Artist {
     id: number;
@@ -25,6 +26,7 @@ const AlbumSearch: React.FC<AlbumSearchProps> = ({
     albumResults,
     onSelect,
 }) => {
+    const { t } = useTranslation();
     return (
         <SearchDropdown<Album>
             value={albumName}
@@ -33,7 +35,7 @@ const AlbumSearch: React.FC<AlbumSearchProps> = ({
             onSelect={onSelect} // ✅ SearchDropdown вже повертає id, тому передаємо напряму
             optionLabel="title"
             getSubtext={(album) => album.artist.name}
-            placeholder="Search album... e.g. 'Future Nostalgia'" // 👈 ДОДАЙ ЦЕ
+            placeholder={t('gameCreation.searchAlbumPlaceholder')}
         />
     );
 };

@@ -1,9 +1,11 @@
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './PlayerRoundResults.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 
 const PlayersRoundResults = () => {
+    const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const roundResult = useAppSelector(selectRoundResult);
 
@@ -66,33 +68,33 @@ const PlayersRoundResults = () => {
                         </div>
 
                         <p className={styles.playerName}>
-                            {isCurrentPlayer ? 'YOU' : player.login}
+                            {isCurrentPlayer ? t('gameplay.youUpper') : player.login}
                         </p>
 
                         {hasStreak && (
                             <div className={`${styles.streakBadge} ${playerStreak >= 5 ? styles.superStreak : ''}`}>
-                                🔥 x{playerStreak} {playerStreak >= 5 ? 'ON FIRE! (2x)' : '(1.5x)'}
+                                🔥 x{playerStreak} {playerStreak >= 5 ? `${t('gameplay.onFire')} (2x)` : '(1.5x)'}
                             </div>
                         )}
 
                         {!noAnswer && r.isCorrect && (
                             <h2 className={styles.playerScore}>
-                                +{r.score.toFixed(2)} points
+                                +{r.score.toFixed(2)} {t('gameplay.points')}
                             </h2>
                         )}
 
                         {!noAnswer ? (
                             <>
-                                {r.isCorrect === false && <div className={styles.incorrectText}>Incorrect answer</div>}
+                                {r.isCorrect === false && <div className={styles.incorrectText}>{t('gameplay.incorrectAnswer')}</div>}
                                 <div className={styles.playerTime}>
-                                    Time: {typeof r.timeTaken === 'number'
+                                    {t('gameplay.timeTaken')} {typeof r.timeTaken === 'number'
                                         ? `${(r.timeTaken / 1000).toFixed(2)}s`
                                         : '—'}
                                 </div>
                             </>
                             
                         ) : (
-                            <div className={styles.incorrectText}>Late with the answer</div>
+                            <div className={styles.incorrectText}>{t('gameplay.lateWithAnswer')}</div>
                         )}
                     </div>
                 );

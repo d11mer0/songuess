@@ -73,28 +73,64 @@ export class DeezerService {
         }
     }
 
+    private arePreviewsExpired(data: any): boolean {
+        if (!data) return false;
+        let trackList: any[] = [];
+        if (Array.isArray(data)) {
+            trackList = data;
+        } else if (Array.isArray(data.data)) {
+            trackList = data.data;
+        } else if (Array.isArray(data.tracks?.data)) {
+            trackList = data.tracks.data;
+        } else if (data.preview) {
+            trackList = [data];
+        }
+
+        const sample = trackList.find((t) => t?.preview && typeof t.preview === 'string');
+        if (!sample) return false;
+
+        const expMatch = sample.preview.match(/exp=(\d+)/);
+        if (!expMatch) return false;
+
+        const expSec = Number(expMatch[1]);
+        const nowSec = Math.floor(Date.now() / 1000);
+        return expSec <= nowSec + 180;
+    }
+
+    private async getCachedValid<T = any>(key: string): Promise<T | null> {
+        const cached = await this.getCached<T>(key);
+        if (!cached) return null;
+        if (this.arePreviewsExpired(cached)) {
+            if (this.redisService) {
+                await this.redisService.del(key);
+            }
+            return null;
+        }
+        return cached;
+    }
+
     // 🔹 Отримати інформацію про трек за ID
     async getTrackById(trackId: number) {
         const cacheKey = `deezer:track:${trackId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/track/${trackId}`);
-        await this.setCached(cacheKey, res, 86400);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
     // 🔹 Отримати інформацію про альбом за ID
     async getAlbumById(albumId: number) {
         const cacheKey = `deezer:album:${albumId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/album/${albumId}`);
         if (res?.tracks?.data) {
             res.tracks.data = filterTracks(res.tracks.data);
         }
-        await this.setCached(cacheKey, res, 43200);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
@@ -123,25 +159,25 @@ export class DeezerService {
     // 🔹 Отримати інформацію про плейліст за ID
     async getPlaylistById(playlistId: number) {
         const cacheKey = `deezer:playlist:${playlistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/playlist/${playlistId}`);
         if (res?.tracks?.data) {
             res.tracks.data = filterTracks(res.tracks.data);
         }
-        await this.setCached(cacheKey, res, 43200);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
     // 🔹 Отримати топ-треки артиста
     async getTopTracksByArtist(artistId: number) {
         const cacheKey = `deezer:artist_top:${artistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/artist/${artistId}/top?limit=10`);
-        await this.setCached(cacheKey, res, 43200);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
@@ -182,13 +218,13 @@ export class DeezerService {
     // 🔹 Отримати всі треки артиста
     async getAllTracksByArtist(artistId: number) {
         const cacheKey = `deezer:artist_all:${artistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const albums = await this.getFilteredArtistAlbums(artistId);
         const allTracks = await this.getTracksFromAlbums(albums);
         const res = filterTracksByArtist(allTracks, this.nonOriginalKeywords);
-        await this.setCached(cacheKey, res, 43200);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
@@ -198,27 +234,8 @@ export class DeezerService {
         type: 'track' | 'album' | 'artist' | 'playlist',
     ) {
         const cacheKey = `deezer:search:${type}:${encodeURIComponent(query.toLowerCase().trim())}`;
-        const cached = await this.getCached<any>(cacheKey);
-        if (cached) {
-            if (type === 'track' && cached?.data?.length > 0) {
-                const samplePreview = cached.data.find((t: any) => t?.preview)?.preview;
-                if (samplePreview) {
-                    const expMatch = samplePreview.match(/exp=(\d+)/);
-                    const nowSec = Math.floor(Date.now() / 1000);
-                    if (expMatch && Number(expMatch[1]) <= nowSec + 180) {
-                        if (this.redisService) {
-                            await this.redisService.del(cacheKey);
-                        }
-                    } else {
-                        return cached;
-                    }
-                } else {
-                    return cached;
-                }
-            } else {
-                return cached;
-            }
-        }
+        const cached = await this.getCachedValid<any>(cacheKey);
+        if (cached) return cached;
 
         const limit = type === 'album' ? 5 : 10;
         const res = await this.deezerApi.fetch(
@@ -312,7 +329,7 @@ export class DeezerService {
 
     async getThemeTracks(themeId: string) {
         const cacheKey = `deezer:theme:${themeId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         const theme = this.getCuratedThemes().find((t) => t.id === themeId);
@@ -333,7 +350,7 @@ export class DeezerService {
             };
         }
 
-        await this.setCached(cacheKey, result, 86400);
+        await this.setCached(cacheKey, result, 1800);
         return result;
     }
 
@@ -341,7 +358,7 @@ export class DeezerService {
         if (!url) throw new BadRequestException('URL cannot be empty');
 
         const cacheKey = `deezer:url:${encodeURIComponent(url.trim())}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
         let result;
@@ -379,7 +396,7 @@ export class DeezerService {
             throw new BadRequestException('Не вдалося розпізнати посилання на плейліст Deezer або Spotify.');
         }
 
-        await this.setCached(cacheKey, result, 86400);
+        await this.setCached(cacheKey, result, 1800);
         return result;
     }
 }

@@ -1,4 +1,5 @@
 import { FaTrophy } from 'react-icons/fa';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from '../GameFinished.module.css';
 import PodiumCard from './FinalScores/PodiumCard';
 import PlayerCard from './FinalScores/PlayerCard';
@@ -16,6 +17,7 @@ interface FinalScoresProps {
 }
 
 const FinalScores = ({ players, userId }: FinalScoresProps) => {
+    const { t } = useTranslation();
     const sortedPlayers = [...players].sort(
         (a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)
     );
@@ -26,7 +28,7 @@ const FinalScores = ({ players, userId }: FinalScoresProps) => {
     return (
         <section className={styles.gameFinishedSection}>
             <h3 className={styles.sectionTitle}>
-                <FaTrophy className={styles.sectionIcon} /> Final Scores
+                <FaTrophy className={styles.sectionIcon} /> {t('gameplay.finalScoresTitle')}
             </h3>
             <div className={styles.playerList}>
                 <div className={styles.podium}>

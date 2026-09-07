@@ -7,6 +7,7 @@ import {
     selectRoundResult,
 } from '../../../../store/gameplay/gameplaySelectors';
 import { FaKeyboard } from 'react-icons/fa';
+import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './TypeInAnswer.module.css';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
+    const { t } = useTranslation();
     const [inputValue, setInputValue] = useState('');
     const [submittedAnswer, setSubmittedAnswer] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -45,7 +47,7 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
     return (
         <div className={styles.container}>
             <h2 className={styles.title}>
-                <FaKeyboard className={styles.icon} /> Hardcore Mode: Введіть назву треку
+                <FaKeyboard className={styles.icon} /> {t('gameplay.typeInTitle')}
             </h2>
 
             {!submittedAnswer && !result ? (
@@ -54,7 +56,7 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
                         ref={inputRef}
                         type="text"
                         className={styles.textInput}
-                        placeholder="Назва треку або виконавець..."
+                        placeholder={t('gameplay.typeInPlaceholder')}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         disabled={!!submittedAnswer || !!result}
@@ -65,18 +67,18 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
                         className={styles.submitButton}
                         disabled={!inputValue.trim() || !!submittedAnswer || !!result}
                     >
-                        Відповісти
+                        {t('gameplay.typeInSubmit')}
                     </button>
                 </form>
             ) : (
                 <div className={styles.submittedAlert}>
-                    Ваша відповідь: <strong>"{submittedAnswer}"</strong>
-                    {!result && ' — очікуємо завершення раунду...'}
+                    {t('gameplay.yourAnswer')} <strong>"{submittedAnswer}"</strong>
+                    {!result && t('gameplay.waitingForRoundEnd')}
                 </div>
             )}
 
             <div className={styles.hintText}>
-                💡 Допускаються незначні друкарські помилки (Fuzzy Match). Натисніть Enter для відправки.
+                {t('gameplay.typeInFuzzyHint')}
             </div>
         </div>
     );
