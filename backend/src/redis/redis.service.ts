@@ -202,12 +202,27 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         try {
             const val = await this.client.get(key);
             if (val !== null) {
-                this.genericCache.set(key, { value: val });
+                const ttl = await this.client.ttl(key);
+                this.genericCache.set(key, {
+                    value: val,
+                    expiresAt: ttl > 0 ? Date.now() + ttl * 1000 : undefined,
+                });
             }
             return val;
         } catch (err: any) {
             this.logger.warn('Failed to get ' + key + ' from Redis: ' + err?.message);
             return null;
+        }
+    }
+
+    async del(key: string): Promise<void> {
+        this.genericCache.delete(key);
+        if (this.isRedisActive && this.client) {
+            try {
+                await this.client.del(key);
+            } catch (err: any) {
+                this.logger.warn('Failed to delete ' + key + ' from Redis: ' + err?.message);
+            }
         }
     }
 

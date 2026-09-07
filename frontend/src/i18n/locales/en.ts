@@ -169,6 +169,11 @@ export const en: TranslationDictionary = {
         allTiersDesc: 'Click on any attempt below or choose a duration:',
         listenTier: 'Listen',
         fullTrack: 'Full Track (30s)',
+        optionsMode: '4 Options',
+        manualMode: 'Manual Input',
+        playingSnippet: 'Playing snippet',
+        pressPlay: 'Click Play to listen',
+        audioError: 'Audio snippet failed to load. Click to retry.',
     },
     gameplay: {
         round: 'Round',

@@ -169,6 +169,11 @@ export interface TranslationDictionary {
         allTiersDesc: string;
         listenTier: string;
         fullTrack: string;
+        optionsMode: string;
+        manualMode: string;
+        playingSnippet: string;
+        pressPlay: string;
+        audioError: string;
     };
     gameplay: {
         round: string;

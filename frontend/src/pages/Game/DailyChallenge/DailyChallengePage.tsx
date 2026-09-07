@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGetDailyChallengeQuery, useSubmitDailyGuessMutation } from '../../../store/api/dailyApi';
 import { soundEffects } from '../../../utils/audio/soundEffects';
 import styles from './DailyChallengePage.module.css';
-import { FaPlay, FaPause, FaShareAlt, FaCheck, FaFire } from 'react-icons/fa';
+import { FaPlay, FaPause, FaShareAlt, FaCheck, FaFire, FaMusic } from 'react-icons/fa';
 import { useTranslation } from '../../../i18n/LanguageContext';
 
 const TIERS = [1, 2, 4, 7, 11, 16];
@@ -12,12 +12,13 @@ const DailyChallengePage: React.FC = () => {
     const { data, isLoading, refetch } = useGetDailyChallengeQuery();
     const [submitGuess, { isLoading: isSubmitting }] = useSubmitDailyGuessMutation();
 
+    const [guessMode, setGuessMode] = useState<'options' | 'manual'>('options');
     const [guessInput, setGuessInput] = useState('');
     const [attempts, setAttempts] = useState<Array<{ text: string; isCorrect: boolean }>>([]);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackTime, setPlaybackTime] = useState(0);
+    const [audioError, setAudioError] = useState(false);
     const [copied, setCopied] = useState(false);
-
     const [selectedTierDuration, setSelectedTierDuration] = useState<number | null>(null);
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -25,16 +26,21 @@ const DailyChallengePage: React.FC = () => {
     const currentTierIndex = Math.min(TIERS.length - 1, attempts.length);
     const maxDuration = TIERS[currentTierIndex];
 
-    const isCompleted = data?.isCompleted || (attempts.length >= 6) || attempts.some((a) => a.isCorrect);
-    const isSolved = data?.isSolved || attempts.some((a) => a.isCorrect);
+    const isCompleted = Boolean(data?.isCompleted || attempts.length >= 6 || attempts.some((a) => a.isCorrect));
+    const isSolved = Boolean(data?.isSolved || attempts.some((a) => a.isCorrect));
     const effectiveDuration = isCompleted ? (selectedTierDuration ?? 30) : maxDuration;
+
+    const nextTierIndex = Math.min(TIERS.length - 1, attempts.length + 1);
+    const diffSec = TIERS[nextTierIndex] - maxDuration;
 
     useEffect(() => {
         if (data?.isCompleted) {
             const reconstructed = [];
             for (let i = 1; i <= data.guessesCount; i++) {
                 reconstructed.push({
-                    text: i === data.guessesCount && data.isSolved ? `${data.track?.artistName} - ${data.track?.title}` : `${t('daily.attempt')} #${i}`,
+                    text: i === data.guessesCount && data.isSolved
+                        ? `${data.track?.artistName} - ${data.track?.title}`
+                        : `${t('daily.attempt')} #${i}`,
                     isCorrect: i === data.guessesCount && data.isSolved,
                 });
             }
@@ -50,18 +56,34 @@ const DailyChallengePage: React.FC = () => {
             audio.pause();
             setIsPlaying(false);
         } else {
-            audio.currentTime = 0;
-            audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+            setAudioError(false);
+            if (audio.currentTime >= effectiveDuration) {
+                audio.currentTime = 0;
+            }
+            audio.play()
+                .then(() => setIsPlaying(true))
+                .catch((err) => {
+                    console.warn('Daily audio play error:', err);
+                    setIsPlaying(false);
+                    setAudioError(true);
+                });
         }
     };
 
     const handleSelectTier = (durationSec: number) => {
         setSelectedTierDuration(durationSec);
         setPlaybackTime(0);
+        setAudioError(false);
         const audio = audioRef.current;
         if (!audio) return;
         audio.currentTime = 0;
-        audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        audio.play()
+            .then(() => setIsPlaying(true))
+            .catch((err) => {
+                console.warn('Tier playback error:', err);
+                setIsPlaying(false);
+                setAudioError(true);
+            });
     };
 
     const handleTimeUpdate = () => {
@@ -75,6 +97,11 @@ const DailyChallengePage: React.FC = () => {
             setIsPlaying(false);
             setPlaybackTime(0);
         }
+    };
+
+    const handleAudioError = () => {
+        setIsPlaying(false);
+        setAudioError(true);
     };
 
     const handleGuessSubmit = async (guessText: string) => {
@@ -151,173 +178,220 @@ const DailyChallengePage: React.FC = () => {
                     src={data.preview}
                     preload="auto"
                     onTimeUpdate={handleTimeUpdate}
-                    onEnded={() => setIsPlaying(false)}
-                    onError={() => {
+                    onEnded={() => {
                         setIsPlaying(false);
+                        setPlaybackTime(0);
                     }}
+                    onError={handleAudioError}
                 />
             )}
 
+            {/* Header */}
             <div className={styles.header}>
                 <h1 className={styles.title}>{t('daily.title')} #{data?.dayNumber}</h1>
+                <p className={styles.subtitle}>{t('daily.subtitle')}</p>
                 <div className={styles.dateRow}>
                     <span>{data?.date}</span>
                     <span className={styles.streakPill}>
-                        <FaFire /> {data?.streak || 0} {t('common.days')} {t('leaderboard.streak').toLowerCase()} ({t('profile.record')}: {data?.maxStreak || 0})
+                        <FaFire /> {data?.streak || 0} {t('common.days')} ({t('profile.record')}: {data?.maxStreak || 0})
                     </span>
                 </div>
             </div>
 
-            {/* Сповіщення про відкриті всі рівні після завершення гри */}
-            {isCompleted && (
-                <>
-                    <div className={styles.unlockedNotice}>
-                        <div className={styles.unlockedIcon}>🔓</div>
-                        <div>
-                            <div className={styles.unlockedTitle}>{t('daily.allTiersUnlocked')}</div>
-                            <div className={styles.unlockedSubtitle}>{t('daily.allTiersDesc')}</div>
-                        </div>
-                    </div>
+            {/* 6-Segment Timeline */}
+            <div className={styles.timelineContainer}>
+                <div className={styles.timelineGrid}>
+                    {TIERS.map((tierSec, idx) => {
+                        const isCurrent = !isCompleted && idx === attempts.length;
+                        const isTierSelected = isCompleted && effectiveDuration === tierSec;
+                        const attempt = attempts[idx];
 
-                    <div className={styles.tierPillsRow}>
-                        {TIERS.map((tierSec, idx) => (
+                        let statusClass = '';
+                        if (attempt?.isCorrect) statusClass = styles.correct;
+                        else if (attempt && !attempt.isCorrect) statusClass = styles.wrong;
+                        else if (isCurrent || isTierSelected) statusClass = styles.active;
+
+                        return (
+                            <div key={idx} className={`${styles.timelineSegment} ${statusClass}`}>
+                                <span>{tierSec}s</span>
+                                <span style={{ fontSize: '10px', marginTop: '2px' }}>
+                                    {attempt ? (attempt.isCorrect ? '✓' : '✗') : (isCurrent ? '▶' : '·')}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Hero Player Card */}
+            <div className={styles.playerCard}>
+                <div className={`${styles.vinylDisc} ${isPlaying ? styles.spinning : ''}`}>
+                    <div className={styles.vinylHole}>
+                        <FaMusic />
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    className={styles.playBtnHero}
+                    onClick={handleTogglePlay}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                    {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: '4px' }} />}
+                </button>
+
+                <div className={styles.playStatusText}>
+                    {audioError
+                        ? t('daily.audioError')
+                        : isPlaying
+                        ? `${t('daily.playingSnippet')} (${playbackTime.toFixed(1)}s / ${effectiveDuration}s)`
+                        : `${t('daily.pressPlay')} (${effectiveDuration}s)`}
+                </div>
+
+                <div className={styles.progressWrapper}>
+                    <div className={styles.progressBarTrack}>
+                        <div className={styles.progressBarFill} style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <div className={styles.timeDisplay}>
+                        {playbackTime.toFixed(1)}s / {effectiveDuration}s
+                    </div>
+                </div>
+            </div>
+
+            {/* Guessing controls (if game not finished) */}
+            {!isCompleted ? (
+                <div>
+                    {data?.options && data.options.length > 0 && (
+                        <div className={styles.modeSwitcher}>
                             <button
-                                key={idx}
                                 type="button"
-                                className={`${styles.tierPill} ${effectiveDuration === tierSec ? styles.activeTierPill : ''}`}
-                                onClick={() => handleSelectTier(tierSec)}
+                                className={`${styles.modeTab} ${guessMode === 'options' ? styles.activeMode : ''}`}
+                                onClick={() => setGuessMode('options')}
                             >
-                                <FaPlay style={{ fontSize: '9px' }} /> {tierSec}s
+                                {t('daily.optionsMode')}
                             </button>
-                        ))}
+                            <button
+                                type="button"
+                                className={`${styles.modeTab} ${guessMode === 'manual' ? styles.activeMode : ''}`}
+                                onClick={() => setGuessMode('manual')}
+                            >
+                                {t('daily.manualMode')}
+                            </button>
+                        </div>
+                    )}
+
+                    {guessMode === 'options' && data?.options && data.options.length > 0 ? (
+                        <div className={styles.optionsGrid}>
+                            {data.options.map((option, i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    className={styles.optionCard}
+                                    onClick={() => handleGuessSubmit(option)}
+                                    disabled={isSubmitting}
+                                >
+                                    <FaMusic className={styles.optionIcon} />
+                                    <span className={styles.optionText}>{option}</span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={styles.manualInputRow}>
+                            <input
+                                type="text"
+                                className={styles.textInput}
+                                placeholder={t('daily.typeGuess')}
+                                value={guessInput}
+                                onChange={(e) => setGuessInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleGuessSubmit(guessInput)}
+                                disabled={isSubmitting}
+                            />
+                            <button
+                                type="button"
+                                className={styles.submitBtn}
+                                onClick={() => handleGuessSubmit(guessInput)}
+                                disabled={!guessInput.trim() || isSubmitting}
+                            >
+                                {t('daily.guessBtn')}
+                            </button>
+                        </div>
+                    )}
+
+                    <div className={styles.skipActionRow}>
                         <button
                             type="button"
-                            className={`${styles.tierPill} ${styles.fullTrackPill} ${effectiveDuration === 30 ? styles.activeTierPill : ''}`}
-                            onClick={() => handleSelectTier(30)}
+                            className={styles.skipBtn}
+                            onClick={handleSkip}
+                            disabled={isSubmitting}
                         >
-                            <FaPlay style={{ fontSize: '9px' }} /> {t('daily.fullTrack')}
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {/* Плеєр фрагмента */}
-            <div className={styles.playerSection}>
-                <div className={styles.progressBarTrack}>
-                    <div className={styles.progressBarFill} style={{ width: `${progressPercent}%` }} />
-                </div>
-                <div className={styles.audioControlsRow}>
-                    <button
-                        className={styles.playBtn}
-                        onClick={handleTogglePlay}
-                        aria-label={isPlaying ? 'Pause' : 'Play'}
-                    >
-                        {isPlaying ? <FaPause /> : <FaPlay />}
-                    </button>
-                    <span className={styles.snippetDurationLabel}>
-                        {playbackTime.toFixed(1)}s / {effectiveDuration}s
-                    </span>
-                </div>
-            </div>
-
-            {/* Сітка 6 спроб */}
-            <div className={styles.attemptsList}>
-                {Array.from({ length: 6 }).map((_, index) => {
-                    const attempt = attempts[index];
-                    let statusClass = styles.empty;
-                    let content = `${t('daily.attempt')} ${index + 1} (${TIERS[index]}s)`;
-
-                    if (attempt) {
-                        statusClass = attempt.isCorrect ? styles.correct : styles.wrong;
-                        content = attempt.isCorrect ? `🟩 ${attempt.text}` : `🟥 ${attempt.text}`;
-                    }
-
-                    return (
-                        <div key={index} className={`${styles.attemptRow} ${statusClass}`}>
-                            <span>{content}</span>
-                            {isCompleted && (
-                                <button
-                                    type="button"
-                                    className={styles.tierPlayBtn}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleSelectTier(TIERS[index]);
-                                    }}
-                                    title={`${t('daily.listenTier')} ${TIERS[index]}s`}
-                                    aria-label={`${t('daily.listenTier')} ${TIERS[index]}s`}
-                                >
-                                    <FaPlay style={{ fontSize: '9px', marginLeft: '1px' }} />
-                                </button>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Форма введення (якщо ще не завершено) */}
-            {!isCompleted ? (
-                <div className={styles.inputSection}>
-                    <div className={styles.typeInRow}>
-                        <input
-                            type="text"
-                            className={styles.textInput}
-                            placeholder={t('daily.typeGuess')}
-                            value={guessInput}
-                            onChange={(e) => setGuessInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleGuessSubmit(guessInput)}
-                        />
-                        <button
-                            className={styles.submitBtn}
-                            onClick={() => handleGuessSubmit(guessInput)}
-                            disabled={!guessInput.trim() || isSubmitting}
-                        >
-                            {t('daily.guessBtn')}
+                            {t('daily.skip')} {diffSec > 0 ? `(+${diffSec}s)` : ''}
                         </button>
                     </div>
 
-                    {data?.options && data.options.length > 0 && (
-                        <>
-                            <div className={styles.optionsTitle}>{t('daily.selectOption')}</div>
-                            <div className={styles.optionsGrid}>
-                                {data.options.map((option, i) => (
-                                    <button
-                                        key={i}
-                                        className={styles.optionBtn}
-                                        onClick={() => handleGuessSubmit(option)}
-                                        disabled={isSubmitting}
+                    {attempts.length > 0 && (
+                        <div className={styles.attemptsHistory}>
+                            <div className={styles.historyTitle}>{t('daily.attempt')}s</div>
+                            <div className={styles.historyChips}>
+                                {attempts.map((att, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`${styles.historyChip} ${att.isCorrect ? styles.correctChip : styles.wrongChip}`}
                                     >
-                                        {option}
-                                    </button>
+                                        <span>{att.isCorrect ? '✓' : '✗'}</span>
+                                        <span>{att.text}</span>
+                                    </div>
                                 ))}
                             </div>
-                        </>
-                    )}
-
-                    <div className={styles.actionRow}>
-                        <button className={styles.skipBtn} onClick={handleSkip} disabled={isSubmitting}>
-                            {t('daily.skip')} (+{TIERS[Math.min(TIERS.length - 1, attempts.length + 1)] - maxDuration}s)
-                        </button>
-                    </div>
-                </div>
-            ) : (
-                /* Результат гри */
-                <div className={`${styles.resultCard} ${isSolved ? styles.solved : styles.failed}`}>
-                    <div className={styles.resultHeader}>
-                        {isSolved ? t('daily.solvedSuccess') : t('daily.failedText')}
-                    </div>
-
-                    {data?.track && (
-                        <div className={styles.trackInfoBox}>
-                            <div className={styles.trackTitle}>{data.track.title}</div>
-                            <div className={styles.trackArtist}>{data.track.artistName}</div>
                         </div>
                     )}
+                </div>
+            ) : (
+                /* Completed summary & Unlocked Tiers */
+                <div>
+                    <div className={`${styles.resultCard} ${isSolved ? styles.solved : styles.failed}`}>
+                        <div className={styles.resultHeader}>
+                            {isSolved ? t('daily.solvedSuccess') : t('daily.failedText')}
+                        </div>
 
-                    <button className={styles.shareBtn} onClick={handleShare}>
-                        {copied ? <FaCheck /> : <FaShareAlt />}
-                        {copied ? t('daily.shareCopied') : t('daily.shareBtn')}
-                    </button>
-                    {copied && <div className={styles.toast}>{t('daily.shareCopied')}</div>}
+                        {data?.track && (
+                            <div className={styles.trackInfoBox}>
+                                <div className={styles.trackTitle}>{data.track.title}</div>
+                                <div className={styles.trackArtist}>{data.track.artistName}</div>
+                            </div>
+                        )}
+
+                        <button type="button" className={styles.shareBtn} onClick={handleShare}>
+                            {copied ? <FaCheck /> : <FaShareAlt />}
+                            {copied ? t('daily.shareCopied') : t('daily.shareBtn')}
+                        </button>
+                        {copied && <div className={styles.toast}>{t('daily.shareCopied')}</div>}
+                    </div>
+
+                    <div className={styles.unlockedSection}>
+                        <div className={styles.unlockedHeader}>
+                            <span>🔓</span>
+                            <span className={styles.unlockedTitle}>{t('daily.allTiersUnlocked')}</span>
+                        </div>
+                        <div className={styles.tierPillsRow}>
+                            {TIERS.map((tierSec, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    className={`${styles.tierPill} ${effectiveDuration === tierSec ? styles.activeTierPill : ''}`}
+                                    onClick={() => handleSelectTier(tierSec)}
+                                >
+                                    <FaPlay style={{ fontSize: '9px' }} /> {tierSec}s
+                                </button>
+                            ))}
+                            <button
+                                type="button"
+                                className={`${styles.tierPill} ${styles.fullTrackPill} ${effectiveDuration === 30 ? styles.activeTierPill : ''}`}
+                                onClick={() => handleSelectTier(30)}
+                            >
+                                <FaPlay style={{ fontSize: '9px' }} /> {t('daily.fullTrack')}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -169,6 +169,11 @@ export const uk: TranslationDictionary = {
         allTiersDesc: 'Натисніть на будь-яку спробу нижче або оберіть тривалість:',
         listenTier: 'Слухати',
         fullTrack: 'Повний трек (30с)',
+        optionsMode: '4 варіанти',
+        manualMode: 'Ввести вручну',
+        playingSnippet: 'Відтворення уривка',
+        pressPlay: 'Натисніть Play для прослуховування',
+        audioError: 'Помилка завантаження аудіо. Натисніть щоб спробувати знову.',
     },
     gameplay: {
         round: 'Раунд',

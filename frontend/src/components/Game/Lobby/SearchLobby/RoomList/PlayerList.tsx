@@ -7,7 +7,7 @@ interface Props {
 const PlayerList = ({ players }: Props) => {
     return (
         <ul className={styles.playerLoginsList}>
-            {players.map((player) => (
+            {(players || []).map((player) => (
                 <li key={player.login} className={styles.playerLogin}>
                     <span className={`${styles.playerStatusDot} ${
                             player.isOnline ? styles.online : styles.offline

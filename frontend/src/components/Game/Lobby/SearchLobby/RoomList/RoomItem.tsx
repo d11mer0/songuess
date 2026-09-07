@@ -26,11 +26,11 @@ const RoomItem = ({ room, onJoin }: Props) => {
                     )}
                 </p>
                 <p className={styles.playersHeader}>
-                    Players ({room.players.length}/{room.lobbyOptions.maxPlayers})
+                    Players ({room.players?.length || 0}/{room.lobbyOptions?.maxPlayers || 4})
                 </p>
             </div>
 
-            <PlayerList players={room.players} />
+            <PlayerList players={room.players || []} />
 
             <Button
                 variant="secondary"

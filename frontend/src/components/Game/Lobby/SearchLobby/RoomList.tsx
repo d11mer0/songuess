@@ -11,7 +11,8 @@ interface Props {
 
 const RoomList = ({ joinRoom }: Props) => {
     const { t } = useTranslation();
-    const rooms = useAppSelector(selectRooms);
+    const rawRooms = useAppSelector(selectRooms);
+    const rooms = Array.isArray(rawRooms) ? rawRooms : [];
     const noRooms = rooms.length === 0;
 
     return (

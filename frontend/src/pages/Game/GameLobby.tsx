@@ -27,10 +27,11 @@ const GameLobby = () => {
     useEffect(() => {
         if (joinParam && !roomInfo) {
             joinRoom(joinParam.trim().toUpperCase());
-            searchParams.delete('join');
-            setSearchParams(searchParams, { replace: true });
+            const next = new URLSearchParams(window.location.search);
+            next.delete('join');
+            setSearchParams(next, { replace: true });
         }
-    }, [joinParam, roomInfo, joinRoom, searchParams, setSearchParams]);
+    }, [joinParam, roomInfo, joinRoom]);
 
     return (
         <div className={styles.container}>

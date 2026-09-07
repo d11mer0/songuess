@@ -40,10 +40,26 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         [navigate, dispatch],
     );
 
+    const handlePlayerLeft = useCallback(
+        (room: Room) => {
+            if (!room) return;
+            const wasKicked = !room.players?.some(
+                (player) => player.id === user?.id,
+            );
+            if (wasKicked) {
+                socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
+                socketHandlers.on('roomsList', handleRoomsUpdate);
+            }
+            dispatch(setCurrentRoom(wasKicked ? null : room));
+            socketEmitter.emit('getRooms');
+        },
+        [dispatch, user?.id, handleRoomsUpdate],
+    );
+
     const handleRoomCreated = useCallback(
         (data: Room) => {
+            if (!data) return;
             dispatch(setCurrentRoom(data));
-            //updateSearchParams(data.id);
 
             socketHandlers.on('playerDisconnected', (room) =>
                 dispatch(setCurrentRoom(room))
@@ -52,7 +68,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             socketHandlers.on('gameStarted', handleGameStarted);
             socketOffMany(['roomsList']);
         },
-        [updateSearchParams, dispatch, handleGameStarted],
+        [dispatch, handleGameStarted, handlePlayerLeft],
     );
 
     const handleJoinedRoom = useCallback(
@@ -63,7 +79,6 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                     return;
                 }
                 dispatch(setCurrentRoom(data));
-                //updateSearchParams(data.id);
                 
                 socketHandlers.on('playerDisconnected', (room) =>
                     dispatch(setCurrentRoom(room))
@@ -74,31 +89,9 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             } else {
                 dispatch(setCurrentRoom(null));
                 socketHandlers.on('roomsList', handleRoomsUpdate);
-
             }
-        }, [
-            navigate,
-            updateSearchParams,
-            handleGameStarted,
-            dispatch
-        ],
-    );
-
-    const handlePlayerLeft = useCallback(
-        (room: Room) => {
-            const wasKicked = !room.players.some(
-                (player) => player.id === user?.id,
-            );
-            if (wasKicked) {
-
-                socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
-                socketHandlers.on('roomsList', handleRoomsUpdate);
-            }
-            dispatch(setCurrentRoom(wasKicked ? null : room));
-            socketEmitter.emit('getRooms');
-            
         },
-        [dispatch, updateSearchParams, user?.id],
+        [navigate, handleGameStarted, handlePlayerLeft, handleRoomsUpdate, dispatch],
     );
 
     const handleDuelMatchFound = useCallback(

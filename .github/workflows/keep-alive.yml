@@ -1,0 +1,23 @@
+name: Keep Alive Backend
+
+on:
+  schedule:
+    # Run every 10 minutes to prevent Render free tier instance from sleeping (spins down after 15m)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Render Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send HTTP GET ping to backend
+        run: |
+          echo "Pinging SonGuess backend at $(date -u)..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://songuess-backend.onrender.com/api/health")
+          echo "Response HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Backend is healthy and awake!"
+          else
+            echo "Warning: Backend responded with status $HTTP_STATUS"
+          fi

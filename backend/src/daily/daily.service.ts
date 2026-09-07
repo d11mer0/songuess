@@ -67,7 +67,12 @@ export class DailyService {
             try {
                 const cached = await this.redisService.get(cacheKey);
                 if (cached) {
-                    return cached;
+                    const expMatch = cached.match(/exp=(\d+)/);
+                    const nowSec = Math.floor(Date.now() / 1000);
+                    if (!expMatch || Number(expMatch[1]) > nowSec + 180) {
+                        return cached;
+                    }
+                    await this.redisService.del(cacheKey);
                 }
             } catch (err) {
                 console.warn('Redis get error for daily preview:', err);
@@ -94,8 +99,8 @@ export class DailyService {
 
         if (this.redisService && previewUrl) {
             try {
-                // Cache for 24 hours (86400 seconds)
-                await this.redisService.set(cacheKey, previewUrl, 86400);
+                // Cache for 30 minutes (1800 seconds)
+                await this.redisService.set(cacheKey, previewUrl, 1800);
             } catch (err) {
                 console.warn('Redis set error for daily preview:', err);
             }
