@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navigation from '../components/Navigation/Navigation';
 import Footer from '../components/Footer/Footer';
 import { useGetMeQuery } from '../store/api/userApi';
@@ -17,13 +17,16 @@ const PartyHostPage = lazy(() => import('../pages/Party/PartyHostPage'));
 const ErrorPage = lazy(() => import('../pages/DefaultPages/ErrorPage/ErrorPage'));
 
 const AppRoutes: React.FC = () => {
+    const location = useLocation();
+    const isPartyOrGamepad = location.pathname.startsWith('/play') || location.pathname.startsWith('/party');
+
     // Check current user session in the background without blocking initial app render
     const hasToken = Boolean(localStorage.getItem('accessToken'));
     useGetMeQuery(undefined, { skip: !hasToken });
 
     return (
         <>
-            <Navigation />
+            {!isPartyOrGamepad && <Navigation />}
             <Suspense fallback={<Loader />}>
                 <Routes>
                     <Route path="/error" element={<ErrorPage />} />
@@ -40,7 +43,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="*" element={<Navigate to="/error" replace />} />
                 </Routes>
             </Suspense>
-            <Footer />
+            {!isPartyOrGamepad && <Footer />}
         </>
     );
 };

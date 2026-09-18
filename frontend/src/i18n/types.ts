@@ -283,6 +283,14 @@ export interface TranslationDictionary {
         roomCode: string;
         partyModeBtn: string;
         partyModeDesc: string;
+        backToLobby: string;
+        fullscreen: string;
+        exitFullscreen: string;
+        selectTheme: string;
+        launchingGame: string;
+        customTracks: string;
+        podiumTitle: string;
+        unmuteHint: string;
     };
     songsPage: {
         title: string;

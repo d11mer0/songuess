@@ -74,5 +74,6 @@ export const {
     useSearchPlaylistsByArtistQuery,
     useGetCuratedThemesQuery,
     useGetThemeTracksQuery,
+    useLazyGetThemeTracksQuery,
     useLazyParsePlaylistUrlQuery,
 } = deezerApi;
