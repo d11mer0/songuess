@@ -50,7 +50,7 @@ export class ReconnectService {
         const userId = client.data.user.id;
         const room = this.roomHelperService.findRoomByPlayerId(userId);
         if (!room) {
-            client.emit('joinedRoom', null);
+            client.emit('reconnectFailed');
             return null;
         }
 

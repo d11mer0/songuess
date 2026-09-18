@@ -61,6 +61,11 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             if (!data) return;
             dispatch(setCurrentRoom(data));
 
+            if (data.lobbyOptions?.isPartyMode) {
+                navigate(`/party/host/${data.id}`);
+                return;
+            }
+
             socketHandlers.on('playerDisconnected', (room) =>
                 dispatch(setCurrentRoom(room))
             );
@@ -68,12 +73,16 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             socketHandlers.on('gameStarted', handleGameStarted);
             socketOffMany(['roomsList']);
         },
-        [dispatch, handleGameStarted, handlePlayerLeft],
+        [dispatch, handleGameStarted, handlePlayerLeft, navigate],
     );
 
     const handleJoinedRoom = useCallback(
         (data: Room) => {
             if (data) {
+                if (data.lobbyOptions?.isPartyMode) {
+                    navigate(`/play/${data.shortCode || data.id}`);
+                    return;
+                }
                 if (data.state !== RoomState.ADDING) {
                     navigate(`/game/${data.id}`);
                     return;

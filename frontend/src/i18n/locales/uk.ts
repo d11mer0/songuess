@@ -296,6 +296,10 @@ export const uk: TranslationDictionary = {
         hostAnswered: 'Ваша відповідь',
         yourAnswerRecorded: 'Вашу відповідь хоста зафіксовано! Очікуємо інших гравців... ⏳',
         hostBadge: 'ХОСТ',
+        roomNotFoundOrClosed: 'Кімнату не знайдено або її закрито. Перевірте код або попросіть хоста розпочати нову гру.',
+        tryAgain: 'Спробувати знову',
+        enterDifferentCode: 'Ввести інший код',
+        connectingToRoom: 'Підключення до кімнати...',
     },
     songsPage: {
         title: 'Колекція треків 🎵',

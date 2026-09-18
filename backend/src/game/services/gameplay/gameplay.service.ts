@@ -102,13 +102,15 @@ export class GameplayService {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room) return;
 
-        room.state = GameRoomState.CREATING;
+        room.state = room.lobbyOptions?.isPartyMode ? GameRoomState.ADDING : GameRoomState.CREATING;
         room.gameData = undefined;
         room.gameProgress = undefined;
 
         room.players = room.players.map(player => ({ ...player, totalScore: 0 }));
         
+        this.roomHelperService.cancelRoomCleanup(room.id);
         this.roomManager.syncRoom(room);
+        this.roomManager.broadcastRoomsList();
         this.server?.to(roomId).emit('gameRestarted', room);
     }
 }

@@ -10,7 +10,8 @@ import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
 import { MatchmakingService } from '../../services/room/matchmaking.service';
-import { LobbyOptions } from '../../interfaces/game.interface';
+import { LobbyOptions, GameRoomState } from '../../interfaces/game.interface';
+import { RoundSyncService } from '../../services/game/round-sync.service';
 
 @WebSocketGateway({
     cors: {
@@ -27,6 +28,7 @@ export class RoomLobbyGateway {
         private readonly roomManagerService: RoomManagerService,
         private readonly roomQueryService: RoomQueryService,
         private readonly matchmakingService: MatchmakingService,
+        private readonly roundSyncService: RoundSyncService,
     ) {}
 
     afterInit() {
@@ -69,6 +71,9 @@ export class RoomLobbyGateway {
         if (room) {
             await client.join(room.id);
             this.server.to(room.id).emit('joinedRoom', room);
+            if (room.state === GameRoomState.STARTED && room.gameProgress) {
+                this.roundSyncService.syncOngoingRound(client, room);
+            }
         } else {
             client.emit('joinedRoom', null);
         }

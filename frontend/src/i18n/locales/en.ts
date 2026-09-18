@@ -296,6 +296,10 @@ export const en: TranslationDictionary = {
         hostAnswered: 'Your answer',
         yourAnswerRecorded: 'Host answer recorded! Waiting for players... ⏳',
         hostBadge: 'HOST',
+        roomNotFoundOrClosed: 'Room not found or game has ended. Please check the code or ask the host to start a new game.',
+        tryAgain: 'Try again',
+        enterDifferentCode: 'Enter different code',
+        connectingToRoom: 'Connecting to room...',
     },
     songsPage: {
         title: 'Song Library 🎵',

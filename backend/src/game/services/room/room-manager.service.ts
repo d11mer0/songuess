@@ -90,33 +90,81 @@ export class RoomManagerService implements OnModuleInit {
     }
 
     async joinRoom(roomId: string, playerId: number, login: string): Promise<GameRoom | null> {
-        const room = this.roomHelperService.findRoom(roomId);
-        if (!room || room.state !== GameRoomState.ADDING ) return null;
-        
-        const userInfo = await this.userService.getUserById(playerId);
-        let player = room.players.find((p) => p.id === playerId);
-        if (!player) {
-            
-            if (room.players.length < room.lobbyOptions.maxPlayers ) {
-                this.roomHelperService.removeUserFromOtherRooms(playerId);
-                player = {
-                    id: playerId,
-                    login,
-                    isOnline: true,
-                    avatar: userInfo.avatar,
-                    isPremium: userInfo.isPremium || false,
-                    customTitle: userInfo.customTitle || null,
-                    nameColor: userInfo.nameColor || null,
-                };
-                room.players.push(player);
-                await this.redisService.saveRoom(room);
-                this.broadcastRoomsList();
-                return room;
+        let room = this.roomHelperService.findRoom(roomId);
+        if (!room) {
+            // Check Redis fallback in case room was persisted or shortCode lookup
+            const fromRedis = await this.redisService.getRoom(roomId);
+            if (fromRedis) {
+                if (!this.rooms.some((r) => r.id === fromRedis.id)) {
+                    this.rooms.push(fromRedis);
+                }
+                room = fromRedis;
+            } else {
+                const allActive = await this.redisService.getAllActiveRooms();
+                const matched = allActive.find(
+                    (r) =>
+                        r.id.toLowerCase() === roomId.toLowerCase() ||
+                        (r.shortCode && r.shortCode.toUpperCase() === roomId.toUpperCase()),
+                );
+                if (matched) {
+                    if (!this.rooms.some((r) => r.id === matched.id)) {
+                        this.rooms.push(matched);
+                    }
+                    room = matched;
+                }
             }
-            return null;
         }
-        await this.redisService.saveRoom(room);
-        return room;
+        if (!room) return null;
+        
+        let player = room.players.find((p) => p.id === playerId);
+        if (player) {
+            player.isOnline = true;
+            this.roomHelperService.cancelRoomCleanup(room.id);
+            await this.redisService.saveRoom(room);
+            this.broadcastRoomsList();
+            return room;
+        }
+
+        const isParty = Boolean(room.lobbyOptions?.isPartyMode);
+        const isAllowedState =
+            room.state === GameRoomState.ADDING ||
+            (isParty && (
+                room.state === GameRoomState.CREATING ||
+                room.state === GameRoomState.ENDED ||
+                room.state === GameRoomState.STARTED
+            ));
+
+        if (!isAllowedState) return null;
+
+        if (room.players.length < room.lobbyOptions.maxPlayers) {
+            const userInfo = await this.userService.getUserById(playerId).catch(() => null);
+            this.roomHelperService.removeUserFromOtherRooms(playerId);
+            player = {
+                id: playerId,
+                login,
+                isOnline: true,
+                avatar: userInfo?.avatar || null,
+                isPremium: userInfo?.isPremium || false,
+                customTitle: userInfo?.customTitle || null,
+                nameColor: userInfo?.nameColor || null,
+            };
+            room.players.push(player);
+
+            if (room.gameProgress) {
+                if (!room.gameProgress.totalScores) room.gameProgress.totalScores = {};
+                if (!room.gameProgress.streaks) room.gameProgress.streaks = {};
+                if (!room.gameProgress.playerResults) room.gameProgress.playerResults = {};
+                room.gameProgress.totalScores[playerId] = 0;
+                room.gameProgress.streaks[playerId] = 0;
+                room.gameProgress.playerResults[playerId] = {};
+            }
+
+            this.roomHelperService.cancelRoomCleanup(room.id);
+            await this.redisService.saveRoom(room);
+            this.broadcastRoomsList();
+            return room;
+        }
+        return null;
     }
 
     leaveRoom(playerId: number): void {

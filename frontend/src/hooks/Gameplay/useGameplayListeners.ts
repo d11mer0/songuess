@@ -147,8 +147,9 @@ export const useGameplayListeners = () => {
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('gameRestarted', handleGameRestarted);
+        socketHandlers.on('reconnectFailed', () => navigate('/game'));
         return () => {
-            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted']);
+            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted', 'reconnectFailed']);
         };
-    }, [handleJoinedRoom]);
+    }, [handleJoinedRoom, navigate]);
 };

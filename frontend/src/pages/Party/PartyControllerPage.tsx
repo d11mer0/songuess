@@ -47,6 +47,7 @@ const PartyControllerPage: React.FC = () => {
 
     const [nickname, setNickname] = useState('');
     const [roomCode, setRoomCode] = useState(code || '');
+    const [joinError, setJoinError] = useState<string | null>(null);
     const [guestLogin, { isLoading: isLoggingIn }] = useGuestLoginMutation();
 
     const [currentRound, setCurrentRound] = useState<RoundPayload | null>(null);
@@ -59,17 +60,20 @@ const PartyControllerPage: React.FC = () => {
 
     // Join room when authenticated and room code available
     useEffect(() => {
-        if (isAuthenticated && roomCode && !currentRoom) {
+        if (isAuthenticated && roomCode && !currentRoom && !joinError) {
             socketInstance.connect();
-            socketEmitter.emit('joinRoom', { id: roomCode });
+            socketEmitter.emit('joinRoom', { id: roomCode.trim().toUpperCase() });
         }
-    }, [isAuthenticated, roomCode, currentRoom]);
+    }, [isAuthenticated, roomCode, currentRoom, joinError]);
 
     // Socket events for party controller
     useEffect(() => {
         const handleJoinedRoom = (room: any) => {
             if (room) {
                 dispatch(setCurrentRoom(room));
+                setJoinError(null);
+            } else {
+                setJoinError(t('party.roomNotFoundOrClosed'));
             }
         };
 
@@ -77,6 +81,24 @@ const PartyControllerPage: React.FC = () => {
             setCurrentRound(payload);
             setSelectedOptionIndex(null);
             setIsAnswerSubmitted(false);
+            setRoundResult(null);
+        };
+
+        const handleReconnectToRound = (payload: any) => {
+            if (!payload) return;
+            setCurrentRound({
+                roundNumber: payload.roundNumber,
+                options: payload.options,
+                startedAt: payload.startedAt,
+            });
+            if (payload.answer) {
+                setIsAnswerSubmitted(true);
+                const idx = payload.options.indexOf(payload.answer);
+                setSelectedOptionIndex(idx >= 0 ? idx : null);
+            } else {
+                setIsAnswerSubmitted(false);
+                setSelectedOptionIndex(null);
+            }
             setRoundResult(null);
         };
 
@@ -104,12 +126,14 @@ const PartyControllerPage: React.FC = () => {
             setRoundResult(null);
             setIsAnswerSubmitted(false);
             setSelectedOptionIndex(null);
+            setJoinError(null);
         };
 
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('currentRoom', handleJoinedRoom);
         socketHandlers.on('gameStarted', handleJoinedRoom);
         socketHandlers.on('roundStarted', handleRoundStarted);
+        socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('roundResult', handleRoundResult);
         socketHandlers.on('gameFinished', handleGameFinished);
         socketHandlers.on('gameEnded', handleGameFinished);
@@ -120,22 +144,28 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('currentRoom');
             socketHandlers.off('gameStarted');
             socketHandlers.off('roundStarted');
+            socketHandlers.off('reconnectToRound');
             socketHandlers.off('roundResult');
             socketHandlers.off('gameFinished');
             socketHandlers.off('gameEnded');
             socketHandlers.off('gameRestarted');
         };
-    }, [dispatch]);
+    }, [dispatch, t]);
 
     const handleGuestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedName = nickname.trim();
-        if (!trimmedName || !roomCode.trim()) return;
+        const targetCode = roomCode.trim().toUpperCase();
+        if (!trimmedName || !targetCode) return;
 
+        setJoinError(null);
         try {
-            await guestLogin({ nickname: trimmedName }).unwrap();
+            const res = await guestLogin({ nickname: trimmedName }).unwrap();
+            if (res?.accessToken) {
+                localStorage.setItem('accessToken', res.accessToken);
+            }
             socketInstance.connect();
-            socketEmitter.emit('joinRoom', { id: roomCode.trim().toUpperCase() });
+            socketEmitter.emit('joinRoom', { id: targetCode });
         } catch (err) {
             console.error('Guest login failed', err);
         }
@@ -199,6 +229,70 @@ const PartyControllerPage: React.FC = () => {
                             {isLoggingIn ? '...' : t('party.joinGameBtn')}
                         </button>
                     </form>
+                </div>
+            </div>
+        );
+    }
+
+    // View 1.5: Error joining room
+    if (joinError) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.authCard}>
+                    <div className={styles.authIcon}>⚠️</div>
+                    <h1 className={styles.authTitle}>#{roomCode}</h1>
+                    <p className={styles.authSubtitle} style={{ color: '#ff6b6b', lineHeight: 1.5 }}>
+                        {joinError}
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px', width: '100%' }}>
+                        <button
+                            type="button"
+                            className={styles.submitBtn}
+                            onClick={() => {
+                                setJoinError(null);
+                                socketInstance.connect();
+                                socketEmitter.emit('joinRoom', { id: roomCode.trim().toUpperCase() });
+                            }}
+                        >
+                            🔄 {t('party.tryAgain')}
+                        </button>
+                        <button
+                            type="button"
+                            className={styles.submitBtn}
+                            style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
+                            onClick={() => {
+                                setJoinError(null);
+                                setRoomCode('');
+                                navigate('/play');
+                            }}
+                        >
+                            ✏️ {t('party.enterDifferentCode')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // View 1.6: Authenticated but waiting for room confirmation
+    if (isAuthenticated && !currentRoom) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.lobbyCard}>
+                    <div className={styles.roomBadge}>#{roomCode}</div>
+                    {user?.avatar && (
+                        <img
+                            src={user.avatar}
+                            alt={user.login}
+                            className={styles.playerAvatar}
+                        />
+                    )}
+                    <h2 className={styles.playerName}>{user?.login}</h2>
+
+                    <div className={styles.waitingPrompt}>
+                        <div className={styles.waitingText}>{t('party.connectingToRoom')}</div>
+                    </div>
                 </div>
             </div>
         );

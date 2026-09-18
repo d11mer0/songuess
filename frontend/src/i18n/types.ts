@@ -296,6 +296,10 @@ export interface TranslationDictionary {
         hostAnswered: string;
         yourAnswerRecorded: string;
         hostBadge: string;
+        roomNotFoundOrClosed: string;
+        tryAgain: string;
+        enterDifferentCode: string;
+        connectingToRoom: string;
     };
     songsPage: {
         title: string;

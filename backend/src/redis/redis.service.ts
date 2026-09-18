@@ -57,6 +57,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             });
 
             await this.client.connect();
+            this.isConnected = true;
         } catch (err: any) {
             this.logger.warn('Could not connect to Redis (' + redisHost + ':' + redisPort + '): ' + err?.message + '. Continuing with in-memory fallback.');
             this.isConnected = false;

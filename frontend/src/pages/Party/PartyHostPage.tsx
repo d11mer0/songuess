@@ -173,11 +173,36 @@ const PartyHostPage: React.FC = () => {
             } catch {}
         };
 
+        const handleReconnectToRound = (payload: any) => {
+            if (!payload) return;
+            setCurrentRound({
+                roundNumber: payload.roundNumber,
+                options: payload.options,
+                preview: payload.preview,
+            });
+            setRoundResult(null);
+            const elapsed = payload.startedAt ? Math.floor((Date.now() - payload.startedAt) / 1000) : 0;
+            setTimeLeft(Math.max(0, 25 - elapsed));
+            if (payload.answer) {
+                setIsHostAnswerSubmitted(true);
+                const idx = payload.options.indexOf(payload.answer);
+                setHostSelectedOptionIndex(idx >= 0 ? idx : null);
+            }
+            if (audioRef.current && payload.preview) {
+                audioRef.current.src = payload.preview;
+                if (payload.startedAt) {
+                    audioRef.current.currentTime = Math.min(25, elapsed);
+                }
+                audioRef.current.play().catch(() => setIsAudioBlocked(true));
+            }
+        };
+
         socketHandlers.on('roundStarted', handleRoundStarted);
         socketHandlers.on('playerAnswered', handlePlayerAnswered);
         socketHandlers.on('roundResult', handleRoundResult);
         socketHandlers.on('gameFinished', handleGameFinished);
         socketHandlers.on('gameEnded', handleGameFinished);
+        socketHandlers.on('reconnectToRound', handleReconnectToRound);
 
         return () => {
             socketHandlers.off('roundStarted');
@@ -185,6 +210,7 @@ const PartyHostPage: React.FC = () => {
             socketHandlers.off('roundResult');
             socketHandlers.off('gameFinished');
             socketHandlers.off('gameEnded');
+            socketHandlers.off('reconnectToRound');
         };
     }, []);
 
