@@ -16,7 +16,13 @@ const GoogleLoginButton: React.FC = () => {
                 try {
                     if (response.credential) {
                         await googleLogin(response.credential).unwrap();
-                        navigate('/')
+                        const pendingCode = sessionStorage.getItem('pendingJoinCode');
+                        if (pendingCode) {
+                            sessionStorage.removeItem('pendingJoinCode');
+                            navigate(`/game?join=${pendingCode}`);
+                        } else {
+                            navigate('/');
+                        }
                         
                     } else {
                         throw new Error('No credential received');

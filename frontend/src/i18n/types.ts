@@ -249,6 +249,18 @@ export interface TranslationDictionary {
         copyLink: string;
         codeCopied: string;
         linkCopied: string;
+        inviteFriends: string;
+        quickCopy: string;
+    };
+    joinPage: {
+        title: string;
+        subtitle: string;
+        roomCode: string;
+        joining: string;
+        loginRequired: string;
+        loginBtn: string;
+        registerBtn: string;
+        backHome: string;
     };
     songsPage: {
         title: string;

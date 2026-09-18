@@ -11,6 +11,7 @@ const AuthRoutes = lazy(() => import('./modules/auth/AuthRoutes'));
 const SongsRoutes = lazy(() => import('./modules/songs/SongsRoutes'));
 const GameRoutes = lazy(() => import('./modules/game/GameRoutes'));
 const UserRoutes = lazy(() => import('./modules/users/UserRoutes'));
+const JoinRoomPage = lazy(() => import('../pages/Game/JoinRoomPage'));
 const ErrorPage = lazy(() => import('../pages/DefaultPages/ErrorPage/ErrorPage'));
 
 const AppRoutes: React.FC = () => {
@@ -28,6 +29,7 @@ const AppRoutes: React.FC = () => {
                     <Route path="/songs/*" element={<SongsRoutes />} />
                     <Route path="/game/*" element={<GameRoutes />} />
                     <Route path="/user/*" element={<UserRoutes />} />
+                    <Route path="/join/:code" element={<JoinRoomPage />} />
                     <Route path="/" element={<MainPage />} />
                     <Route path="*" element={<Navigate to="/error" replace />} />
                 </Routes>

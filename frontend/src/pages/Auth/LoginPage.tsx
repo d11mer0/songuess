@@ -21,7 +21,13 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
         try {
             await loginUser(formData).unwrap();
-            navigate('/');
+            const pendingCode = sessionStorage.getItem('pendingJoinCode');
+            if (pendingCode) {
+                sessionStorage.removeItem('pendingJoinCode');
+                navigate(`/game?join=${pendingCode}`);
+            } else {
+                navigate('/');
+            }
         } catch {}
     };
 

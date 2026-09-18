@@ -25,13 +25,17 @@ const GameLobby = () => {
     } = useGameRoom();
 
     useEffect(() => {
-        if (joinParam && !roomInfo) {
-            joinRoom(joinParam.trim().toUpperCase());
-            const next = new URLSearchParams(window.location.search);
-            next.delete('join');
-            setSearchParams(next, { replace: true });
+        const codeToJoin = joinParam?.trim() || sessionStorage.getItem('pendingJoinCode');
+        if (codeToJoin && !roomInfo) {
+            sessionStorage.removeItem('pendingJoinCode');
+            joinRoom(codeToJoin.toUpperCase());
+            if (joinParam) {
+                const next = new URLSearchParams(window.location.search);
+                next.delete('join');
+                setSearchParams(next, { replace: true });
+            }
         }
-    }, [joinParam, roomInfo, joinRoom]);
+    }, [joinParam, roomInfo, joinRoom, setSearchParams]);
 
     return (
         <div className={styles.container}>

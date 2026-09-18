@@ -249,6 +249,18 @@ export const en: TranslationDictionary = {
         copyLink: 'Copy Link',
         codeCopied: 'Code copied to clipboard!',
         linkCopied: 'Link copied to clipboard!',
+        inviteFriends: 'Invite Friends 📱',
+        quickCopy: 'Copy Link 📋',
+    },
+    joinPage: {
+        title: 'Game Invitation',
+        subtitle: "You've been invited to play SonGuess online music trivia!",
+        roomCode: 'Room Code:',
+        joining: 'Joining the room...',
+        loginRequired: 'To join this room with your friends, please log in or sign up:',
+        loginBtn: 'Sign In',
+        registerBtn: 'Create Account',
+        backHome: 'Back to Home',
     },
     songsPage: {
         title: 'Song Library 🎵',

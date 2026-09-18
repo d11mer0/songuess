@@ -16,8 +16,8 @@ const RoomShareModal: React.FC<RoomShareModalProps> = ({ isOpen, onClose, roomId
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
 
-    const displayCode = (shortCode || roomId).toUpperCase().substring(0, 4);
-    const shareUrl = `${window.location.origin}/game?join=${shortCode || roomId}`;
+    const displayCode = (shortCode ? shortCode : roomId).toUpperCase();
+    const shareUrl = `${window.location.origin}/join/${shortCode || roomId}`;
 
     useEffect(() => {
         if (isOpen && canvasRef.current) {
