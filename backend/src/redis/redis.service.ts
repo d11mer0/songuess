@@ -79,7 +79,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     async saveRoom(room: GameRoom, ttlSeconds: number = DEFAULT_TTL_SECONDS): Promise<void> {
-        this.memoryFallback.set(room.id, JSON.parse(JSON.stringify(room)));
+        this.memoryFallback.set(room.id, structuredClone(room));
 
         if (!this.isRedisActive || !this.client) {
             return;

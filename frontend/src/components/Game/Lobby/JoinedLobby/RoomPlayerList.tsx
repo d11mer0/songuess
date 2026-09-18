@@ -1,31 +1,30 @@
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../store/store';
+import React from 'react';
+import { FaCrown } from 'react-icons/fa';
+import { BsXLg, BsPerson } from 'react-icons/bs';
+import { useAppSelector } from '../../../../store/hooks';
+import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 import styles from './JoinedLobby.module.css';
 
 interface Props {
     kickMember: (memberId: number) => void;
 }
 
-import { FaCrown } from 'react-icons/fa';
-import { BsXLg, BsPerson } from 'react-icons/bs';
-import { useAppSelector } from '../../../../store/hooks';
-import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
-import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
-
-const RoomPlayerList = ({kickMember}: Props) => {
-    const { user } = useSelector((state: RootState) => state.user);
+const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
+    const { user } = useAppSelector((state) => state.user);
     const roomInfo = useAppSelector(selectCurrentRoom);
     
-    if(!roomInfo) return<div></div>;
+    if (!roomInfo) return <div></div>;
 
     const slots = Array.from({ length: roomInfo.lobbyOptions.maxPlayers }, (_, index) => roomInfo.players[index] ?? null);
 
     return (
-            <ul className={styles.grid}>
-                {slots.map((player, i) => (
-                    <li className={styles.playerSlot} key={i}>
-                        <div className={styles.playerInfo}>
-                            {player ? ( <>
+        <ul className={styles.grid}>
+            {slots.map((player, i) => (
+                <li className={styles.playerSlot} key={i}>
+                    <div className={styles.playerInfo}>
+                        {player ? (
+                            <>
                                 <div className={styles.avatarWrapper}>
                                     {player.id === roomInfo.leaderId && (
                                         <span className={styles.leaderBadge}>
@@ -40,8 +39,8 @@ const RoomPlayerList = ({kickMember}: Props) => {
                                             e.currentTarget.src = DEFAULT_AVATAR;
                                         }}
                                         style={{
-                                            border: (player as any).isPremium ? '2px solid #ffd700' : 'none',
-                                            boxShadow: (player as any).isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
+                                            border: player.isPremium ? '2px solid #ffd700' : 'none',
+                                            boxShadow: player.isPremium ? '0 0 10px rgba(255, 215, 0, 0.6)' : 'none',
                                         }}
                                     />
                                     {user?.id === roomInfo.leaderId && player.id !== roomInfo.leaderId && (
@@ -61,15 +60,16 @@ const RoomPlayerList = ({kickMember}: Props) => {
                                     className={styles.login}
                                     title={player.login}
                                     style={{
-                                        color: (player as any).nameColor || ((player as any).isPremium ? '#ffd700' : 'inherit'),
-                                        textShadow: (player as any).isPremium ? '0 0 8px rgba(255, 215, 0, 0.7)' : 'none',
-                                        fontWeight: (player as any).isPremium ? 800 : 600,
+                                        color: player.nameColor || (player.isPremium ? '#ffd700' : 'inherit'),
+                                        textShadow: player.isPremium ? '0 0 8px rgba(255, 215, 0, 0.7)' : 'none',
+                                        fontWeight: player.isPremium ? 800 : 600,
                                     }}
                                 >
-                                    {(player as any).isPremium && '⭐ '}
+                                    {player.isPremium && '⭐ '}
                                     {player.login}
                                 </div>
-                            </> ) : ( <>
+                            </>
+                        ) : ( <>
                                 <div className={styles.avatarWrapper}>
                                     <div className={styles.emptySlot}>
                                         <span className={styles.emptyIcon}>

@@ -5,6 +5,9 @@ export interface Player {
     avatar: string | null;
     totalScore?: number;
     streak?: number;
+    isPremium?: boolean;
+    nameColor?: string | null;
+    customTitle?: string | null;
 }
 
 export type GameMode = 'CLASSIC' | 'HEARDLE' | 'DUEL';

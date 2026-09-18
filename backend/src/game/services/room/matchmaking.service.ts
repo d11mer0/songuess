@@ -146,6 +146,9 @@ export class MatchmakingService {
 
             // Автоматичний старт гри через 2 секунди
             setTimeout(() => {
+                const currentRoom = this.roomManager.allRooms.find((r) => r.id === roomId);
+                if (!currentRoom || currentRoom.players.length < 2) return;
+
                 this.gameplayService.handleLaunchGame(
                     player1.socket,
                     roomId,

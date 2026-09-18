@@ -52,6 +52,7 @@ export class ConnectionService {
 
                 if (!isClear) {
                     this.roomHelperService.assignNewLeader(room.id);
+                    this.roomManagerService.syncRoom(room);
                     this.server
                         ?.to(room.id)
                         .emit(

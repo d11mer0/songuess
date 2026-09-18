@@ -1,14 +1,12 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { socketInstance, socketEmitter, socketHandlers } from '../../services/socket';
+import { socketEmitter } from '../../services/socket';
 import { useGameplayListeners } from './useGameplayListeners';
-import { } from '../../types/roomTypes';
 import { SelectedTracks } from '../../types/gameTypes';
 import { selectCurrentRoom, selectTrackInfo } from '../../store/gameplay/gameplaySelectors';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { createKickMember } from '../../utils/socketUtils/createKickMember';
 import { useSocketConnection } from '../common/useSocketConnection';
-import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
+import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 
 export const useGameplay = () => {
@@ -18,14 +16,21 @@ export const useGameplay = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
     const trackInfo = useAppSelector(selectTrackInfo);
     
-    const kickMember = createKickMember(currentRoom?.id);
-    
     useSocketConnection();
     useGameplayListeners();
 
-    const deleteRoom = () => {
+    const kickMember = useCallback((memberId: number) => {
+        if (currentRoom?.id) {
+            socketEmitter.emit('kickMember', {
+                roomId: currentRoom.id,
+                memberId,
+            });
+        }
+    }, [currentRoom?.id]);
+
+    const deleteRoom = useCallback(() => {
         if (roomId) socketEmitter.emit('deleteRoom', { id: roomId });
-    };
+    }, [roomId]);
 
     const launchGame = useCallback(
         (selectedTracks: SelectedTracks) => {
@@ -65,21 +70,16 @@ export const useGameplay = () => {
                 'roundResult', 
                 'gameRestarted' 
             ]);
-            
-            socketHandlers.on('roomsList', (rooms) => {
-                dispatch(setRooms(rooms));
-            });
             navigate('/game');
             socketEmitter.emit('getRooms');
-            
         }
-    }, [currentRoom]);
+    }, [currentRoom, dispatch, navigate]);
 
-    const restartGame = () => {
+    const restartGame = useCallback(() => {
         if (roomId) {
             socketEmitter.emit('restartGame', { roomId });
         }
-    };
+    }, [roomId]);
 
     return {
         kickMember,
