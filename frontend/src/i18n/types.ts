@@ -291,6 +291,8 @@ export interface TranslationDictionary {
         customTracks: string;
         podiumTitle: string;
         unmuteHint: string;
+        hostSelectingTracks: string;
+        prepareForRound: string;
     };
     songsPage: {
         title: string;

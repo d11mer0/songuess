@@ -10,9 +10,15 @@ class SocketInstance {
     private socket: Socket | null = null;
 
     connect() {
-        if (!this.socket || this.socket.disconnected) {
-            const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken');
 
+        // If the socket was previously created with a different or null token, tear it down
+        if (this.socket && (this.socket.auth as any)?.token !== token) {
+            this.socket.disconnect();
+            this.socket = null;
+        }
+
+        if (!this.socket || this.socket.disconnected) {
             this.socket = io(API_URL, {
                 transports: ['websocket'],
                 auth: { token },

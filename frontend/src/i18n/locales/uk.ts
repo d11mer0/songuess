@@ -291,6 +291,8 @@ export const uk: TranslationDictionary = {
         customTracks: '🎵 Налаштувати треки',
         podiumTitle: '🎉 ПЕРЕМОЖЦІ ВЕЧІРКИ! 🎉',
         unmuteHint: '🔊 Натисніть для звуку',
+        hostSelectingTracks: 'Хост налаштовує треки вечірки... 🎵',
+        prepareForRound: 'Приготуйтеся! Зараз на екрані з\'являться 4 кнопки!',
     },
     songsPage: {
         title: 'Колекція треків 🎵',

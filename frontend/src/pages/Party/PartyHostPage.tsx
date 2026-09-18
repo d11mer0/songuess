@@ -7,6 +7,7 @@ import { socketEmitter, socketHandlers } from '../../services/socket';
 import { useSocketConnection } from '../../hooks/common/useSocketConnection';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useGetCuratedThemesQuery, useLazyGetThemeTracksQuery } from '../../store/api/deezerApi';
+import { RoomState } from '../../types/roomTypes';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
 import styles from './PartyHostPage.module.css';
@@ -72,16 +73,29 @@ const PartyHostPage: React.FC = () => {
             }
         };
 
+        const handleGameRestarted = (room: any) => {
+            if (room) {
+                dispatch(setCurrentRoom(room));
+            }
+            setIsGameFinished(false);
+            setCurrentRound(null);
+            setRoundResult(null);
+        };
+
         socketHandlers.on('joinedRoom', handleRoomSync);
         socketHandlers.on('currentRoom', handleRoomSync);
+        socketHandlers.on('gameStarted', handleRoomSync);
         socketHandlers.on('playerLeft', handleRoomSync);
         socketHandlers.on('playerDisconnected', handleRoomSync);
+        socketHandlers.on('gameRestarted', handleGameRestarted);
 
         return () => {
             socketHandlers.off('joinedRoom');
             socketHandlers.off('currentRoom');
+            socketHandlers.off('gameStarted');
             socketHandlers.off('playerLeft');
             socketHandlers.off('playerDisconnected');
+            socketHandlers.off('gameRestarted');
         };
     }, [routeRoomId, currentRoom?.id, dispatch]);
 
@@ -182,25 +196,59 @@ const PartyHostPage: React.FC = () => {
             const themeToLoad = selectedThemeId || 'ukrainian-hits';
             const res = await triggerGetThemeTracks(themeToLoad).unwrap();
 
-            if (res && res.tracks && res.tracks.length > 0) {
+            // Extract the track array properly (Deezer returns { tracks: { data: [...] } } or { tracks: [...] })
+            let tracks: any[] = [];
+            if (Array.isArray(res?.tracks)) {
+                tracks = res.tracks;
+            } else if (Array.isArray(res?.tracks?.data)) {
+                tracks = res.tracks.data;
+            } else if (Array.isArray(res)) {
+                tracks = res;
+            }
+
+            console.log('🚀 Launching party game with tracks count:', tracks.length);
+
+            if (tracks.length >= 3) {
                 socketEmitter.emit('launchGame', {
                     roomId: currentRoom.id,
                     selectedTracks: {
-                        type: 'theme',
+                        type: 'THEME',
                         id: themeToLoad,
-                        tracks: res.tracks,
+                        tracks: tracks,
                     },
                 });
             } else {
-                // Fallback to normal game setup if theme tracks fail
+                console.warn('Not enough tracks returned, navigating to setup');
+                if (currentRoom.state === RoomState.ADDING) {
+                    socketEmitter.emit('startGame', { id: currentRoom.id });
+                }
                 navigate(`/game/${currentRoom.id}`);
             }
         } catch (err) {
             console.error('Failed to launch party theme', err);
+            if (currentRoom.state === RoomState.ADDING) {
+                socketEmitter.emit('startGame', { id: currentRoom.id });
+            }
             navigate(`/game/${currentRoom.id}`);
         } finally {
             setIsLaunching(false);
         }
+    };
+
+    const handleCustomTracks = () => {
+        if (!currentRoom) return;
+        if (currentRoom.state === RoomState.ADDING) {
+            socketEmitter.emit('startGame', { id: currentRoom.id });
+        }
+        navigate(`/game/${currentRoom.id}`);
+    };
+
+    const handleRestart = () => {
+        if (!currentRoom) return;
+        socketEmitter.emit('restartGame', { roomId: currentRoom.id });
+        setIsGameFinished(false);
+        setCurrentRound(null);
+        setRoundResult(null);
     };
 
     const toggleFullscreen = () => {
@@ -308,7 +356,7 @@ const PartyHostPage: React.FC = () => {
                                 </button>
                                 <button
                                     className={styles.customTracksBtn}
-                                    onClick={() => navigate(`/game/${currentRoom?.id}`)}
+                                    onClick={handleCustomTracks}
                                 >
                                     {t('party.customTracks')}
                                 </button>
@@ -403,9 +451,14 @@ const PartyHostPage: React.FC = () => {
                             );
                         })}
                     </div>
-                    <button className={styles.startPartyBtn} onClick={() => navigate('/game')}>
-                        {t('party.backToLobby')}
-                    </button>
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                        <button className={styles.startPartyBtn} onClick={handleRestart}>
+                            🔄 {t('gameplay.restartGame') || 'Зіграти ще раз'}
+                        </button>
+                        <button className={styles.customTracksBtn} onClick={() => navigate('/game')}>
+                            {t('party.backToLobby')}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

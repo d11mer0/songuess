@@ -2,18 +2,26 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGuestLoginMutation } from '../../store/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { socketEmitter, socketHandlers } from '../../services/socket';
+import { socketEmitter, socketHandlers, socketInstance } from '../../services/socket';
 import { useSocketConnection } from '../../hooks/common/useSocketConnection';
 import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { RoomState } from '../../types/roomTypes';
 import confetti from 'canvas-confetti';
 import styles from './PartyControllerPage.module.css';
+
+const BUTTON_THEMES = [
+    { label: 'A', shape: '▲', className: styles.btnRed, color: '#e63946' },
+    { label: 'B', shape: '◆', className: styles.btnBlue, color: '#0077b6' },
+    { label: 'C', shape: '●', className: styles.btnYellow, color: '#e09f3e' },
+    { label: 'D', shape: '■', className: styles.btnGreen, color: '#2a9d8f' },
+];
 
 interface RoundPayload {
     roundNumber: number;
     options: string[];
-    preview: string;
+    startedAt: number;
 }
 
 interface RoundResultPayload {
@@ -27,23 +35,18 @@ interface RoundResultPayload {
     }>;
 }
 
-const BUTTON_THEMES = [
-    { label: 'A', shape: '▲', className: styles.btnRed, color: '#e63946' },
-    { label: 'B', shape: '◆', className: styles.btnBlue, color: '#0077b6' },
-    { label: 'C', shape: '●', className: styles.btnYellow, color: '#e09f3e' },
-    { label: 'D', shape: '■', className: styles.btnGreen, color: '#2a9d8f' },
-];
-
 const PartyControllerPage: React.FC = () => {
     const { code } = useParams<{ code: string }>();
-    const navigate = useNavigate();
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { user, isAuthenticated } = useAppSelector((state) => state.user);
+
+    const { user } = useAppSelector((state) => state.user);
+    const isAuthenticated = Boolean(user && user.id);
     const currentRoom = useAppSelector(selectCurrentRoom);
 
     const [nickname, setNickname] = useState('');
-    const [roomCode, setRoomCode] = useState((code || '').toUpperCase());
+    const [roomCode, setRoomCode] = useState(code || '');
     const [guestLogin, { isLoading: isLoggingIn }] = useGuestLoginMutation();
 
     const [currentRound, setCurrentRound] = useState<RoundPayload | null>(null);
@@ -57,6 +60,7 @@ const PartyControllerPage: React.FC = () => {
     // Join room when authenticated and room code available
     useEffect(() => {
         if (isAuthenticated && roomCode && !currentRoom) {
+            socketInstance.connect();
             socketEmitter.emit('joinRoom', { id: roomCode });
         }
     }, [isAuthenticated, roomCode, currentRoom]);
@@ -78,30 +82,48 @@ const PartyControllerPage: React.FC = () => {
 
         const handleRoundResult = (payload: RoundResultPayload) => {
             setRoundResult(payload);
-            setIsAnswerSubmitted(false);
         };
 
         const handleGameFinished = () => {
             setIsGameFinished(true);
             try {
                 confetti({
-                    particleCount: 120,
+                    particleCount: 150,
                     spread: 80,
                     origin: { y: 0.6 },
                 });
             } catch {}
         };
 
+        const handleGameRestarted = (room: any) => {
+            if (room) {
+                dispatch(setCurrentRoom(room));
+            }
+            setIsGameFinished(false);
+            setCurrentRound(null);
+            setRoundResult(null);
+            setIsAnswerSubmitted(false);
+            setSelectedOptionIndex(null);
+        };
+
         socketHandlers.on('joinedRoom', handleJoinedRoom);
+        socketHandlers.on('currentRoom', handleJoinedRoom);
+        socketHandlers.on('gameStarted', handleJoinedRoom);
         socketHandlers.on('roundStarted', handleRoundStarted);
         socketHandlers.on('roundResult', handleRoundResult);
         socketHandlers.on('gameFinished', handleGameFinished);
+        socketHandlers.on('gameEnded', handleGameFinished);
+        socketHandlers.on('gameRestarted', handleGameRestarted);
 
         return () => {
             socketHandlers.off('joinedRoom');
+            socketHandlers.off('currentRoom');
+            socketHandlers.off('gameStarted');
             socketHandlers.off('roundStarted');
             socketHandlers.off('roundResult');
             socketHandlers.off('gameFinished');
+            socketHandlers.off('gameEnded');
+            socketHandlers.off('gameRestarted');
         };
     }, [dispatch]);
 
@@ -112,6 +134,7 @@ const PartyControllerPage: React.FC = () => {
 
         try {
             await guestLogin({ nickname: trimmedName }).unwrap();
+            socketInstance.connect();
             socketEmitter.emit('joinRoom', { id: roomCode.trim().toUpperCase() });
         } catch (err) {
             console.error('Guest login failed', err);
@@ -261,6 +284,8 @@ const PartyControllerPage: React.FC = () => {
     }
 
     // View 4: Lobby Waiting Screen
+    const isCreating = currentRoom?.state === RoomState.CREATING;
+
     return (
         <div className={styles.container}>
             <div className={styles.lobbyCard}>
@@ -276,9 +301,11 @@ const PartyControllerPage: React.FC = () => {
 
                 <div className={styles.waitingPrompt}>
                     <div className={styles.waitingText}>
-                        {t('party.waitingInLobby')}
+                        {isCreating ? t('party.hostSelectingTracks') : t('party.waitingInLobby')}
                     </div>
-                    <p className={styles.tvHint}>{t('party.instructionsWatchTv')}</p>
+                    <p className={styles.tvHint}>
+                        {isCreating ? t('party.prepareForRound') : t('party.instructionsWatchTv')}
+                    </p>
                 </div>
             </div>
         </div>

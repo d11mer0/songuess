@@ -291,6 +291,8 @@ export const en: TranslationDictionary = {
         customTracks: '🎵 Custom Tracks',
         podiumTitle: '🎉 PARTY CHAMPIONS! 🎉',
         unmuteHint: '🔊 Click to enable audio',
+        hostSelectingTracks: 'Host is selecting party tracks... 🎵',
+        prepareForRound: 'Get ready! 4 buttons will appear on your screen!',
     },
     songsPage: {
         title: 'Song Library 🎵',
