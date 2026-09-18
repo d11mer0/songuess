@@ -91,13 +91,19 @@ export class AuthService {
     }
 
     async guestLogin(dto: GuestAuthDto) {
-        const trimmed = (dto.nickname || 'Player').trim();
-        const baseLogin = trimmed.replace(/\s+/g, '_');
+        const sanitized = (dto.nickname || '')
+            .trim()
+            .replace(/[<>/"'\\]/g, '')
+            .replace(/\s+/g, '_')
+            .substring(0, 20);
+        const baseLogin = sanitized || 'Player';
         let uniqueLogin = baseLogin;
         let counter = 1;
 
         while (await this.prisma.user.findUnique({ where: { login: uniqueLogin } })) {
-            uniqueLogin = `${baseLogin}_${counter++}`;
+            const suffix = counter > 3 ? Math.floor(100 + Math.random() * 900) : counter;
+            uniqueLogin = `${baseLogin}_${suffix}`;
+            counter++;
         }
 
         const randomSuffix = Math.random().toString(36).substring(2, 7);

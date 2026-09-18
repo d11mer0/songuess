@@ -57,7 +57,7 @@ export class AuthController {
     }
 
     @Public()
-    @Throttle({ default: { limit: 15, ttl: 60000 } })
+    @Throttle({ default: { limit: 60, ttl: 60000 } })
     @Post('guest')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Швидкий гостьовий вхід для вечірки' })

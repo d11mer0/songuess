@@ -9,7 +9,7 @@ export function checkAllPlayersAnswered(
     totalPlayers: number,
 ): boolean {
     const answered = Object.values(playerResults).filter(r => r[roundNumber] !== undefined).length;
-    return answered === totalPlayers;
+    return totalPlayers > 0 && answered >= totalPlayers;
 }
 
 export function isGameFinished(room: GameRoom): boolean {

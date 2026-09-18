@@ -166,8 +166,11 @@ const PartyControllerPage: React.FC = () => {
             }
             socketInstance.connect();
             socketEmitter.emit('joinRoom', { id: targetCode });
-        } catch (err) {
+        } catch (err: any) {
             console.error('Guest login failed', err);
+            const msg = err?.data?.message;
+            const displayMsg = Array.isArray(msg) ? msg.join(', ') : (msg || 'Помилка входу');
+            setJoinError(displayMsg);
         }
     };
 

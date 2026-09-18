@@ -35,6 +35,13 @@ export class GameplayService {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room) return;
 
+        const userId = client.data.user?.id;
+        if (room.leaderId !== userId) return;
+        if (room.state === GameRoomState.STARTED) return;
+        if (!selectedTracks?.tracks || selectedTracks.tracks.length < 3) return;
+
+        this.roundManager.cancelRoomGame(room.id);
+
         room.gameData = selectedTracks;
         room.state = GameRoomState.STARTED;
 
@@ -65,9 +72,19 @@ export class GameplayService {
     handleAnswer(client: Socket, roomId: string, roundNumber: number, answer: string, snippetDurationUsed?: number) {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room?.gameProgress) return;
+        if (room.state !== GameRoomState.STARTED) return;
 
-        const playerId = client.data.user.id;
+        const playerId = client.data.user?.id;
+        if (!playerId) return;
+
         const { rounds, playerResults } = room.gameProgress;
+
+        if (typeof roundNumber !== 'number' || roundNumber !== room.gameProgress.currentRound) return;
+        if (!rounds[roundNumber]) return;
+
+        if (!playerResults[playerId]) {
+            playerResults[playerId] = {};
+        }
 
         if (!validateAnswerSubmission(playerResults, playerId, roundNumber)) return;
 
@@ -92,7 +109,9 @@ export class GameplayService {
             return;
         }
 
-        const allAnswered = checkAllPlayersAnswered(playerResults, roundNumber, room.players.length);
+        const onlineCount = room.players.filter((p) => p.isOnline).length;
+        const targetCount = Math.max(1, onlineCount);
+        const allAnswered = checkAllPlayersAnswered(playerResults, roundNumber, targetCount);
         if (allAnswered) {
             this.roundManager.finishRound(roomId, roundNumber);
         }
@@ -101,6 +120,11 @@ export class GameplayService {
     handleRestartGame(client: Socket, roomId: string) {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room) return;
+
+        const userId = client.data.user?.id;
+        if (room.leaderId !== userId) return;
+
+        this.roundManager.cancelRoomGame(room.id);
 
         room.state = room.lobbyOptions?.isPartyMode ? GameRoomState.ADDING : GameRoomState.CREATING;
         room.gameData = undefined;
