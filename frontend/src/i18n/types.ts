@@ -262,6 +262,28 @@ export interface TranslationDictionary {
         registerBtn: string;
         backHome: string;
     };
+    party: {
+        hostTitle: string;
+        controllerTitle: string;
+        enterNickname: string;
+        nicknamePlaceholder: string;
+        roomCodePlaceholder: string;
+        joinGameBtn: string;
+        waitingInLobby: string;
+        instructionsWatchTv: string;
+        answerSubmitted: string;
+        correct: string;
+        incorrect: string;
+        yourRank: string;
+        finalRank: string;
+        scanToPlay: string;
+        playersConnected: string;
+        startPartyGame: string;
+        answersCount: string;
+        roomCode: string;
+        partyModeBtn: string;
+        partyModeDesc: string;
+    };
     songsPage: {
         title: string;
         subtitle: string;

@@ -17,6 +17,7 @@ export interface LobbyOptions {
     gameMode?: GameMode;
     answerMode?: AnswerMode;
     roundsCount?: number;
+    isPartyMode?: boolean;
 }
 
 export enum RoomState {

@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { GuestAuthDto } from './dto/guest-auth.dto';
 import { MailService } from '../common/mail/mail.service'; // ✅ Додай цей імпорт
 
 import { TokenService } from '../common/services/token/token.service';
@@ -86,6 +87,55 @@ export class AuthService {
             message:
                 'Registration successful. You can now log in.',
             requiresVerification: false,
+        };
+    }
+
+    async guestLogin(dto: GuestAuthDto) {
+        const trimmed = (dto.nickname || 'Player').trim();
+        const baseLogin = trimmed.replace(/\s+/g, '_');
+        let uniqueLogin = baseLogin;
+        let counter = 1;
+
+        while (await this.prisma.user.findUnique({ where: { login: uniqueLogin } })) {
+            uniqueLogin = `${baseLogin}_${counter++}`;
+        }
+
+        const randomSuffix = Math.random().toString(36).substring(2, 7);
+        const guestEmail = `guest_${Date.now()}_${randomSuffix}@guest.songuess.local`;
+        const defaultAvatar = this.configService.get<string>(
+            'DEFAULT_AVATAR_URL',
+            'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg',
+        );
+
+        const hashedPassword = await this.hashService.hashPassword(
+            `guest_${Date.now()}_${randomSuffix}`,
+        );
+
+        const user = await this.prisma.user.create({
+            data: {
+                login: uniqueLogin,
+                email: guestEmail,
+                password: hashedPassword,
+                isVerified: true,
+                avatar: defaultAvatar,
+            },
+        });
+
+        const tokens = this.tokenService.generateTokens(
+            user.id,
+            user.login,
+            user.email,
+        );
+
+        return {
+            ...tokens,
+            user: {
+                id: user.id,
+                login: user.login,
+                email: user.email,
+                avatar: user.avatar,
+                isGuest: true,
+            },
         };
     }
 

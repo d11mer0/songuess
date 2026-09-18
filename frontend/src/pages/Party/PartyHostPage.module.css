@@ -1,0 +1,361 @@
+
+.container {
+    min-height: 100vh;
+    width: 100%;
+    background: radial-gradient(circle at 50% 20%, #201335 0%, #0d0915 80%);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 48px;
+    box-sizing: border-box;
+    font-family: var(--font-main, sans-serif);
+    overflow: hidden;
+    position: relative;
+}
+
+/* TV Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+    margin-bottom: 32px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logoText {
+    font-family: var(--font-title, sans-serif);
+    font-size: 38px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00f3ff, #9b5de5, #f15bb5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.partyBadge {
+    padding: 6px 16px;
+    background: rgba(241, 91, 181, 0.15);
+    border: 2px solid #f15bb5;
+    border-radius: 20px;
+    color: #f15bb5;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/* Big Code Banner */
+.codeBanner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px 28px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+.codeLabel {
+    font-size: 14px;
+    color: #a0a0b0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.codeValue {
+    font-family: var(--font-mono, monospace);
+    font-size: 40px;
+    font-weight: 900;
+    color: #00f3ff;
+    letter-spacing: 4px;
+    text-shadow: 0 0 16px rgba(0, 243, 255, 0.6);
+}
+
+/* TV Lobby Content */
+.lobbyContent {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 48px;
+    align-items: center;
+}
+
+.qrCard {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.qrWrapper {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 16px;
+    display: inline-block;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.qrCanvas {
+    display: block;
+    width: 220px !important;
+    height: 220px !important;
+}
+
+.qrInstruction {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #e0e0e0;
+}
+
+.qrLink {
+    margin-top: 6px;
+    font-family: var(--font-mono, monospace);
+    font-size: 14px;
+    color: #00f3ff;
+}
+
+.playersSection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.playersHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.playersCount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.playersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.playerCard {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(155, 93, 229, 0.3);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    animation: scaleIn 0.3s ease-out;
+}
+
+.cardAvatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #00f3ff;
+    object-fit: cover;
+}
+
+.cardName {
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.startPartyBtn {
+    padding: 20px 48px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, #00f3ff, #9b5de5, #f15bb5);
+    color: #fff;
+    font-size: 24px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 12px 36px rgba(155, 93, 229, 0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 24px;
+    letter-spacing: 1px;
+}
+
+.startPartyBtn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 16px 48px rgba(155, 93, 229, 0.7);
+}
+
+/* TV Game Arena */
+.arena {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.roundTopBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.timerBox {
+    font-family: var(--font-mono, monospace);
+    font-size: 48px;
+    font-weight: 900;
+    color: #00f3ff;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+}
+
+.answersCounter {
+    font-size: 24px;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 12px 28px;
+    border-radius: 30px;
+}
+
+.visualizerArea {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.vinylDisc {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #333 15%, #111 16%, #222 45%, #111 70%);
+    box-shadow: 0 0 40px rgba(155, 93, 229, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    animation: spin 3s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* The 4 Kahoot-style TV option blocks */
+.optionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.optionBlock {
+    padding: 24px 32px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    font-size: 26px;
+    font-weight: 800;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.optionRed { background: linear-gradient(135deg, #e63946, #c1121f); }
+.optionBlue { background: linear-gradient(135deg, #0077b6, #023e8a); }
+.optionYellow { background: linear-gradient(135deg, #e09f3e, #d97706); }
+.optionGreen { background: linear-gradient(135deg, #2a9d8f, #1b4332); }
+
+.optionShape {
+    font-size: 38px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.optionCorrect {
+    box-shadow: 0 0 30px #2a9d8f, 0 0 60px #2a9d8f;
+    transform: scale(1.04);
+}
+
+.optionWrong {
+    opacity: 0.3;
+    filter: grayscale(0.7);
+}
+
+/* TV Leaderboard Table */
+.leaderboardSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.lbTitle {
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #00f3ff, #f15bb5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lbTable {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lbRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.lbRank {
+    width: 48px;
+    color: #00f3ff;
+}
+
+.lbPlayer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.lbPoints {
+    color: #f15bb5;
+    font-family: var(--font-mono, monospace);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}

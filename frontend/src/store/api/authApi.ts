@@ -90,12 +90,33 @@ export const authApi = createApi({
                 } catch (error) {}
             },
         }),
+        guestLogin: builder.mutation<{ accessToken: string; user: any }, { nickname: string }>({
+            query: (body) => ({
+                url: '/auth/guest',
+                method: 'POST',
+                body,
+            }),
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    if (data?.accessToken) {
+                        localStorage.setItem('accessToken', data.accessToken);
+                    }
+                    await dispatch(
+                        userApi.endpoints.getMe.initiate(undefined, {
+                            forceRefetch: true,
+                        }),
+                    ).unwrap();
+                } catch (error) {}
+            },
+        }),
     }),
 });
 
 export const {
     useRegisterMutation,
     useLoginMutation,
+    useGuestLoginMutation,
     useLazyRefreshQuery,
     useLogoutMutation,
     useVerifyEmailMutation,

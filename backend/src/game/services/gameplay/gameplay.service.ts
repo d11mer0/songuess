@@ -83,6 +83,7 @@ export class GameplayService {
         );
 
         this.roomManager.syncRoom(room);
+        this.server?.to(roomId).emit('playerAnswered', { playerId, roundNumber });
 
         // У режимі DUEL, якщо гравець дав правильну відповідь — раунд фінішує негайно!
         const result = playerResults[playerId][roundNumber];

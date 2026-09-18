@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styles from './JoinedLobby.module.css';
 import RoomPlayerList from './RoomPlayerList';
 import InviteLink from './InviteLink';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
+    const navigate = useNavigate();
     const { t } = useTranslation();
     const { user } = useAppSelector(state => state.user);
     const roomInfo = useAppSelector(selectCurrentRoom);
@@ -50,6 +52,13 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
             />
             <div className={styles.buttonGroup}>
                 <InviteLink roomId={roomInfo.id} shortCode={roomInfo.shortCode} />
+                <Button
+                    variant="neutral"
+                    onClick={() => navigate(`/party/host/${roomInfo.id}`)}
+                    title={t('party.hostTitle')}
+                >
+                    📺 TV
+                </Button>
                 <Button variant="danger" onClick={leaveRoom}>
                     {t('gameplay.leaveRoom')}
                 </Button>

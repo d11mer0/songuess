@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LobbyOptions, GameMode, AnswerMode } from '../../../../types/roomTypes';
 import styles from './LobbyControls.module.css';
 import Checkboxes from './LobbyControls/Checkboxes';
@@ -175,6 +175,33 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
 
                     <Checkboxes options={lobbyOptions} onToggle={handleChange} />
                     <MaxPlayersInput maxPlayers={lobbyOptions.maxPlayers} onChange={setMaxPlayers} />
+                    <button
+                        type="button"
+                        onClick={() => createRoom({
+                            ...lobbyOptions,
+                            maxPlayers: 12,
+                            isPartyMode: true,
+                        })}
+                        style={{
+                            width: '100%',
+                            padding: '12px 18px',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(0, 243, 255, 0.5)',
+                            background: 'linear-gradient(135deg, rgba(0, 243, 255, 0.15), rgba(155, 93, 229, 0.25))',
+                            color: '#00f3ff',
+                            fontSize: '15px',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            marginBottom: '16px',
+                            boxShadow: '0 4px 16px rgba(0, 243, 255, 0.15)',
+                        }}
+                    >
+                        {t('party.partyModeBtn')}
+                    </button>
                     <ActionButtons
                         onAutoJoin={autoJoinRoom}
                         onCreateRoom={createRoom}

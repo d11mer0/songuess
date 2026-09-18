@@ -15,6 +15,7 @@ import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { RegisterDto, RegisterResponseDto } from './dto/register.dto';
 import { RefreshTokenResponseDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { GuestAuthDto } from './dto/guest-auth.dto';
 import {
     SendTokenEmailDto,
     SendTokenEmailResponseDto,
@@ -53,6 +54,18 @@ export class AuthController {
             await this.authService.login(loginDto);
         res.cookie('refreshToken', refreshToken, cookieOptions);
         return res.json({ accessToken });
+    }
+
+    @Public()
+    @Throttle({ default: { limit: 15, ttl: 60000 } })
+    @Post('guest')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Швидкий гостьовий вхід для вечірки' })
+    async guestLogin(@Body() guestAuthDto: GuestAuthDto, @Res() res: Response) {
+        const { accessToken, refreshToken, user } =
+            await this.authService.guestLogin(guestAuthDto);
+        res.cookie('refreshToken', refreshToken, cookieOptions);
+        return res.json({ accessToken, user });
     }
 
     @Public()
