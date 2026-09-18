@@ -1,11 +1,12 @@
 // deezer-api.service.ts
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import Bottleneck from 'bottleneck';
 
 @Injectable()
 export class DeezerApi {
+    private readonly logger = new Logger(DeezerApi.name);
     private readonly BASE_URL = 'https://api.deezer.com';
 
     private limiter = new Bottleneck({
@@ -27,9 +28,7 @@ export class DeezerApi {
 
     async fetch(endpoint: string): Promise<any> {
         try {
-            console.log(
-                `[⬆️ Запит] ${endpoint} at ${new Date().toISOString()}`,
-            );
+            this.logger.debug(`[Deezer API] ${endpoint}`);
             return await this.limiter.schedule(() => this.rawFetch(endpoint));
         } catch (error) {
             throw new BadRequestException(`Deezer API error: ${error.message}`);

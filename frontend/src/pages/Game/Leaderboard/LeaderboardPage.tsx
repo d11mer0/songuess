@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useGetLeaderboardQuery } from '../../../store/api/leaderboardApi';
 import { useAppSelector } from '../../../store/hooks';
 import styles from './LeaderboardPage.module.css';
@@ -10,13 +10,16 @@ const LeaderboardPage: React.FC = () => {
     const [period, setPeriod] = useState<'all_time' | 'weekly' | 'monthly'>('all_time');
     const [genre, setGenre] = useState<string>('all');
 
-    const GENRES = [
-        { id: 'all', label: t('genres.all') },
-        { id: 'rock', label: t('genres.rock') },
-        { id: 'pop', label: t('genres.pop') },
-        { id: 'hiphop', label: t('genres.hiphop') },
-        { id: 'electronic', label: t('genres.electronic') },
-    ];
+    const genres = useMemo(
+        () => [
+            { id: 'all', label: t('genres.all') },
+            { id: 'rock', label: t('genres.rock') },
+            { id: 'pop', label: t('genres.pop') },
+            { id: 'hiphop', label: t('genres.hiphop') },
+            { id: 'electronic', label: t('genres.electronic') },
+        ],
+        [t],
+    );
 
     const { data, isLoading } = useGetLeaderboardQuery({ period, genre });
 
@@ -54,7 +57,7 @@ const LeaderboardPage: React.FC = () => {
 
             {/* Жанри */}
             <div className={styles.genreList}>
-                {GENRES.map((g) => (
+                {genres.map((g) => (
                     <button
                         key={g.id}
                         className={`${styles.genrePill} ${genre === g.id ? styles.active : ''}`}

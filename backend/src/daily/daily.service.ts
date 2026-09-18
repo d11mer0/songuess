@@ -5,6 +5,7 @@ import { isFuzzyMatch } from '../utils/gameplay/fuzzy-match.util';
 import { AchievementService } from '../achievements/achievement.service';
 import { DeezerService } from '../deezer/deezer.service';
 import { RedisService } from '../redis/redis.service';
+import { shuffleArray } from '../utils/array';
 
 @Injectable()
 export class DailyService {
@@ -38,10 +39,9 @@ export class DailyService {
             .filter((t) => t.id !== correctTrack.id)
             .map((t) => `${t.artistName} - ${t.title}`);
         
-        // Перемішуємо і беремо 3 додаткові опції
-        const shuffled = otherOptions.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const shuffled = shuffleArray(otherOptions).slice(0, 3);
         const all = [...shuffled, `${correctTrack.artistName} - ${correctTrack.title}`];
-        return all.sort(() => 0.5 - Math.random());
+        return shuffleArray(all);
     }
 
     generateShareText(dayNumber: number, guessesCount: number, isSolved: boolean, streak: number): string {
@@ -230,25 +230,47 @@ export class DailyService {
                 maxStreak = Math.max(user?.maxDailyStreak || 0, newStreak);
                 const score = isCorrect ? Math.max(100, 700 - attempt * 100) : 0;
 
-                await this.prisma.dailyResult.create({
-                    data: {
-                        userId,
-                        date: dateStr,
-                        dayNumber,
-                        guessesCount: attempt,
-                        isSolved: isCorrect,
-                        score,
-                    },
-                });
-
-                await this.prisma.user.update({
-                    where: { id: userId },
-                    data: {
-                        dailyStreak: newStreak,
-                        maxDailyStreak: maxStreak,
-                        lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
-                    },
-                });
+                if (typeof this.prisma.$transaction === 'function') {
+                    await this.prisma.$transaction([
+                        this.prisma.dailyResult.create({
+                            data: {
+                                userId,
+                                date: dateStr,
+                                dayNumber,
+                                guessesCount: attempt,
+                                isSolved: isCorrect,
+                                score,
+                            },
+                        }),
+                        this.prisma.user.update({
+                            where: { id: userId },
+                            data: {
+                                dailyStreak: newStreak,
+                                maxDailyStreak: maxStreak,
+                                lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
+                            },
+                        }),
+                    ]);
+                } else {
+                    await this.prisma.dailyResult.create({
+                        data: {
+                            userId,
+                            date: dateStr,
+                            dayNumber,
+                            guessesCount: attempt,
+                            isSolved: isCorrect,
+                            score,
+                        },
+                    });
+                    await this.prisma.user.update({
+                        where: { id: userId },
+                        data: {
+                            dailyStreak: newStreak,
+                            maxDailyStreak: maxStreak,
+                            lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
+                        },
+                    });
+                }
 
                 if (this.achievementService && newStreak >= 7) {
                     this.achievementService.awardAchievement(userId, 'DAILY_STREAK_7').catch(() => {});

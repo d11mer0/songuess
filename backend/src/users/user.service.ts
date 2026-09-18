@@ -79,8 +79,12 @@ export class UserService {
             where: { login },
         });
 
-        if (existingUser) {
+        if (existingUser && existingUser.id !== userId) {
             throw new BadRequestException('Цей логін вже використовується');
+        }
+
+        if (existingUser && existingUser.id === userId) {
+            return { login };
         }
 
         try {

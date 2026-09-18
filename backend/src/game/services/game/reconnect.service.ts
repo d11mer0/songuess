@@ -67,17 +67,18 @@ export class ReconnectService {
         }
 
         client.join(room.id);
+        this.roomManagerService.syncRoom(room);
         this.roomManagerService.broadcastRoomsList();
         this.server?.to(room.id).emit('joinedRoom', sanitizeRoom(room));
 
-        if (room.state === GameRoomState.ENDED) {
-            const { playerResults, rounds } = room.gameProgress!;
+        if (room.state === GameRoomState.ENDED && room.gameProgress?.rounds) {
+            const { playerResults, rounds } = room.gameProgress;
             const myResults = rounds.map((round, roundIndex) => {
-                const playerResult = playerResults[userId][roundIndex];
+                const playerResult = playerResults?.[userId]?.[roundIndex];
                 const { preview, ...trackWithoutPreview } = round.track;
                 return {
                     roundNumber: round.roundNumber,
-                    isCorrect: playerResult.isCorrect,
+                    isCorrect: playerResult?.isCorrect ?? false,
                     track: trackWithoutPreview,
                 };
             });

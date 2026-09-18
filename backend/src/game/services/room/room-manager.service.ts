@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, OnModuleInit, Optional } from '@nestjs/common';
 import { Server } from 'socket.io';
 import {
     GameRoom,

@@ -98,12 +98,21 @@ export class AuthService {
             .substring(0, 20);
         const baseLogin = sanitized || 'Player';
         let uniqueLogin = baseLogin;
-        let counter = 1;
+        const existing = await this.prisma.user.findUnique({
+            where: { login: uniqueLogin },
+            select: { id: true },
+        });
 
-        while (await this.prisma.user.findUnique({ where: { login: uniqueLogin } })) {
-            const suffix = counter > 3 ? Math.floor(100 + Math.random() * 900) : counter;
-            uniqueLogin = `${baseLogin}_${suffix}`;
-            counter++;
+        if (existing) {
+            const randSuffix = Math.floor(100 + Math.random() * 900);
+            uniqueLogin = `${baseLogin}_${randSuffix}`;
+            const secondCheck = await this.prisma.user.findUnique({
+                where: { login: uniqueLogin },
+                select: { id: true },
+            });
+            if (secondCheck) {
+                uniqueLogin = `${baseLogin}_${Date.now().toString().slice(-4)}`;
+            }
         }
 
         const randomSuffix = Math.random().toString(36).substring(2, 7);
@@ -113,15 +122,11 @@ export class AuthService {
             'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg',
         );
 
-        const hashedPassword = await this.hashService.hashPassword(
-            `guest_${Date.now()}_${randomSuffix}`,
-        );
-
         const user = await this.prisma.user.create({
             data: {
                 login: uniqueLogin,
                 email: guestEmail,
-                password: hashedPassword,
+                password: null,
                 isVerified: true,
                 avatar: defaultAvatar,
             },

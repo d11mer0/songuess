@@ -52,8 +52,16 @@ const PartyHostPage: React.FC = () => {
     const [isGameFinished, setIsGameFinished] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
     const [selectedThemeId, setSelectedThemeId] = useState<string>('ukrainian-hits');
     const [isLaunching, setIsLaunching] = useState(false);
+
+    const toggleMute = useCallback(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = !audioRef.current.muted;
+            setIsMuted(audioRef.current.muted);
+        }
+    }, []);
 
     // Host gameplay state
     const [hostSelectedOptionIndex, setHostSelectedOptionIndex] = useState<number | null>(null);
@@ -211,17 +219,27 @@ const PartyHostPage: React.FC = () => {
             socketHandlers.off('gameFinished');
             socketHandlers.off('gameEnded');
             socketHandlers.off('reconnectToRound');
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
         };
     }, []);
 
     // Round countdown timer
     useEffect(() => {
-        if (!currentRound || roundResult || timeLeft <= 0) return;
+        if (!currentRound || roundResult) return;
         const timer = setInterval(() => {
-            setTimeLeft((prev) => Math.max(0, prev - 1));
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
         }, 1000);
         return () => clearInterval(timer);
-    }, [currentRound, roundResult, timeLeft]);
+    }, [currentRound, roundResult]);
 
     // Host can answer by clicking an option
     const handleHostAnswer = useCallback(
@@ -356,6 +374,14 @@ const PartyHostPage: React.FC = () => {
                             {t('party.unmuteHint')}
                         </button>
                     )}
+
+                    <button
+                        className={styles.fullscreenBtn}
+                        onClick={toggleMute}
+                        title={isMuted ? "Unmute" : "Mute"}
+                    >
+                        {isMuted ? '🔇' : '🔊'}
+                    </button>
 
                     <button className={styles.fullscreenBtn} onClick={toggleFullscreen}>
                         {isFullscreen ? t('party.exitFullscreen') : t('party.fullscreen')}

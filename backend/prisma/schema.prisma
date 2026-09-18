@@ -73,6 +73,8 @@ model GameScore {
   @@index([userId])
   @@index([createdAt])
   @@index([genre])
+  @@index([genre, createdAt])
+  @@index([userId, createdAt])
 }
 
 model Achievement {

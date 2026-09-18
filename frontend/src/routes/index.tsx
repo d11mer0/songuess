@@ -37,10 +37,10 @@ const AppRoutes: React.FC = () => {
                     <Route path="/join/:code" element={<JoinRoomPage />} />
                     <Route path="/play/:code" element={<PartyControllerPage />} />
                     <Route path="/play" element={<PartyControllerPage />} />
-                    <Route path="/party/:code" element={<PartyControllerPage />} />
-                    <Route path="/party" element={<PartyControllerPage />} />
                     <Route path="/party/host/:id" element={<PartyHostPage />} />
                     <Route path="/party/host" element={<PartyHostPage />} />
+                    <Route path="/party/:code" element={<PartyControllerPage />} />
+                    <Route path="/party" element={<PartyControllerPage />} />
                     <Route path="/" element={<MainPage />} />
                     <Route path="*" element={<Navigate to="/error" replace />} />
                 </Routes>

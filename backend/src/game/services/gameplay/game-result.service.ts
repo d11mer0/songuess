@@ -24,14 +24,14 @@ export class GameResultService {
     async finishGame(room: GameRoom) {
         const { playerResults, rounds } = room.gameProgress!;
 
-        for (const player of room.players) {
+        const resultsPromises = room.players.map(async (player) => {
             const myResults = rounds.map((round, i) => {
-                const res = playerResults[player.id][i];
+                const res = playerResults?.[player.id]?.[i];
                 const { preview, ...trackWithoutPreview } = round.track;
                 
                 return {
                     roundNumber: round.roundNumber,
-                    isCorrect: res.isCorrect,
+                    isCorrect: res?.isCorrect ?? false,
                     track: trackWithoutPreview,
                 };
             });
@@ -53,7 +53,10 @@ export class GameResultService {
                     },
                 });
 
-                const user = await this.prisma.user.findUnique({ where: { id: player.id } });
+                const user = await this.prisma.user.findUnique({
+                    where: { id: player.id },
+                    select: { record: true },
+                });
                 const currentRecord = user?.record || 0;
                 if (user && totalScore > currentRecord) {
                     await this.prisma.user.update({
@@ -68,7 +71,9 @@ export class GameResultService {
             } catch (err) {
                 console.error('Failed to record game score for user', player.id, err);
             }
-        }
+        });
+
+        await Promise.allSettled(resultsPromises);
 
         // Визначаємо переможця гри для FIRST_WIN та DUEL_GLADIATOR
         if (this.achievementService && room.players.length > 0) {
