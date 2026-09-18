@@ -293,6 +293,9 @@ export const en: TranslationDictionary = {
         unmuteHint: '🔊 Click to enable audio',
         hostSelectingTracks: 'Host is selecting party tracks... 🎵',
         prepareForRound: 'Get ready! 4 buttons will appear on your screen!',
+        hostAnswered: 'Your answer',
+        yourAnswerRecorded: 'Host answer recorded! Waiting for players... ⏳',
+        hostBadge: 'HOST',
     },
     songsPage: {
         title: 'Song Library 🎵',

@@ -293,6 +293,9 @@ export interface TranslationDictionary {
         unmuteHint: string;
         hostSelectingTracks: string;
         prepareForRound: string;
+        hostAnswered: string;
+        yourAnswerRecorded: string;
+        hostBadge: string;
     };
     songsPage: {
         title: string;

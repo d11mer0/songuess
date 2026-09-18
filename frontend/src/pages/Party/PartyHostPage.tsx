@@ -39,6 +39,7 @@ const PartyHostPage: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -53,6 +54,10 @@ const PartyHostPage: React.FC = () => {
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
     const [selectedThemeId, setSelectedThemeId] = useState<string>('ukrainian-hits');
     const [isLaunching, setIsLaunching] = useState(false);
+
+    // Host gameplay state
+    const [hostSelectedOptionIndex, setHostSelectedOptionIndex] = useState<number | null>(null);
+    const [isHostAnswerSubmitted, setIsHostAnswerSubmitted] = useState(false);
 
     const { data: curatedThemes = [] } = useGetCuratedThemesQuery();
     const [triggerGetThemeTracks] = useLazyGetThemeTracksQuery();
@@ -80,6 +85,8 @@ const PartyHostPage: React.FC = () => {
             setIsGameFinished(false);
             setCurrentRound(null);
             setRoundResult(null);
+            setHostSelectedOptionIndex(null);
+            setIsHostAnswerSubmitted(false);
         };
 
         socketHandlers.on('joinedRoom', handleRoomSync);
@@ -132,6 +139,8 @@ const PartyHostPage: React.FC = () => {
             setRoundResult(null);
             setAnsweredPlayerIds(new Set());
             setTimeLeft(25);
+            setHostSelectedOptionIndex(null);
+            setIsHostAnswerSubmitted(false);
 
             if (audioRef.current && payload.preview) {
                 audioRef.current.src = payload.preview;
@@ -187,6 +196,42 @@ const PartyHostPage: React.FC = () => {
         }, 1000);
         return () => clearInterval(timer);
     }, [currentRound, roundResult, timeLeft]);
+
+    // Host can answer by clicking an option
+    const handleHostAnswer = useCallback(
+        (index: number) => {
+            if (isHostAnswerSubmitted || !currentRound || !currentRoom) return;
+
+            setHostSelectedOptionIndex(index);
+            setIsHostAnswerSubmitted(true);
+
+            const answer = currentRound.options[index];
+            socketEmitter.emit('submitAnswer', {
+                roomId: currentRoom.id,
+                roundNumber: currentRound.roundNumber,
+                answer,
+                snippetDurationUsed: 0,
+            });
+        },
+        [isHostAnswerSubmitted, currentRound, currentRoom],
+    );
+
+    // Host keyboard shortcuts: Keys 1, 2, 3, 4
+    useEffect(() => {
+        if (!currentRound || roundResult || isHostAnswerSubmitted) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (['1', '2', '3', '4'].includes(e.key)) {
+                const idx = parseInt(e.key, 10) - 1;
+                if (idx >= 0 && idx < currentRound.options.length) {
+                    handleHostAnswer(idx);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [currentRound, roundResult, isHostAnswerSubmitted, handleHostAnswer]);
 
     const handleStartParty = async () => {
         if (!currentRoom) return;
@@ -249,6 +294,8 @@ const PartyHostPage: React.FC = () => {
         setIsGameFinished(false);
         setCurrentRound(null);
         setRoundResult(null);
+        setHostSelectedOptionIndex(null);
+        setIsHostAnswerSubmitted(false);
     };
 
     const toggleFullscreen = () => {
@@ -322,7 +369,10 @@ const PartyHostPage: React.FC = () => {
                                             alt={p.login}
                                             className={styles.cardAvatar}
                                         />
-                                        <span className={styles.cardName}>{p.login}</span>
+                                        <span className={styles.cardName}>
+                                            {p.login}
+                                            {p.id === user?.id && ` (${t('party.hostBadge')})`}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -366,7 +416,7 @@ const PartyHostPage: React.FC = () => {
                 </div>
             )}
 
-            {/* View 2: Round Active (Arena) */}
+            {/* View 2: Round Active (Arena with Host interactive answer options) */}
             {currentRound && !roundResult && !isGameFinished && (
                 <div className={styles.arena}>
                     <div className={styles.roundTopBar}>
@@ -381,23 +431,49 @@ const PartyHostPage: React.FC = () => {
                     </div>
 
                     <div className={styles.optionsGrid}>
-                        {currentRound.options.map((opt, idx) => (
-                            <div
-                                key={idx}
-                                className={`${styles.optionBlock} ${OPTION_CLASSES[idx]}`}
-                            >
-                                <span className={styles.optionShape}>{SHAPES[idx]}</span>
-                                <span>{opt}</span>
-                            </div>
-                        ))}
+                        {currentRound.options.map((opt, idx) => {
+                            const isSelected = hostSelectedOptionIndex === idx;
+                            const isDimmed = isHostAnswerSubmitted && !isSelected;
+
+                            return (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    className={`${styles.optionBlock} ${OPTION_CLASSES[idx]} ${
+                                        isSelected ? styles.optionSelectedByHost : ''
+                                    } ${isDimmed ? styles.optionDimmedForHost : ''}`}
+                                    onClick={() => handleHostAnswer(idx)}
+                                    disabled={isHostAnswerSubmitted}
+                                >
+                                    <div className={styles.optionLeft}>
+                                        <span className={styles.optionShape}>{SHAPES[idx]}</span>
+                                        <span className={styles.optionText}>{opt}</span>
+                                    </div>
+                                    <div className={styles.optionRight}>
+                                        <span className={styles.keyHint}>[{idx + 1}]</span>
+                                        {isSelected && (
+                                            <span className={styles.hostBadge}>
+                                                ✓ {t('party.hostAnswered')}
+                                            </span>
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
+
+                    {isHostAnswerSubmitted && (
+                        <div className={styles.hostStatusBanner}>
+                            {t('party.yourAnswerRecorded')}
+                        </div>
+                    )}
                 </div>
             )}
 
             {/* View 3: Round Results & Leaderboard */}
             {roundResult && !isGameFinished && (
                 <div className={styles.leaderboardSection}>
-                    <h2 className={styles.lbTitle}>🏆 {t('gameplay.totalScores')}</h2>
+                    <h2 className={styles.lbTitle}>🏆 {t('gameplay.totalScoresTitle')}</h2>
                     <div className={styles.correctSongBadge}>
                         ✅ {roundResult.correctAnswer}
                     </div>
@@ -405,8 +481,13 @@ const PartyHostPage: React.FC = () => {
                     <div className={styles.lbTable}>
                         {sortedLeaderboard.map((res, i) => {
                             const player = currentRoom?.players?.find((p) => p.id === res.playerId);
+                            const isMe = player?.id === user?.id;
+
                             return (
-                                <div key={res.playerId} className={styles.lbRow}>
+                                <div
+                                    key={res.playerId}
+                                    className={`${styles.lbRow} ${isMe ? styles.lbRowCurrent : ''}`}
+                                >
                                     <span className={styles.lbRank}>#{i + 1}</span>
                                     <div className={styles.lbPlayer}>
                                         <img
@@ -414,13 +495,16 @@ const PartyHostPage: React.FC = () => {
                                             alt=""
                                             className={styles.lbAvatar}
                                         />
-                                        <span>{player?.login || 'Player'}</span>
-                                        {res.streak && res.streak > 1 && (
+                                        <span className={styles.lbPlayerName}>
+                                            {player?.login || 'Player'}
+                                            {isMe && <span className={styles.meTag}> ({t('party.hostBadge')})</span>}
+                                        </span>
+                                        {Boolean(res.streak && res.streak > 1) && (
                                             <span className={styles.streakBadge}>🔥 x{res.streak}</span>
                                         )}
                                     </div>
                                     <span className={styles.lbPoints}>
-                                        {res.totalScore} {t('gameplay.scores')}
+                                        {res.totalScore} {t('gameplay.points')}
                                     </span>
                                 </div>
                             );
@@ -446,7 +530,7 @@ const PartyHostPage: React.FC = () => {
                                         className={styles.podiumAvatar}
                                     />
                                     <span className={styles.podiumName}>{player?.login || 'Player'}</span>
-                                    <span className={styles.podiumScore}>{res.totalScore} {t('gameplay.scores')}</span>
+                                    <span className={styles.podiumScore}>{res.totalScore} {t('gameplay.points')}</span>
                                 </div>
                             );
                         })}

@@ -223,8 +223,8 @@ const PartyControllerPage: React.FC = () => {
                 </h2>
                 {myResult && (
                     <div className={styles.resultPoints}>
-                        +{myResult.score} {t('gameplay.scores')}
-                        {myResult.streak > 1 && ` 🔥 x${myResult.streak}`}
+                        +{myResult.score} {t('gameplay.points')}
+                        {Boolean(myResult.streak && myResult.streak > 1) && ` 🔥 x${myResult.streak}`}
                     </div>
                 )}
                 {myRank > 0 && (

@@ -293,6 +293,9 @@ export const uk: TranslationDictionary = {
         unmuteHint: '🔊 Натисніть для звуку',
         hostSelectingTracks: 'Хост налаштовує треки вечірки... 🎵',
         prepareForRound: 'Приготуйтеся! Зараз на екрані з\'являться 4 кнопки!',
+        hostAnswered: 'Ваша відповідь',
+        yourAnswerRecorded: 'Вашу відповідь хоста зафіксовано! Очікуємо інших гравців... ⏳',
+        hostBadge: 'ХОСТ',
     },
     songsPage: {
         title: 'Колекція треків 🎵',
