@@ -59,9 +59,11 @@ export const useGameplayListeners = () => {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             }
             if (data.isPartyMode) {
-                if (user && data.room?.leaderId && user.id !== data.room.leaderId) {
+                if (user && data.room?.leaderId && String(user.id) !== String(data.room.leaderId)) {
                     const code = data.shortCode || data.roomId;
                     navigate(`/play/${code}`);
+                } else if (user && data.room?.leaderId && String(user.id) === String(data.room.leaderId)) {
+                    navigate(`/party/host/${data.roomId}`);
                 }
             }
         },
@@ -175,12 +177,32 @@ export const useGameplayListeners = () => {
         (room: Room) => {
             if (room && room.state !== RoomState.ADDING) {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+                if (room.lobbyOptions?.isPartyMode && user?.id && room.leaderId) {
+                    if (String(user.id) === String(room.leaderId)) {
+                        navigate(`/party/host/${room.id}`);
+                    } else {
+                        const code = room.shortCode || room.id;
+                        navigate(`/play/${code}`);
+                    }
+                }
             } else {
                 navigate('/game');
             }
         },
-        [navigate, dispatch],
+        [navigate, dispatch, user?.id],
     );
+
+    // If room is in TV / party mode, automatically route host to TV and player to gamepad
+    useEffect(() => {
+        if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom.leaderId) {
+            if (String(user.id) === String(currentRoom.leaderId)) {
+                navigate(`/party/host/${currentRoom.id}`);
+            } else {
+                const code = currentRoom.shortCode || currentRoom.id;
+                navigate(`/play/${code}`);
+            }
+        }
+    }, [currentRoom?.id, currentRoom?.leaderId, currentRoom?.lobbyOptions?.isPartyMode, user?.id, navigate]);
 
     const handleGameRestarted = useCallback((room: Room) => {
         dispatch(setGameEndedData(null));          // ✅ очистка результатів

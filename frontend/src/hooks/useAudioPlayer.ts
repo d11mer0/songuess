@@ -8,16 +8,38 @@ interface UseAudioPlayerArgs {
     maxPlayDuration?: number;
 }
 
+const getSavedVolume = (fallback: number): number => {
+    if (typeof window === 'undefined') return fallback;
+    const stored = localStorage.getItem('songuess_music_volume');
+    if (stored !== null) {
+        const parsed = parseFloat(stored);
+        if (!Number.isNaN(parsed) && parsed >= 0 && parsed <= 1) {
+            return parsed;
+        }
+    }
+    return 0.7;
+};
+
 export const useAudioPlayer = ({
     previewUrl,
     startedAt,
-    initialVolume = 0.1,
+    initialVolume = 0.7,
     maxPlayDuration,
 }: UseAudioPlayerArgs) => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const [volume, setVolume] = useState(initialVolume);
+    const [volume, setVolumeState] = useState(() => getSavedVolume(initialVolume));
     const [isPlaying, setIsPlaying] = useState(false);
     const [isAutoplayBlocked, setIsAutoplayBlocked] = useState(false);
+
+    const setVolume = useCallback((newVolume: number) => {
+        setVolumeState(newVolume);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('songuess_music_volume', String(newVolume));
+        }
+        if (audioRef.current) {
+            audioRef.current.volume = newVolume;
+        }
+    }, []);
 
     const resumeAudio = useCallback(() => {
         const audio = audioRef.current;

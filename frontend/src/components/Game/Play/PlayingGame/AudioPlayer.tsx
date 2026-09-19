@@ -24,7 +24,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
     const { audioRef, volume, setVolume, isPlaying, isAutoplayBlocked, resumeAudio } = useAudioPlayer({
         previewUrl: trackInfo?.preview ?? null,
         startedAt: trackInfo?.startedAt ?? null,
-        initialVolume: 0.1,
+        initialVolume: 0.7,
         maxPlayDuration,
     });
 

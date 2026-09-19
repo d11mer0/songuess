@@ -7,11 +7,46 @@ import { RedisService } from '../../../redis/redis.service';
 @Injectable()
 export class RoomHelperService {
     private disconnectGraceTimers = new Map<string, NodeJS.Timeout>();
+    private leaderReassignTimers = new Map<string, NodeJS.Timeout>();
 
     constructor(
         private readonly roomManagerService: RoomManagerService,
         @Optional() private readonly redisService?: RedisService,
     ) {}
+
+    cancelLeaderReassignment(roomId: string) {
+        const timer = this.leaderReassignTimers.get(roomId);
+        if (timer) {
+            clearTimeout(timer);
+            this.leaderReassignTimers.delete(roomId);
+        }
+    }
+
+    scheduleLeaderReassignment(roomId: string, delayMs = 7000) {
+        this.cancelLeaderReassignment(roomId);
+        const timer = setTimeout(() => {
+            this.leaderReassignTimers.delete(roomId);
+            const room = this.findRoom(roomId);
+            if (!room) return;
+            const currentLeader = room.players.find((p) => p.id === room.leaderId);
+            if (!currentLeader || !currentLeader.isOnline) {
+                this.assignNewLeader(roomId);
+                this.roomManagerService.syncRoom(room);
+                this.roomManagerService.broadcastRoomsList();
+                this.roomManagerService.serverInfo?.to(roomId).emit(
+                    'playerDisconnected',
+                    room,
+                );
+                if (room.shortCode) {
+                    this.roomManagerService.serverInfo?.to(room.shortCode).emit(
+                        'playerDisconnected',
+                        room,
+                    );
+                }
+            }
+        }, delayMs);
+        this.leaderReassignTimers.set(roomId, timer);
+    }
 
     assignNewLeader(roomId: string) {
         const room = this.findRoom(roomId);
@@ -48,6 +83,7 @@ export class RoomHelperService {
             clearTimeout(timer);
             this.disconnectGraceTimers.delete(roomId);
         }
+        this.cancelLeaderReassignment(roomId);
     }
 
     scheduleRoomCleanup(roomId: string, delayMs = 10000) {

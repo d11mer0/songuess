@@ -54,15 +54,24 @@ const PartyHostPage: React.FC = () => {
     const [isGameFinished, setIsGameFinished] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
+    const [isMuted, setIsMuted] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('songuess_tv_muted') === 'true';
+        }
+        return false;
+    });
     const [selectedThemeId, setSelectedThemeId] = useState<string>('ukrainian-hits');
     const [selectedGameType, setSelectedGameType] = useState<GameType>('THEME');
     const [isLaunching, setIsLaunching] = useState(false);
 
     const toggleMute = useCallback(() => {
         if (audioRef.current) {
-            audioRef.current.muted = !audioRef.current.muted;
-            setIsMuted(audioRef.current.muted);
+            const next = !audioRef.current.muted;
+            audioRef.current.muted = next;
+            setIsMuted(next);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('songuess_tv_muted', String(next));
+            }
         }
     }, []);
 
@@ -126,7 +135,7 @@ const PartyHostPage: React.FC = () => {
 
     // Only the leader can host the TV page; redirect non-host players back to the game room
     useEffect(() => {
-        if (currentRoom && user && currentRoom.leaderId && currentRoom.leaderId !== user.id) {
+        if (currentRoom && user && currentRoom.leaderId && String(currentRoom.leaderId) !== String(user.id)) {
             navigate(`/game/${currentRoom.id}`);
         }
     }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
@@ -148,14 +157,29 @@ const PartyHostPage: React.FC = () => {
         }
     }, [joinUrl, displayCode]);
 
-    // Handle Unblocking audio via click
+    // Handle Unblocking audio via click or any user gesture
     const unlockAudio = useCallback(() => {
         if (audioRef.current) {
+            audioRef.current.muted = isMuted;
+            audioRef.current.volume = 0.8;
             audioRef.current.play().then(() => {
                 setIsAudioBlocked(false);
             }).catch(() => {});
         }
-    }, []);
+    }, [isMuted]);
+
+    useEffect(() => {
+        if (!isAudioBlocked) return;
+        const handleInteraction = () => {
+            unlockAudio();
+        };
+        window.addEventListener('pointerdown', handleInteraction, { once: true });
+        window.addEventListener('keydown', handleInteraction, { once: true });
+        return () => {
+            window.removeEventListener('pointerdown', handleInteraction);
+            window.removeEventListener('keydown', handleInteraction);
+        };
+    }, [isAudioBlocked, unlockAudio]);
 
     // Listen to gameplay events
     useEffect(() => {
@@ -170,7 +194,11 @@ const PartyHostPage: React.FC = () => {
             if (audioRef.current && payload.preview) {
                 audioRef.current.src = payload.preview;
                 audioRef.current.currentTime = 0;
-                audioRef.current.play().catch(() => {
+                audioRef.current.volume = 0.8;
+                audioRef.current.muted = isMuted;
+                audioRef.current.play().then(() => {
+                    setIsAudioBlocked(false);
+                }).catch(() => {
                     setIsAudioBlocked(true);
                 });
             }
@@ -215,10 +243,14 @@ const PartyHostPage: React.FC = () => {
             }
             if (audioRef.current && payload.preview) {
                 audioRef.current.src = payload.preview;
+                audioRef.current.volume = 0.8;
+                audioRef.current.muted = isMuted;
                 if (payload.startedAt) {
                     audioRef.current.currentTime = Math.min(25, elapsed);
                 }
-                audioRef.current.play().catch(() => setIsAudioBlocked(true));
+                audioRef.current.play().then(() => {
+                    setIsAudioBlocked(false);
+                }).catch(() => setIsAudioBlocked(true));
             }
         };
 

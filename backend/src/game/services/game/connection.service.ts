@@ -51,16 +51,17 @@ export class ConnectionService {
                 const isClear = this.roomHelperService.cleanUpRoomById(room.id);
 
                 if (!isClear) {
-                    this.roomHelperService.assignNewLeader(room.id);
+                    if (room.leaderId === user.id) {
+                        this.roomHelperService.scheduleLeaderReassignment(room.id, 7000);
+                    }
                     this.roomManagerService.syncRoom(room);
-                    this.server
-                        ?.to(room.id)
-                        .emit(
-                        'playerDisconnected',
-                        room.state === GameRoomState.ADDING
-                            ? room
-                            : sanitizeRoom(room),
-                        );
+                    const payload = room.state === GameRoomState.ADDING
+                        ? room
+                        : sanitizeRoom(room);
+                    this.server?.to(room.id).emit('playerDisconnected', payload);
+                    if (room.shortCode) {
+                        this.server?.to(room.shortCode).emit('playerDisconnected', payload);
+                    }
                     this.roomManagerService.broadcastRoomsList();
                 }
             }

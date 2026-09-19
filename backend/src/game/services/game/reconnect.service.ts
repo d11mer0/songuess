@@ -70,6 +70,9 @@ export class ReconnectService {
         this.roomManagerService.syncRoom(room);
         this.roomManagerService.broadcastRoomsList();
         this.server?.to(room.id).emit('joinedRoom', sanitizeRoom(room));
+        if (room.shortCode) {
+            this.server?.to(room.shortCode).emit('joinedRoom', sanitizeRoom(room));
+        }
 
         if (room.state === GameRoomState.ENDED && room.gameProgress?.rounds) {
             const { playerResults, rounds } = room.gameProgress;

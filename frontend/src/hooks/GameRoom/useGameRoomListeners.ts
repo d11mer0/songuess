@@ -115,10 +115,28 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 'joinedRoom',
                 'roomsList',
                 'roomDeleted',
+                'partyModeSwitched',
                 'duelMatchFound',
             ]);
         },
         [navigate, dispatch],
+    );
+
+    const handlePartyModeSwitched = useCallback(
+        (data: { roomId: string; shortCode?: string; isPartyMode: boolean; room?: any }) => {
+            if (data.room) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
+            }
+            if (data.isPartyMode) {
+                if (user && data.room?.leaderId && String(user.id) === String(data.room.leaderId)) {
+                    navigate(`/party/host/${data.roomId}`);
+                } else if (user && data.room?.leaderId && String(user.id) !== String(data.room.leaderId)) {
+                    const code = data.shortCode || data.roomId;
+                    navigate(`/play/${code}`);
+                }
+            }
+        },
+        [dispatch, navigate, user],
     );
 
     useEffect(() => {
@@ -130,6 +148,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         socketHandlers.on('playerDisconnected', handlePlayerDisconnected);
         socketHandlers.on('roomDeleted', handleRoomDeleted);
         socketHandlers.on('gameStarted', handleGameStarted);
+        socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
 
         return () => {
             socketOffMany([
@@ -141,6 +160,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 'playerDisconnected',
                 'roomDeleted',
                 'gameStarted',
+                'partyModeSwitched',
             ]);
         };
     }, [
@@ -152,5 +172,6 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         handlePlayerDisconnected,
         handleRoomDeleted,
         handleGameStarted,
+        handlePartyModeSwitched,
     ]);
 };
