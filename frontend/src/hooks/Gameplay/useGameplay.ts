@@ -29,8 +29,28 @@ export const useGameplay = () => {
     }, [currentRoom?.id]);
 
     const deleteRoom = useCallback(() => {
-        if (roomId) socketEmitter.emit('deleteRoom', { id: roomId });
-    }, [roomId]);
+        const targetId = roomId || currentRoom?.id;
+        if (targetId) {
+            socketEmitter.emit('deleteRoom', { id: targetId });
+            dispatch(setCurrentRoom(null));
+            socketOffMany([
+                'playerDisconnected',
+                'playerLeft',
+                'message',
+                'roomDeleted',
+                'roundStarted',
+                'roundResult',
+                'gameEnded',
+                'gameRestarted',
+                'partyModeSwitched',
+                'joinedRoom',
+                'reconnectToRound',
+                'reconnectFailed',
+            ]);
+            navigate('/game');
+            socketEmitter.emit('getRooms');
+        }
+    }, [roomId, currentRoom?.id, dispatch, navigate]);
 
     const launchGame = useCallback(
         (selectedTracks: SelectedTracks) => {
@@ -59,21 +79,28 @@ export const useGameplay = () => {
     );
 
     const leaveRoom = useCallback(() => {
-        if (currentRoom) {                   
-            socketEmitter.emit('leaveRoom', { id: currentRoom.id });
+        const targetId = currentRoom?.id || roomId;
+        if (targetId) {                   
+            socketEmitter.emit('leaveRoom', { id: targetId });
             dispatch(setCurrentRoom(null));
             socketOffMany([
                 'playerDisconnected', 
+                'playerLeft',
                 'message', 
                 'roomDeleted', 
                 'roundStarted', 
                 'roundResult', 
-                'gameRestarted' 
+                'gameEnded',
+                'gameRestarted',
+                'partyModeSwitched',
+                'joinedRoom',
+                'reconnectToRound',
+                'reconnectFailed',
             ]);
             navigate('/game');
             socketEmitter.emit('getRooms');
         }
-    }, [currentRoom, dispatch, navigate]);
+    }, [currentRoom?.id, roomId, dispatch, navigate]);
 
     const restartGame = useCallback(() => {
         if (roomId) {

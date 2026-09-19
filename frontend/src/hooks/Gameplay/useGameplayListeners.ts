@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { socketHandlers,} from '../../services/socket';
+import { socketEmitter, socketHandlers } from '../../services/socket';
 import { Room, RoomState } from '../../types/roomTypes';
 import { useNavigate } from 'react-router-dom';
 
@@ -70,11 +70,27 @@ export const useGameplayListeners = () => {
 
     const handleRoomDeleted = useCallback(
         (data: { roomId?: string; error?: string }) => {
-            if (data.roomId) {
+            if (data?.roomId) {
+                dispatch(setCurrentRoom(null));
+                socketOffMany([
+                    'playerDisconnected',
+                    'playerLeft',
+                    'message',
+                    'roomDeleted',
+                    'roundStarted',
+                    'roundResult',
+                    'gameEnded',
+                    'gameRestarted',
+                    'partyModeSwitched',
+                    'joinedRoom',
+                    'reconnectToRound',
+                    'reconnectFailed',
+                ]);
                 navigate('/game');
+                socketEmitter.emit('getRooms');
             }
         },
-        [navigate],
+        [navigate, dispatch],
     );
 
     const handleRoundEnded = useCallback(
@@ -117,40 +133,48 @@ export const useGameplayListeners = () => {
 
     const handlePlayerLeft = useCallback(
         (room: Room) => {
-            const wasKicked = !room.players.some(
+            if (!room) return;
+            const wasKicked = !room.players?.some(
                 (player) => player.id === user?.id,
             );
-            wasKicked 
-                ? dispatch(setCurrentRoom(null)) 
-                : dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
-            
             if (wasKicked) {
+                dispatch(setCurrentRoom(null));
                 socketOffMany([
                     'playerDisconnected', 
+                    'playerLeft', 
                     'message', 
                     'roomDeleted', 
                     'roundStarted', 
-                    'roundResult'
+                    'roundResult',
+                    'gameEnded',
+                    'gameRestarted',
+                    'partyModeSwitched',
+                    'joinedRoom',
+                    'reconnectToRound',
+                    'reconnectFailed',
                 ]);
-                
                 navigate('/game');
+                socketEmitter.emit('getRooms');
+            } else {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
         },
         [dispatch, navigate, user?.id],
     );
 
+    const handlePlayerDisconnected = useCallback(
+        (room: Room) => {
+            if (room) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+            }
+        },
+        [dispatch],
+    );
+
     const handleJoinedRoom = useCallback(
         (room: Room) => {
-
             if (room && room.state !== RoomState.ADDING) {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
-                socketHandlers.on('gameEnded', handleGameEnded);
-                socketHandlers.on('roundResult', handleRoundEnded);
-                socketHandlers.on('playerLeft', handlePlayerLeft);
-                socketHandlers.on('playerDisconnected', (room) => {
-                    dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
-            });
-                socketHandlers.on('roomDeleted', handleRoomDeleted);
             } else {
                 navigate('/game');
             }
@@ -171,8 +195,38 @@ export const useGameplayListeners = () => {
         socketHandlers.on('gameRestarted', handleGameRestarted);
         socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
         socketHandlers.on('reconnectFailed', () => navigate('/game'));
+        socketHandlers.on('gameEnded', handleGameEnded);
+        socketHandlers.on('roundResult', handleRoundEnded);
+        socketHandlers.on('playerLeft', handlePlayerLeft);
+        socketHandlers.on('playerDisconnected', handlePlayerDisconnected);
+        socketHandlers.on('roomDeleted', handleRoomDeleted);
+
         return () => {
-            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted', 'partyModeSwitched', 'reconnectFailed']);
+            socketOffMany([
+                'joinedRoom',
+                'roundStarted',
+                'reconnectToRound',
+                'gameRestarted',
+                'partyModeSwitched',
+                'reconnectFailed',
+                'gameEnded',
+                'roundResult',
+                'playerLeft',
+                'playerDisconnected',
+                'roomDeleted',
+            ]);
         };
-    }, [handleJoinedRoom, handlePartyModeSwitched, handleSetTrackInfo, navigate]);
+    }, [
+        handleSetTrackInfo,
+        handleJoinedRoom,
+        handleReconnectToRound,
+        handleGameRestarted,
+        handlePartyModeSwitched,
+        handleGameEnded,
+        handleRoundEnded,
+        handlePlayerLeft,
+        handlePlayerDisconnected,
+        handleRoomDeleted,
+        navigate,
+    ]);
 };

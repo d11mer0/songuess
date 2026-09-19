@@ -9,6 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
+import { RoomHelperService } from '../../services/room/room-helper.service';
 import { MatchmakingService } from '../../services/room/matchmaking.service';
 import { LobbyOptions, GameRoomState } from '../../interfaces/game.interface';
 import { RoundSyncService } from '../../services/game/round-sync.service';
@@ -27,6 +28,7 @@ export class RoomLobbyGateway {
     constructor(
         private readonly roomManagerService: RoomManagerService,
         private readonly roomQueryService: RoomQueryService,
+        private readonly roomHelperService: RoomHelperService,
         private readonly matchmakingService: MatchmakingService,
         private readonly roundSyncService: RoundSyncService,
     ) {}
@@ -128,17 +130,30 @@ export class RoomLobbyGateway {
         const user = client.data.user;
         if (!user) return;
 
+        const room = this.roomHelperService.findRoom(data?.id)
+            || this.roomHelperService.findRoomByPlayerId(user.id);
+        if (!room) return;
+
+        const canonicalId = room.id;
+        const shortCode = room.shortCode;
+
         const success = this.roomManagerService.deleteRoomIfLeader(
-            data.id,
+            canonicalId,
             user.id,
         );
 
         if (success) {
-            this.server.to(data.id).emit('roomDeleted', { roomId: data.id });
+            this.server.to(canonicalId).emit('roomDeleted', { roomId: canonicalId });
+            if (shortCode) {
+                this.server.to(shortCode).emit('roomDeleted', { roomId: canonicalId });
+            }
             // Вихід усіх сокетів з кімнати
             for (const [socketId, socket] of this.server.sockets.sockets) {
-                if (socket.rooms.has(data.id)) {
-                    socket.leave(data.id);
+                if (socket.rooms.has(canonicalId)) {
+                    socket.leave(canonicalId);
+                }
+                if (shortCode && socket.rooms.has(shortCode)) {
+                    socket.leave(shortCode);
                 }
             }
         } else {

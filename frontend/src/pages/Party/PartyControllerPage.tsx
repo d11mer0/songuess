@@ -138,6 +138,22 @@ const PartyControllerPage: React.FC = () => {
             }
         };
 
+        const handleRoomDeleted = () => {
+            dispatch(setCurrentRoom(null));
+            navigate('/game');
+        };
+
+        const handlePlayerLeft = (room: any) => {
+            if (!room) return;
+            const wasKicked = !room.players?.some((p: any) => p.id === user?.id);
+            if (wasKicked) {
+                dispatch(setCurrentRoom(null));
+                navigate('/game');
+            } else {
+                dispatch(setCurrentRoom(room));
+            }
+        };
+
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('currentRoom', handleJoinedRoom);
         socketHandlers.on('gameStarted', handleJoinedRoom);
@@ -148,6 +164,8 @@ const PartyControllerPage: React.FC = () => {
         socketHandlers.on('gameEnded', handleGameFinished);
         socketHandlers.on('gameRestarted', handleGameRestarted);
         socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
+        socketHandlers.on('roomDeleted', handleRoomDeleted);
+        socketHandlers.on('playerLeft', handlePlayerLeft);
 
         return () => {
             socketHandlers.off('joinedRoom');
@@ -160,8 +178,10 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('gameEnded');
             socketHandlers.off('gameRestarted');
             socketHandlers.off('partyModeSwitched');
+            socketHandlers.off('roomDeleted');
+            socketHandlers.off('playerLeft');
         };
-    }, [dispatch, navigate, roomCode, t]);
+    }, [dispatch, navigate, roomCode, t, user?.id]);
 
     const handleGuestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

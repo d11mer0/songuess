@@ -209,14 +209,17 @@ export class RoomManagerService implements OnModuleInit {
     }
 
     deleteRoomIfLeader(roomId: string, userId: number): boolean {
-        const roomIndex = this.rooms.findIndex((room) => room.id === roomId);
+        const room = this.roomHelperService.findRoom(roomId);
+        if (!room) return false;
+
+        const roomIndex = this.rooms.findIndex((r) => r.id === room.id);
         if (roomIndex === -1) return false;
 
-        const room = this.rooms[roomIndex];
         if (room.leaderId !== userId) return false;
 
+        this.roomHelperService.cancelRoomCleanup(room.id);
         this.rooms.splice(roomIndex, 1);
-        this.redisService.deleteRoom(roomId);
+        this.redisService.deleteRoom(room.id);
         this.broadcastRoomsList();
         return true;
     }

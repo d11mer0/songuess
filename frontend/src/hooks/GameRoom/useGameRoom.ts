@@ -48,15 +48,9 @@ export const useGameRoom = () => {
         if (roomInfo) {
             socketEmitter.emit('leaveRoom', { id: roomInfo.id });
             dispatch(setCurrentRoom(null));
-            socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
-            
-            socketHandlers.on('roomsList', (rooms) => {
-                dispatch(setRooms(rooms));
-            });
             socketEmitter.emit('getRooms');
-
         }
-    }, [roomInfo, updateSearchParams]);
+    }, [roomInfo]);
 
     const autoJoinRoom = useCallback(() => {
         

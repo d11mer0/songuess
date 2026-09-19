@@ -100,12 +100,18 @@ const PartyHostPage: React.FC = () => {
             setIsHostAnswerSubmitted(false);
         };
 
+        const handleRoomDeleted = () => {
+            dispatch(setCurrentRoom(null));
+            navigate('/game');
+        };
+
         socketHandlers.on('joinedRoom', handleRoomSync);
         socketHandlers.on('currentRoom', handleRoomSync);
         socketHandlers.on('gameStarted', handleRoomSync);
         socketHandlers.on('playerLeft', handleRoomSync);
         socketHandlers.on('playerDisconnected', handleRoomSync);
         socketHandlers.on('gameRestarted', handleGameRestarted);
+        socketHandlers.on('roomDeleted', handleRoomDeleted);
 
         return () => {
             socketHandlers.off('joinedRoom');
@@ -114,8 +120,9 @@ const PartyHostPage: React.FC = () => {
             socketHandlers.off('playerLeft');
             socketHandlers.off('playerDisconnected');
             socketHandlers.off('gameRestarted');
+            socketHandlers.off('roomDeleted');
         };
-    }, [routeRoomId, currentRoom?.id, dispatch]);
+    }, [routeRoomId, currentRoom?.id, dispatch, navigate]);
 
     // Only the leader can host the TV page; redirect non-host players back to the game room
     useEffect(() => {

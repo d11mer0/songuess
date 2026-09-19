@@ -7,6 +7,8 @@ import { RootState } from '../../store/store';
 import { useAppDispatch } from '../../store/hooks';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
+import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
+
 interface UseGameRoomListenersProps {
     updateSearchParams: (id: string | null) => void;
 }
@@ -24,9 +26,8 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
     );
 
     const handleGameStarted = useCallback(
-        
         (data: Room) => {
-            dispatch(setCurrentRoom(data));
+            dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
             navigate(`/game/${data.id}`);
             socketOffMany([
                 'playerDisconnected', 
@@ -34,7 +35,8 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 'gameStarted',            
                 'roomCreated', 
                 'joinedRoom', 
-                'roomsList'
+                'roomsList',
+                'roomDeleted',
             ]);
         },
         [navigate, dispatch],
@@ -46,34 +48,40 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
             const wasKicked = !room.players?.some(
                 (player) => player.id === user?.id,
             );
-            if (wasKicked) {
-                socketOffMany(['playerDisconnected', 'playerLeft', 'gameStarted']);
-                socketHandlers.on('roomsList', handleRoomsUpdate);
-            }
-            dispatch(setCurrentRoom(wasKicked ? null : room));
+            dispatch(setCurrentRoom(wasKicked ? null : mapBackendRoomToFrontend(room)));
             socketEmitter.emit('getRooms');
         },
-        [dispatch, user?.id, handleRoomsUpdate],
+        [dispatch, user?.id],
+    );
+
+    const handlePlayerDisconnected = useCallback(
+        (room: Room) => {
+            if (room) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+            }
+        },
+        [dispatch],
+    );
+
+    const handleRoomDeleted = useCallback(
+        (data: { roomId?: string }) => {
+            dispatch(setCurrentRoom(null));
+            socketEmitter.emit('getRooms');
+        },
+        [dispatch],
     );
 
     const handleRoomCreated = useCallback(
         (data: Room) => {
             if (!data) return;
-            dispatch(setCurrentRoom(data));
+            dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
 
             if (data.lobbyOptions?.isPartyMode) {
                 navigate(`/party/host/${data.id}`);
                 return;
             }
-
-            socketHandlers.on('playerDisconnected', (room) =>
-                dispatch(setCurrentRoom(room))
-            );
-            socketHandlers.on('playerLeft', handlePlayerLeft);
-            socketHandlers.on('gameStarted', handleGameStarted);
-            socketOffMany(['roomsList']);
         },
-        [dispatch, handleGameStarted, handlePlayerLeft, navigate],
+        [dispatch, navigate],
     );
 
     const handleJoinedRoom = useCallback(
@@ -87,25 +95,17 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                     navigate(`/game/${data.id}`);
                     return;
                 }
-                dispatch(setCurrentRoom(data));
-                
-                socketHandlers.on('playerDisconnected', (room) =>
-                    dispatch(setCurrentRoom(room))
-                );
-                socketHandlers.on('playerLeft', handlePlayerLeft);
-                socketHandlers.on('gameStarted', handleGameStarted);
-                socketOffMany(['roomsList']); 
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
             } else {
                 dispatch(setCurrentRoom(null));
-                socketHandlers.on('roomsList', handleRoomsUpdate);
             }
         },
-        [navigate, handleGameStarted, handlePlayerLeft, handleRoomsUpdate, dispatch],
+        [navigate, dispatch],
     );
 
     const handleDuelMatchFound = useCallback(
         (data: { roomId: string; room: Room }) => {
-            dispatch(setCurrentRoom(data.room));
+            dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             navigate(`/game/${data.roomId}`);
             socketOffMany([
                 'playerDisconnected',
@@ -114,6 +114,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 'roomCreated',
                 'joinedRoom',
                 'roomsList',
+                'roomDeleted',
                 'duelMatchFound',
             ]);
         },
@@ -125,9 +126,31 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('roomsList', handleRoomsUpdate);
         socketHandlers.on('duelMatchFound', handleDuelMatchFound);
+        socketHandlers.on('playerLeft', handlePlayerLeft);
+        socketHandlers.on('playerDisconnected', handlePlayerDisconnected);
+        socketHandlers.on('roomDeleted', handleRoomDeleted);
+        socketHandlers.on('gameStarted', handleGameStarted);
 
         return () => {
-            socketOffMany(['roomCreated', 'joinedRoom', 'roomsList', 'duelMatchFound']);
+            socketOffMany([
+                'roomCreated',
+                'joinedRoom',
+                'roomsList',
+                'duelMatchFound',
+                'playerLeft',
+                'playerDisconnected',
+                'roomDeleted',
+                'gameStarted',
+            ]);
         };
-    }, [handleRoomCreated, handleJoinedRoom, handleRoomsUpdate, handleDuelMatchFound]);
+    }, [
+        handleRoomCreated,
+        handleJoinedRoom,
+        handleRoomsUpdate,
+        handleDuelMatchFound,
+        handlePlayerLeft,
+        handlePlayerDisconnected,
+        handleRoomDeleted,
+        handleGameStarted,
+    ]);
 };

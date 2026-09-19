@@ -11,6 +11,7 @@ import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
 import { RoomHelperService } from '../../services/room/room-helper.service';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
+import { GameRoomState } from '../../interfaces/game.interface';
 
 @WebSocketGateway({
     cors: {
@@ -32,19 +33,33 @@ export class RoomControlGateway {
     @SubscribeMessage('leaveRoom')
     handleLeaveRoom(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { id: string },
+        @MessageBody() data: { id?: string },
     ) {
         const user = client.data.user;
         if (!user) return;
 
-        this.roomManagerService.leaveRoom(user.id);
-        client.leave(data.id);
-        const room = this.roomQueryService.getRoomInfo(
-            data.id,
-            this.roomManagerService.allRooms,
-        );
+        const room = (data?.id ? this.roomHelperService.findRoom(data.id) : undefined)
+            || this.roomHelperService.findRoomByPlayerId(user.id);
+        if (!room) return;
 
-        this.server.to(data.id).emit('playerLeft', sanitizeRoom(room));
+        const roomId = room.id;
+        const shortCode = room.shortCode;
+
+        this.roomManagerService.leaveRoom(user.id);
+        client.leave(roomId);
+        if (shortCode) {
+            client.leave(shortCode);
+        }
+
+        const remainingRoom = this.roomHelperService.findRoom(roomId);
+        const payload = remainingRoom
+            ? sanitizeRoom(remainingRoom)
+            : { id: roomId, players: [], leaderId: -1, state: GameRoomState.ADDING };
+
+        this.server.to(roomId).emit('playerLeft', payload);
+        if (shortCode) {
+            this.server.to(shortCode).emit('playerLeft', payload);
+        }
     }
 
     @SubscribeMessage('kickMember')
@@ -55,21 +70,30 @@ export class RoomControlGateway {
         const user = client.data.user;
         if (!user) return;
 
+        const room = this.roomHelperService.findRoom(data.roomId);
+        const roomId = room ? room.id : data.roomId;
+        const shortCode = room?.shortCode;
+
         const kicked = this.roomManagerService.kickMember(
             user.id,
-            data.roomId,
+            roomId,
             data.memberId,
         );
         if (kicked) {
-            const room = this.roomQueryService.getRoomInfo(
-                data.roomId,
-                this.roomManagerService.allRooms,
-            );
-            this.server.to(data.roomId).emit('playerLeft', sanitizeRoom(room));
+            const remainingRoom = this.roomHelperService.findRoom(roomId);
+            const payload = remainingRoom
+                ? sanitizeRoom(remainingRoom)
+                : { id: roomId, players: [], leaderId: -1, state: GameRoomState.ADDING };
+
+            this.server.to(roomId).emit('playerLeft', payload);
+            if (shortCode) {
+                this.server.to(shortCode).emit('playerLeft', payload);
+            }
 
             for (const [_, socket] of this.server.sockets.sockets) {
                 if (socket.data?.user?.id === data.memberId) {
-                    socket.leave(data.roomId);
+                    socket.leave(roomId);
+                    if (shortCode) socket.leave(shortCode);
                     break;
                 }
             }
@@ -84,9 +108,15 @@ export class RoomControlGateway {
         const user = client.data.user;
         if (!user) return;
 
-        const room = this.roomManagerService.startGame(data.id, user.id);
+        const foundRoom = this.roomHelperService.findRoom(data.id);
+        const roomId = foundRoom ? foundRoom.id : data.id;
+
+        const room = this.roomManagerService.startGame(roomId, user.id);
         if (room) {
-            this.server.to(data.id).emit('gameStarted', room);
+            this.server.to(room.id).emit('gameStarted', room);
+            if (room.shortCode) {
+                this.server.to(room.shortCode).emit('gameStarted', room);
+            }
             this.server.emit(
                 'roomsList',
                 this.roomQueryService.getAllJoinableRooms(
@@ -140,11 +170,16 @@ export class RoomControlGateway {
             this.roomManagerService.allRooms,
         );
 
-        this.server.to(room.id).emit('partyModeSwitched', {
+        const partyPayload = {
             roomId: room.id,
             shortCode: room.shortCode,
             isPartyMode: room.lobbyOptions.isPartyMode,
             room: sanitizeRoom(roomInfo),
-        });
+        };
+
+        this.server.to(room.id).emit('partyModeSwitched', partyPayload);
+        if (room.shortCode) {
+            this.server.to(room.shortCode).emit('partyModeSwitched', partyPayload);
+        }
     }
 }
