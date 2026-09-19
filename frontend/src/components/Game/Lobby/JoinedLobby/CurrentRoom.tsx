@@ -6,6 +6,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import Button from '../../../UI/Button/Button';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import { socketEmitter } from '../../../../services/socket';
 
 interface Props {
     startGame: () => void;
@@ -18,6 +19,15 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
     const { t } = useTranslation();
     const { user } = useAppSelector(state => state.user);
     const roomInfo = useAppSelector(selectCurrentRoom);
+
+    const handleSwitchToTv = () => {
+        if (!roomInfo) return;
+        socketEmitter.emit('switchPartyMode', {
+            roomId: roomInfo.id,
+            isPartyMode: true,
+        });
+        navigate(`/party/host/${roomInfo.id}`);
+    };
 
     if(!roomInfo) return <div>{t('gameplay.noRoomsAvailable')}</div>;
     return (
@@ -60,7 +70,7 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
                     <>
                         <Button
                             variant="neutral"
-                            onClick={() => navigate(`/party/host/${roomInfo.id}`)}
+                            onClick={handleSwitchToTv}
                             title={t('party.hostTitle')}
                         >
                             📺 TV

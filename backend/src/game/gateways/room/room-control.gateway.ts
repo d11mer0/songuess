@@ -112,4 +112,39 @@ export class RoomControlGateway {
         );
         client.emit('roomsList', rooms);
     }
+
+    @SubscribeMessage('switchPartyMode')
+    async handleSwitchPartyMode(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { roomId: string; isPartyMode: boolean },
+    ) {
+        const user = client.data.user;
+        if (!user) return;
+
+        const room = this.roomHelperService.findRoom(data.roomId);
+        if (!room || room.leaderId !== user.id) return;
+
+        if (!room.lobbyOptions) {
+            room.lobbyOptions = {
+                allowAutoJoin: true,
+                publicLobby: true,
+                maxPlayers: 8,
+                isPartyMode: true,
+            };
+        }
+        room.lobbyOptions.isPartyMode = Boolean(data.isPartyMode);
+        await this.roomManagerService.syncRoom(room);
+
+        const roomInfo = this.roomQueryService.getRoomInfo(
+            room.id,
+            this.roomManagerService.allRooms,
+        );
+
+        this.server.to(room.id).emit('partyModeSwitched', {
+            roomId: room.id,
+            shortCode: room.shortCode,
+            isPartyMode: room.lobbyOptions.isPartyMode,
+            room: sanitizeRoom(roomInfo),
+        });
+    }
 }

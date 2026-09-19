@@ -129,6 +129,15 @@ const PartyControllerPage: React.FC = () => {
             setJoinError(null);
         };
 
+        const handlePartyModeSwitched = (data: any) => {
+            if (data?.room) {
+                dispatch(setCurrentRoom(data.room));
+            }
+            if (data?.isPartyMode === false && (data?.roomId || roomCode)) {
+                navigate(`/game/${data.roomId || roomCode}`);
+            }
+        };
+
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('currentRoom', handleJoinedRoom);
         socketHandlers.on('gameStarted', handleJoinedRoom);
@@ -138,6 +147,7 @@ const PartyControllerPage: React.FC = () => {
         socketHandlers.on('gameFinished', handleGameFinished);
         socketHandlers.on('gameEnded', handleGameFinished);
         socketHandlers.on('gameRestarted', handleGameRestarted);
+        socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
 
         return () => {
             socketHandlers.off('joinedRoom');
@@ -149,8 +159,9 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('gameFinished');
             socketHandlers.off('gameEnded');
             socketHandlers.off('gameRestarted');
+            socketHandlers.off('partyModeSwitched');
         };
-    }, [dispatch, t]);
+    }, [dispatch, navigate, roomCode, t]);
 
     const handleGuestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

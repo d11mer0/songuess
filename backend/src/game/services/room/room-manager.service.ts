@@ -100,11 +100,11 @@ export class RoomManagerService implements OnModuleInit {
                 }
                 room = fromRedis;
             } else {
-                const allActive = await this.redisService.getAllActiveRooms();
+                const allActive = (await this.redisService.getAllActiveRooms()) || [];
                 const matched = allActive.find(
                     (r) =>
-                        r.id.toLowerCase() === roomId.toLowerCase() ||
-                        (r.shortCode && r.shortCode.toUpperCase() === roomId.toUpperCase()),
+                        Boolean(r?.id && r.id.toLowerCase() === roomId.toLowerCase()) ||
+                        Boolean(r?.shortCode && r.shortCode.toUpperCase() === roomId.toUpperCase()),
                 );
                 if (matched) {
                     if (!this.rooms.some((r) => r.id === matched.id)) {

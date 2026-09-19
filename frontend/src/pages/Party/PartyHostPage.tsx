@@ -331,8 +331,24 @@ const PartyHostPage: React.FC = () => {
         }
     };
 
+    const handleBackToLobby = () => {
+        if (currentRoom) {
+            socketEmitter.emit('switchPartyMode', {
+                roomId: currentRoom.id,
+                isPartyMode: false,
+            });
+            navigate(`/game/${currentRoom.id}`);
+        } else {
+            navigate('/game');
+        }
+    };
+
     const handleCustomTracks = () => {
         if (!currentRoom) return;
+        socketEmitter.emit('switchPartyMode', {
+            roomId: currentRoom.id,
+            isPartyMode: false,
+        });
         if (currentRoom.state === RoomState.ADDING) {
             socketEmitter.emit('startGame', { id: currentRoom.id });
         }
@@ -368,7 +384,7 @@ const PartyHostPage: React.FC = () => {
             {/* Top Bar on TV */}
             <div className={styles.header}>
                 <div className={styles.brand}>
-                    <button className={styles.backBtn} onClick={() => navigate('/game')}>
+                    <button className={styles.backBtn} onClick={handleBackToLobby}>
                         {t('party.backToLobby')}
                     </button>
                     <span className={styles.logoText}>SonGuess</span>
@@ -598,7 +614,7 @@ const PartyHostPage: React.FC = () => {
                         <button className={styles.startPartyBtn} onClick={handleRestart}>
                             🔄 {t('gameplay.restartGame') || 'Зіграти ще раз'}
                         </button>
-                        <button className={styles.customTracksBtn} onClick={() => navigate('/game')}>
+                        <button className={styles.customTracksBtn} onClick={handleBackToLobby}>
                             {t('party.backToLobby')}
                         </button>
                     </div>

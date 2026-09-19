@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { GameRoundPublicData} from '../../types/gameTypes';
 import { GameEndedPayload } from '../../types/gameEndedTypes';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
 
 import {
     setCurrentRoom,
@@ -31,6 +32,7 @@ export const useGameplayListeners = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { user } = useAppSelector((state) => state.user);
+    const currentRoom = useAppSelector(selectCurrentRoom);
 
     const handleReconnectToRound = useCallback(
         (payload: GameRoundPublicData & { answer: string | null }) => {
@@ -41,9 +43,29 @@ export const useGameplayListeners = () => {
 
     const handleSetTrackInfo = useCallback (
         (payload: GameRoundPublicData) => {
+            if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom?.leaderId && user.id !== currentRoom.leaderId) {
+                const code = currentRoom.shortCode || currentRoom.id;
+                navigate(`/play/${code}`);
+                return;
+            }
             dispatch(startRound(payload));
         },
-        [dispatch],
+        [dispatch, currentRoom, user, navigate],
+    );
+
+    const handlePartyModeSwitched = useCallback(
+        (data: { roomId: string; shortCode?: string; isPartyMode: boolean; room?: any }) => {
+            if (data.room) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
+            }
+            if (data.isPartyMode) {
+                if (user && data.room?.leaderId && user.id !== data.room.leaderId) {
+                    const code = data.shortCode || data.roomId;
+                    navigate(`/play/${code}`);
+                }
+            }
+        },
+        [dispatch, navigate, user],
     );
 
     const handleRoomDeleted = useCallback(
@@ -147,9 +169,10 @@ export const useGameplayListeners = () => {
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('gameRestarted', handleGameRestarted);
+        socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
         socketHandlers.on('reconnectFailed', () => navigate('/game'));
         return () => {
-            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted', 'reconnectFailed']);
+            socketOffMany(['joinedRoom', 'roundStarted', 'reconnectToRound', 'gameRestarted', 'partyModeSwitched', 'reconnectFailed']);
         };
-    }, [handleJoinedRoom, navigate]);
+    }, [handleJoinedRoom, handlePartyModeSwitched, handleSetTrackInfo, navigate]);
 };
