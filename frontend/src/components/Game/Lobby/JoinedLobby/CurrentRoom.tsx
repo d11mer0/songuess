@@ -52,21 +52,23 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
             />
             <div className={styles.buttonGroup}>
                 <InviteLink roomId={roomInfo.id} shortCode={roomInfo.shortCode} />
-                <Button
-                    variant="neutral"
-                    onClick={() => navigate(`/party/host/${roomInfo.id}`)}
-                    title={t('party.hostTitle')}
-                >
-                    📺 TV
-                </Button>
                 <Button variant="danger" onClick={leaveRoom}>
                     {t('gameplay.leaveRoom')}
                 </Button>
 
                 {roomInfo.leaderId === user?.id && (
-                    <Button variant="primary" onClick={startGame}>
-                        {t('gameplay.startGame')}
-                    </Button>
+                    <>
+                        <Button
+                            variant="neutral"
+                            onClick={() => navigate(`/party/host/${roomInfo.id}`)}
+                            title={t('party.hostTitle')}
+                        >
+                            📺 TV
+                        </Button>
+                        <Button variant="primary" onClick={startGame}>
+                            {t('gameplay.startGame')}
+                        </Button>
+                    </>
                 )}
             </div>
         </div>

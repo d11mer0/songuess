@@ -114,6 +114,13 @@ const PartyHostPage: React.FC = () => {
         };
     }, [routeRoomId, currentRoom?.id, dispatch]);
 
+    // Only the leader can host the TV page; redirect non-host players back to the game room
+    useEffect(() => {
+        if (currentRoom && user && currentRoom.leaderId && currentRoom.leaderId !== user.id) {
+            navigate(`/game/${currentRoom.id}`);
+        }
+    }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
+
     const displayCode = (currentRoom?.shortCode || currentRoom?.id || routeRoomId || '').toUpperCase();
     const joinUrl = `${window.location.origin}/play/${displayCode}`;
 
