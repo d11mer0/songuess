@@ -11,12 +11,14 @@ interface PlaylistSearchProps {
     searchTerm: string;
     setSearchTerm: (term: string) => void;
     onSelect: (playlistId: number) => void;
+    autoFocus?: boolean;
 }
 
 const PlaylistSearch: React.FC<PlaylistSearchProps> = ({
     searchTerm,
     setSearchTerm,
     onSelect,
+    autoFocus = false,
 }) => {
     const { data: searchResults } = useSearchDeezerQuery(
         { query: searchTerm, type: 'playlist' },
@@ -32,6 +34,7 @@ const PlaylistSearch: React.FC<PlaylistSearchProps> = ({
             optionLabel="title"
             getSubtext={(playlist) => playlist.user?.name || 'Unknown author'}
             placeholder="Search playlist... e.g. 'Dua Lipa - Best Tracks'"
+            autoFocus={autoFocus}
         />
     );
 };

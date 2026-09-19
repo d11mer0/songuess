@@ -18,6 +18,7 @@ interface AlbumSearchProps {
     setAlbumName: (name: string) => void;
     albumResults: Album[];
     onSelect: (albumId: number) => void;
+    autoFocus?: boolean;
 }
 
 const AlbumSearch: React.FC<AlbumSearchProps> = ({
@@ -25,6 +26,7 @@ const AlbumSearch: React.FC<AlbumSearchProps> = ({
     setAlbumName,
     albumResults,
     onSelect,
+    autoFocus = false,
 }) => {
     const { t } = useTranslation();
     return (
@@ -36,6 +38,7 @@ const AlbumSearch: React.FC<AlbumSearchProps> = ({
             optionLabel="title"
             getSubtext={(album) => album.artist.name}
             placeholder={t('gameCreation.searchAlbumPlaceholder')}
+            autoFocus={autoFocus}
         />
     );
 };

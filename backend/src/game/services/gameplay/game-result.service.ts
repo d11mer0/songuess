@@ -92,5 +92,9 @@ export class GameResultService {
         }
 
         room.state = GameRoomState.ENDED;
+        this.server?.to(room.id).emit('gameFinished');
+        if (room.shortCode) {
+            this.server?.to(room.shortCode).emit('gameFinished');
+        }
     }
 }

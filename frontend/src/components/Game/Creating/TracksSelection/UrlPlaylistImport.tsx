@@ -11,9 +11,10 @@ import styles from './UrlPlaylistImport.module.css';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
+    autoFocus?: boolean;
 }
 
-const UrlPlaylistImport: FC<Props> = ({ handleStart }) => {
+const UrlPlaylistImport: FC<Props> = ({ handleStart, autoFocus = false }) => {
     const { t } = useTranslation();
     const [url, setUrl] = useState('');
     const [triggerParse, { data: playlistDetails, isLoading, isFetching, error }] =
@@ -54,6 +55,7 @@ const UrlPlaylistImport: FC<Props> = ({ handleStart }) => {
             <div className={styles.inputGroup}>
                 <input
                     type="text"
+                    autoFocus={autoFocus}
                     className={styles.urlInput}
                     placeholder={t('gameCreation.importUrlPlaceholder')}
                     value={url}

@@ -300,6 +300,22 @@ export interface TranslationDictionary {
         tryAgain: string;
         enterDifferentCode: string;
         connectingToRoom: string;
+        checkingRoom: string;
+        roomIsFull: string;
+        backHome: string;
+        modeDisabledTitle: string;
+        modeDisabledDesc: string;
+        continueInRegularMode: string;
+        leavePartyGame: string;
+        autoLeaveCountdown: string;
+        gameCompleted: string;
+        watchTvForPodium: string;
+        waitingForRestart: string;
+        themeLoadError: string;
+        notEnoughTracks: string;
+        chooseMusicMode: string;
+        waitingForFriends: string;
+        curatedThemesTitle: string;
     };
     songsPage: {
         title: string;

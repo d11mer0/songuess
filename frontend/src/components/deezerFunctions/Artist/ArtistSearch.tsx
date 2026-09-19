@@ -6,12 +6,14 @@ interface ArtistSearchProps {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     onSelect: (artist: ArtistInfo) => void; // ✅ Передаємо весь об'єкт Artist
+    autoFocus?: boolean;
 }
 
 const ArtistSearch: React.FC<ArtistSearchProps> = ({
     searchQuery,
     setSearchQuery,
     onSelect,
+    autoFocus = false,
 }) => {
     const {
         data: searchData,
@@ -33,6 +35,7 @@ const ArtistSearch: React.FC<ArtistSearchProps> = ({
             }}
             optionLabel="name"
             placeholder="Search artist... e.g. 'Dua Lipa'"
+            autoFocus={autoFocus}
         />
 
     );

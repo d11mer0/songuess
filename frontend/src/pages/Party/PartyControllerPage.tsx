@@ -288,6 +288,13 @@ const PartyControllerPage: React.FC = () => {
         };
     }, [dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, t, user?.id]);
 
+    // Ensure finished state is preserved if refreshed when game is ended
+    useEffect(() => {
+        if (currentRoom?.state === RoomState.ENDED) {
+            setIsGameFinished(true);
+        }
+    }, [currentRoom?.state]);
+
     const handleGuestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedName = nickname.trim();
@@ -593,6 +600,52 @@ const PartyControllerPage: React.FC = () => {
                     <div className={styles.waitingPrompt}>
                         <div className={styles.waitingText}>{t('party.connectingToRoom')}</div>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    // View: Game Finished / Podium Celebration Screen
+    if (isGameFinished) {
+        const sortedPlayers = currentRoom?.players
+            ? [...currentRoom.players].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
+            : [];
+        const myRank = sortedPlayers.findIndex((p) => p.id === user?.id) + 1;
+        const myPlayer = sortedPlayers.find((p) => p.id === user?.id);
+        const medals = ['🥇', '🥈', '🥉'];
+        const medalEmoji = myRank > 0 && myRank <= 3 ? medals[myRank - 1] : '🎖️';
+
+        return (
+            <div className={`${styles.container} ${styles.finishedScreen}`}>
+                <div className={styles.finishedCard}>
+                    <div className={styles.finishedMedal}>{medalEmoji}</div>
+                    <h1 className={styles.finishedTitle}>{t('party.podiumTitle')}</h1>
+                    <p className={styles.finishedSubtitle}>{t('party.watchTvForPodium')}</p>
+
+                    <div className={styles.finalStatsBox}>
+                        <div className={styles.finalStatItem}>
+                            <span className={styles.finalStatLabel}>{t('party.finalRank')}</span>
+                            <span className={styles.finalStatValue}>#{myRank > 0 ? myRank : '-'}</span>
+                        </div>
+                        <div className={styles.finalStatDivider} />
+                        <div className={styles.finalStatItem}>
+                            <span className={styles.finalStatLabel}>{t('gameplay.points')}</span>
+                            <span className={styles.finalStatValue}>{myPlayer?.totalScore ?? 0}</span>
+                        </div>
+                    </div>
+
+                    <div className={styles.finishedWaiting}>
+                        <div className={styles.waitingText}>{t('party.waitingForRestart')}</div>
+                    </div>
+
+                    <button
+                        type="button"
+                        className={`${styles.submitBtn} ${styles.leaveBtn}`}
+                        onClick={handleLeaveParty}
+                        style={{ marginTop: '20px' }}
+                    >
+                        {t('party.leavePartyGame')}
+                    </button>
                 </div>
             </div>
         );

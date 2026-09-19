@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
@@ -63,6 +63,7 @@ const PartyHostPage: React.FC = () => {
     const [selectedThemeId, setSelectedThemeId] = useState<string>('ukrainian-hits');
     const [selectedGameType, setSelectedGameType] = useState<GameType>('THEME');
     const [isLaunching, setIsLaunching] = useState(false);
+    const [launchError, setLaunchError] = useState<string | null>(null);
 
     const toggleMute = useCallback(() => {
         if (audioRef.current) {
@@ -329,6 +330,7 @@ const PartyHostPage: React.FC = () => {
     const handleStartParty = async () => {
         if (!currentRoom) return;
         setIsLaunching(true);
+        setLaunchError(null);
 
         try {
             const themeToLoad = selectedThemeId || 'ukrainian-hits';
@@ -347,6 +349,7 @@ const PartyHostPage: React.FC = () => {
             console.log('🚀 Launching party game with tracks count:', tracks.length);
 
             if (tracks.length >= 3) {
+                setLaunchError(null);
                 socketEmitter.emit('launchGame', {
                     roomId: currentRoom.id,
                     selectedTracks: {
@@ -356,18 +359,12 @@ const PartyHostPage: React.FC = () => {
                     },
                 });
             } else {
-                console.warn('Not enough tracks returned, navigating to setup');
-                if (currentRoom.state === RoomState.ADDING) {
-                    socketEmitter.emit('startGame', { id: currentRoom.id });
-                }
-                navigate(`/game/${currentRoom.id}`);
+                console.warn('Not enough tracks returned for theme');
+                setLaunchError(t('party.notEnoughTracks'));
             }
         } catch (err) {
             console.error('Failed to launch party theme', err);
-            if (currentRoom.state === RoomState.ADDING) {
-                socketEmitter.emit('startGame', { id: currentRoom.id });
-            }
-            navigate(`/game/${currentRoom.id}`);
+            setLaunchError(t('party.themeLoadError'));
         } finally {
             setIsLaunching(false);
         }
@@ -377,10 +374,12 @@ const PartyHostPage: React.FC = () => {
         if (!currentRoom) return;
         if (!selectedTracks?.tracks || selectedTracks.tracks.length < 3) {
             console.warn('Not enough tracks returned to start party');
+            setLaunchError(t('party.notEnoughTracks'));
             return;
         }
 
         setIsLaunching(true);
+        setLaunchError(null);
         socketEmitter.emit('launchGame', {
             roomId: currentRoom.id,
             selectedTracks,
@@ -433,9 +432,30 @@ const PartyHostPage: React.FC = () => {
         }
     };
 
-    const sortedLeaderboard = roundResult
-        ? [...roundResult.results].sort((a, b) => b.totalScore - a.totalScore)
-        : [];
+    // Ensure finished state is preserved if refreshed when game is ended
+    useEffect(() => {
+        if (currentRoom?.state === RoomState.ENDED) {
+            setIsGameFinished(true);
+        }
+    }, [currentRoom?.state]);
+
+    const sortedLeaderboard = useMemo(() => {
+        if (roundResult?.results && roundResult.results.length > 0) {
+            return [...roundResult.results].sort((a, b) => b.totalScore - a.totalScore);
+        }
+        if (currentRoom?.players && currentRoom.players.length > 0) {
+            return [...currentRoom.players]
+                .map((p) => ({
+                    playerId: p.id,
+                    answer: '',
+                    score: 0,
+                    streak: p.streak ?? 0,
+                    totalScore: p.totalScore ?? 0,
+                }))
+                .sort((a, b) => b.totalScore - a.totalScore);
+        }
+        return [];
+    }, [roundResult, currentRoom?.players]);
 
     return (
         <div className={styles.container} onClick={isAudioBlocked ? unlockAudio : undefined}>
@@ -480,83 +500,127 @@ const PartyHostPage: React.FC = () => {
             {/* View 1: TV Lobby */}
             {!currentRound && !roundResult && !isGameFinished && (
                 <div className={styles.lobbyContent}>
-                    <div className={styles.qrCard}>
-                        <div className={styles.qrWrapper}>
-                            <canvas ref={canvasRef} className={styles.qrCanvas} />
+                    {/* Left Column: QR Code & Connected Players (Attendance Center) */}
+                    <div className={styles.sidebarArea}>
+                        <div className={styles.qrCard}>
+                            <div className={styles.qrWrapper}>
+                                <canvas ref={canvasRef} className={styles.qrCanvas} />
+                            </div>
+                            <div className={styles.qrInstruction}>{t('party.scanToPlay')}</div>
+                            <div className={styles.qrLink}>{joinUrl}</div>
                         </div>
-                        <div className={styles.qrInstruction}>{t('party.scanToPlay')}</div>
-                        <div className={styles.qrLink}>{joinUrl}</div>
-                    </div>
 
-                    <div className={styles.playersSection}>
-                        <div>
+                        <div className={styles.playersSidebarCard}>
                             <div className={styles.playersHeader}>
                                 <span className={styles.playersCount}>
-                                    👥 {t('party.playersConnected')}: {currentRoom?.players?.length || 0}
+                                    👥 {t('party.playersConnected')} ({currentRoom?.players?.length || 0})
                                 </span>
                             </div>
 
-                            <div className={styles.playersGrid}>
-                                {currentRoom?.players?.map((p) => (
-                                    <div key={p.id} className={styles.playerCard}>
-                                        <img
-                                            src={p.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
-                                            alt={p.login}
-                                            className={styles.cardAvatar}
-                                        />
-                                        <span className={styles.cardName}>
-                                            {p.login}
-                                            {p.id === user?.id && ` (${t('party.hostBadge')})`}
-                                        </span>
+                            <div className={styles.playersList}>
+                                {currentRoom?.players && currentRoom.players.length > 0 ? (
+                                    currentRoom.players.map((p) => (
+                                        <div key={p.id} className={styles.playerCard}>
+                                            <img
+                                                src={p.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
+                                                alt={p.login}
+                                                className={styles.cardAvatar}
+                                            />
+                                            <div className={styles.cardInfo}>
+                                                <span className={styles.cardName}>{p.login}</span>
+                                                {p.id === user?.id && (
+                                                    <span className={styles.hostBadgeTag}>{t('party.hostBadge')}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className={styles.noPlayersNotice}>
+                                        {t('party.waitingForFriends')}
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
+                    </div>
 
-                        {/* Track Selection & Start Controls */}
-                        <div className={styles.controlsBlock}>
+                    {/* Right Column: Game Setup & Launch Center (Main Stage) */}
+                    <div className={styles.mainControlsArea}>
+                        <div className={styles.setupCard}>
+                            <div className={styles.setupHeader}>
+                                <h2 className={styles.setupTitle}>🎮 {t('gameCreation.selectGameType')}</h2>
+                                <p className={styles.setupSubtitle}>{t('party.chooseMusicMode')}</p>
+                            </div>
+
                             <div className={styles.modeTabs}>
                                 <button
                                     type="button"
                                     className={`${styles.modeTab} ${selectedGameType === 'THEME' ? styles.modeTabActive : ''}`}
-                                    onClick={() => setSelectedGameType('THEME')}
+                                    onClick={() => {
+                                        setSelectedGameType('THEME');
+                                        setLaunchError(null);
+                                    }}
                                 >
                                     {t('gameCreation.typeThemes')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`${styles.modeTab} ${selectedGameType === 'ARTIST' ? styles.modeTabActive : ''}`}
-                                    onClick={() => setSelectedGameType('ARTIST')}
+                                    onClick={() => {
+                                        setSelectedGameType('ARTIST');
+                                        setLaunchError(null);
+                                    }}
                                 >
                                     {t('gameCreation.typeArtist')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`${styles.modeTab} ${selectedGameType === 'PLAYLIST' ? styles.modeTabActive : ''}`}
-                                    onClick={() => setSelectedGameType('PLAYLIST')}
+                                    onClick={() => {
+                                        setSelectedGameType('PLAYLIST');
+                                        setLaunchError(null);
+                                    }}
                                 >
                                     {t('gameCreation.typePlaylist')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`${styles.modeTab} ${selectedGameType === 'ALBUM' ? styles.modeTabActive : ''}`}
-                                    onClick={() => setSelectedGameType('ALBUM')}
+                                    onClick={() => {
+                                        setSelectedGameType('ALBUM');
+                                        setLaunchError(null);
+                                    }}
                                 >
                                     {t('gameCreation.typeAlbum')}
                                 </button>
                                 <button
                                     type="button"
                                     className={`${styles.modeTab} ${selectedGameType === 'URL' ? styles.modeTabActive : ''}`}
-                                    onClick={() => setSelectedGameType('URL')}
+                                    onClick={() => {
+                                        setSelectedGameType('URL');
+                                        setLaunchError(null);
+                                    }}
                                 >
                                     {t('gameCreation.typeUrl')}
                                 </button>
                             </div>
 
+                            {launchError && (
+                                <div className={styles.launchErrorBanner}>
+                                    <span>⚠️ {launchError}</span>
+                                    <button
+                                        type="button"
+                                        className={styles.clearErrorBtn}
+                                        onClick={() => setLaunchError(null)}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            )}
+
                             {selectedGameType === 'THEME' ? (
-                                <>
+                                <div className={styles.themeModeContainer}>
                                     <div className={styles.themePicker}>
-                                        <span className={styles.themeLabel}>{t('party.selectTheme')}</span>
+                                        <span className={styles.themeLabel}>{t('party.curatedThemesTitle')}</span>
                                         <div className={styles.themeChips}>
                                             {curatedThemes.map((theme) => (
                                                 <button
@@ -565,7 +629,7 @@ const PartyHostPage: React.FC = () => {
                                                     className={`${styles.themeChip} ${selectedThemeId === theme.id ? styles.themeChipActive : ''}`}
                                                     onClick={() => setSelectedThemeId(theme.id)}
                                                 >
-                                                    {theme.title}
+                                                    <span className={styles.themeChipTitle}>{theme.title}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -580,12 +644,14 @@ const PartyHostPage: React.FC = () => {
                                             {isLaunching ? t('party.launchingGame') : `${t('party.startPartyGame')} 🚀`}
                                         </button>
                                     </div>
-                                </>
+                                </div>
                             ) : (
                                 <div className={styles.customSelectionWrapper}>
                                     <TrackSelectionBlock
+                                        key={selectedGameType}
                                         selectedGameType={selectedGameType}
                                         onStart={handleStartWithSelectedTracks}
+                                        autoFocus={true}
                                     />
                                 </div>
                             )}

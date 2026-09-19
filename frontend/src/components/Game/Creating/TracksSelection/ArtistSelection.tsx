@@ -11,9 +11,10 @@ type TracksFormat = 'ALL' | 'PLAYLIST' | 'ALBUM';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
+    autoFocus?: boolean;
 }
 
-const ArtistSelection: FC<Props> = ({ handleStart }) => { 
+const ArtistSelection: FC<Props> = ({ handleStart, autoFocus = false }) => { 
     const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedArtist, setSelectedArtist] = useState<ArtistInfo | null>(
@@ -51,6 +52,7 @@ const ArtistSelection: FC<Props> = ({ handleStart }) => {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 onSelect={handleSelectArtist}
+                autoFocus={autoFocus}
             />
 
             {selectedArtist && (

@@ -8,9 +8,10 @@ import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
+    autoFocus?: boolean;
 }
 
-const AlbumSelection: FC<Props> = ({ handleStart }: Props) => {
+const AlbumSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props) => {
     const { t } = useTranslation();
     const [albumName, setAlbumName] = useState('');
     const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
@@ -29,6 +30,7 @@ const AlbumSelection: FC<Props> = ({ handleStart }: Props) => {
                 setAlbumName={setAlbumName}
                 albumResults={albumResults?.data || []}
                 onSelect={setSelectedAlbumId}
+                autoFocus={autoFocus}
             />
 
             {selectedAlbumId && (

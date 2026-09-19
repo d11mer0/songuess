@@ -12,9 +12,10 @@ import { useTranslation } from '../../../../i18n/LanguageContext';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
+    autoFocus?: boolean;
 }
 
-const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
+const PlaylistSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(
@@ -48,6 +49,7 @@ const PlaylistSelection: FC<Props> = ({ handleStart }: Props) => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 onSelect={setSelectedPlaylistId}
+                autoFocus={autoFocus}
             />
             {(isLoadingTracks || isFetching) && <OverviewLoadingPlaceholder loadingText={t('gameCreation.loadingPlaylistTracks')} />}
             {(selectedPlaylistId !== null && playlistDetails && !isFetching) && (

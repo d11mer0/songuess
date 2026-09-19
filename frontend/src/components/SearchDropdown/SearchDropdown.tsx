@@ -14,6 +14,7 @@ interface SearchDropdownProps<T> {
     getSubtext?: (item: T) => string; 
     autoCloseDelay?: number | false; 
     placeholder?: string;
+    autoFocus?: boolean;
 }
 
 const SearchDropdown = <T extends { id: number }>({
@@ -24,7 +25,8 @@ const SearchDropdown = <T extends { id: number }>({
     optionLabel,
     getSubtext,
     autoCloseDelay = false,
-    placeholder = "Search ..."
+    placeholder = "Search ...",
+    autoFocus = false,
 }: SearchDropdownProps<T>) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +73,7 @@ const SearchDropdown = <T extends { id: number }>({
                 <input
                     ref={inputRef}
                     type="text"
+                    autoFocus={autoFocus}
                     className={styles.searchInput}
                     value={value}
                     onChange={(e) => {
