@@ -8,6 +8,8 @@ import { useSocketConnection } from '../../hooks/common/useSocketConnection';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { useGetCuratedThemesQuery, useLazyGetThemeTracksQuery } from '../../store/api/deezerApi';
 import { RoomState } from '../../types/roomTypes';
+import TrackSelectionBlock from '../../components/Game/Creating/CreatingGame/TrackSelectionBlock';
+import { GameType, SelectedTracks } from '../../types/gameTypes';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
 import styles from './PartyHostPage.module.css';
@@ -54,6 +56,7 @@ const PartyHostPage: React.FC = () => {
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [selectedThemeId, setSelectedThemeId] = useState<string>('ukrainian-hits');
+    const [selectedGameType, setSelectedGameType] = useState<GameType>('THEME');
     const [isLaunching, setIsLaunching] = useState(false);
 
     const toggleMute = useCallback(() => {
@@ -331,6 +334,20 @@ const PartyHostPage: React.FC = () => {
         }
     };
 
+    const handleStartWithSelectedTracks = (selectedTracks: SelectedTracks) => {
+        if (!currentRoom) return;
+        if (!selectedTracks?.tracks || selectedTracks.tracks.length < 3) {
+            console.warn('Not enough tracks returned to start party');
+            return;
+        }
+
+        setIsLaunching(true);
+        socketEmitter.emit('launchGame', {
+            roomId: currentRoom.id,
+            selectedTracks,
+        });
+    };
+
     const handleBackToLobby = () => {
         if (currentRoom) {
             socketEmitter.emit('switchPartyMode', {
@@ -453,39 +470,82 @@ const PartyHostPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Theme Selection & Start Controls */}
+                        {/* Track Selection & Start Controls */}
                         <div className={styles.controlsBlock}>
-                            <div className={styles.themePicker}>
-                                <span className={styles.themeLabel}>{t('party.selectTheme')}</span>
-                                <div className={styles.themeChips}>
-                                    {curatedThemes.map((theme) => (
-                                        <button
-                                            key={theme.id}
-                                            type="button"
-                                            className={`${styles.themeChip} ${selectedThemeId === theme.id ? styles.themeChipActive : ''}`}
-                                            onClick={() => setSelectedThemeId(theme.id)}
-                                        >
-                                            {theme.title}
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className={styles.modeTabs}>
+                                <button
+                                    type="button"
+                                    className={`${styles.modeTab} ${selectedGameType === 'THEME' ? styles.modeTabActive : ''}`}
+                                    onClick={() => setSelectedGameType('THEME')}
+                                >
+                                    {t('gameCreation.typeThemes')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`${styles.modeTab} ${selectedGameType === 'ARTIST' ? styles.modeTabActive : ''}`}
+                                    onClick={() => setSelectedGameType('ARTIST')}
+                                >
+                                    {t('gameCreation.typeArtist')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`${styles.modeTab} ${selectedGameType === 'PLAYLIST' ? styles.modeTabActive : ''}`}
+                                    onClick={() => setSelectedGameType('PLAYLIST')}
+                                >
+                                    {t('gameCreation.typePlaylist')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`${styles.modeTab} ${selectedGameType === 'ALBUM' ? styles.modeTabActive : ''}`}
+                                    onClick={() => setSelectedGameType('ALBUM')}
+                                >
+                                    {t('gameCreation.typeAlbum')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`${styles.modeTab} ${selectedGameType === 'URL' ? styles.modeTabActive : ''}`}
+                                    onClick={() => setSelectedGameType('URL')}
+                                >
+                                    {t('gameCreation.typeUrl')}
+                                </button>
                             </div>
 
-                            <div className={styles.actionButtons}>
-                                <button
-                                    className={styles.startPartyBtn}
-                                    onClick={handleStartParty}
-                                    disabled={isLaunching}
-                                >
-                                    {isLaunching ? t('party.launchingGame') : `${t('party.startPartyGame')} 🚀`}
-                                </button>
-                                <button
-                                    className={styles.customTracksBtn}
-                                    onClick={handleCustomTracks}
-                                >
-                                    {t('party.customTracks')}
-                                </button>
-                            </div>
+                            {selectedGameType === 'THEME' ? (
+                                <>
+                                    <div className={styles.themePicker}>
+                                        <span className={styles.themeLabel}>{t('party.selectTheme')}</span>
+                                        <div className={styles.themeChips}>
+                                            {curatedThemes.map((theme) => (
+                                                <button
+                                                    key={theme.id}
+                                                    type="button"
+                                                    className={`${styles.themeChip} ${selectedThemeId === theme.id ? styles.themeChipActive : ''}`}
+                                                    onClick={() => setSelectedThemeId(theme.id)}
+                                                >
+                                                    {theme.title}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.actionButtons}>
+                                        <button
+                                            className={styles.startPartyBtn}
+                                            onClick={handleStartParty}
+                                            disabled={isLaunching}
+                                        >
+                                            {isLaunching ? t('party.launchingGame') : `${t('party.startPartyGame')} 🚀`}
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className={styles.customSelectionWrapper}>
+                                    <TrackSelectionBlock
+                                        selectedGameType={selectedGameType}
+                                        onStart={handleStartWithSelectedTracks}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
