@@ -303,6 +303,11 @@ export const en: TranslationDictionary = {
         checkingRoom: 'Checking room...',
         roomIsFull: 'Room is already full of players.',
         backHome: 'Back to Home',
+        modeDisabledTitle: '📺 Party Mode Disabled',
+        modeDisabledDesc: 'The host has switched the game to regular mode. In regular mode, music and questions stream directly on your device.',
+        continueInRegularMode: '🎮 Play in Regular Mode',
+        leavePartyGame: '🚪 Leave Room',
+        autoLeaveCountdown: 'Auto-exit in {seconds}s...',
     },
     songsPage: {
         title: 'Song Library 🎵',

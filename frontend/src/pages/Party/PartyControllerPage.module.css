@@ -347,3 +347,32 @@
     50% { transform: scale(1.15); }
     100% { transform: scale(1); }
 }
+
+/* Mode Disabled / Transition Card */
+.countdownBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: rgba(241, 91, 181, 0.15);
+    border: 1px solid rgba(241, 91, 181, 0.4);
+    border-radius: 20px;
+    color: #f15bb5;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.leaveBtn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #e0e0e0 !important;
+    box-shadow: none !important;
+}
+
+.leaveBtn:hover {
+    background: rgba(230, 57, 70, 0.2) !important;
+    border-color: rgba(230, 57, 70, 0.5) !important;
+    color: #ff6b6b !important;
+}
+

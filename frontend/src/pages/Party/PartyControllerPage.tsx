@@ -7,6 +7,7 @@ import { socketEmitter, socketHandlers, socketInstance } from '../../services/so
 import { useSocketConnection } from '../../hooks/common/useSocketConnection';
 import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
+import { logout } from '../../store/users/userSlice';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { RoomState } from '../../types/roomTypes';
 import Loader from '../../components/UI/Loader/Loader/Loader';
@@ -52,6 +53,9 @@ const PartyControllerPage: React.FC = () => {
     const [joinError, setJoinError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [initialCheckDone, setInitialCheckDone] = useState(!code);
+
+    const [partyModeDisabledData, setPartyModeDisabledData] = useState<any | null>(null);
+    const [autoLeaveSeconds, setAutoLeaveSeconds] = useState(20);
 
     const [guestLogin, { isLoading: isLoggingIn }] = useGuestLoginMutation();
     const [triggerCheckRoom, { isFetching: isCheckingRoom }] = useLazyCheckRoomQuery();
@@ -102,6 +106,57 @@ const PartyControllerPage: React.FC = () => {
         }
     }, [isAuthenticated, roomCode, currentRoom, joinError, initialCheckDone, isCheckingRoom]);
 
+    // Safe leave handler when party mode ends or user leaves
+    const handleLeaveParty = useCallback(() => {
+        setPartyModeDisabledData(null);
+        const targetId = currentRoom?.id || roomCode;
+        if (targetId) {
+            socketEmitter.emit('leaveRoom', { id: targetId });
+        }
+        dispatch(setCurrentRoom(null));
+
+        const isGuestUser = Boolean(
+            user?.email?.includes('@guest.') ||
+            user?.login?.includes('_guest_')
+        );
+        if (isGuestUser) {
+            dispatch(logout());
+        }
+        navigate('/');
+    }, [currentRoom?.id, dispatch, navigate, roomCode, user]);
+
+    // Continue in regular mode when host switched off TV mode
+    const handleContinueRegularMode = useCallback(() => {
+        const targetRoom = partyModeDisabledData?.room || currentRoom;
+        const targetId = partyModeDisabledData?.roomId || currentRoom?.id || roomCode;
+        setPartyModeDisabledData(null);
+
+        if (targetRoom?.state === RoomState.ADDING) {
+            navigate('/game');
+        } else {
+            navigate(`/game/${targetId}`);
+        }
+    }, [currentRoom, navigate, partyModeDisabledData, roomCode]);
+
+    // Auto-leave countdown timer when host disables party mode
+    useEffect(() => {
+        if (!partyModeDisabledData) return;
+
+        setAutoLeaveSeconds(20);
+        const interval = setInterval(() => {
+            setAutoLeaveSeconds((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    handleLeaveParty();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [partyModeDisabledData, handleLeaveParty]);
+
     // Socket events for party controller
     useEffect(() => {
         const handleJoinedRoom = (room: any) => {
@@ -111,6 +166,16 @@ const PartyControllerPage: React.FC = () => {
             } else {
                 setJoinError(t('party.roomNotFoundOrClosed'));
             }
+        };
+
+        const handleGameStarted = (room: any) => {
+            if (partyModeDisabledData) {
+                // If game starts in regular mode and user has not chosen to continue,
+                // safely leave to avoid stalling the host's round
+                handleLeaveParty();
+                return;
+            }
+            handleJoinedRoom(room);
         };
 
         const handleRoundStarted = (payload: RoundPayload) => {
@@ -169,8 +234,12 @@ const PartyControllerPage: React.FC = () => {
             if (data?.room) {
                 dispatch(setCurrentRoom(data.room));
             }
-            if (data?.isPartyMode === false && (data?.roomId || roomCode)) {
-                navigate(`/game/${data.roomId || roomCode}`);
+            if (data?.isPartyMode === false) {
+                // Host turned off TV mode! Do not abruptly navigate; show smart choice screen
+                setPartyModeDisabledData(data);
+            } else if (data?.isPartyMode === true) {
+                // Host turned TV mode back on!
+                setPartyModeDisabledData(null);
             }
         };
 
@@ -192,7 +261,7 @@ const PartyControllerPage: React.FC = () => {
 
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('currentRoom', handleJoinedRoom);
-        socketHandlers.on('gameStarted', handleJoinedRoom);
+        socketHandlers.on('gameStarted', handleGameStarted);
         socketHandlers.on('roundStarted', handleRoundStarted);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('roundResult', handleRoundResult);
@@ -217,7 +286,7 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('roomDeleted');
             socketHandlers.off('playerLeft');
         };
-    }, [dispatch, navigate, roomCode, t, user?.id]);
+    }, [dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, t, user?.id]);
 
     const handleGuestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -351,7 +420,7 @@ const PartyControllerPage: React.FC = () => {
         );
     }
 
-    // View 1: Error joining room (MUST be checked before View 2 so invalid rooms are not prompted for nickname)
+    // View 1: Error joining room (checked before View 2 so invalid rooms are not prompted for nickname)
     if (joinError) {
         return (
             <div className={styles.container}>
@@ -389,6 +458,42 @@ const PartyControllerPage: React.FC = () => {
                             onClick={() => navigate('/')}
                         >
                             🏠 {t('party.backHome')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // View 1.5: Party Mode Disabled by Host (Smart Transition Screen)
+    if (partyModeDisabledData) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.authCard}>
+                    <div className={styles.authIcon}>📺</div>
+                    <h1 className={styles.authTitle}>{t('party.modeDisabledTitle')}</h1>
+                    <p className={styles.authSubtitle} style={{ lineHeight: 1.5, marginBottom: '16px' }}>
+                        {t('party.modeDisabledDesc')}
+                    </p>
+
+                    <div className={styles.countdownBadge}>
+                        ⏳ {t('party.autoLeaveCountdown', { seconds: autoLeaveSeconds })}
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                        <button
+                            type="button"
+                            className={styles.submitBtn}
+                            onClick={handleContinueRegularMode}
+                        >
+                            {t('party.continueInRegularMode')}
+                        </button>
+                        <button
+                            type="button"
+                            className={`${styles.submitBtn} ${styles.leaveBtn}`}
+                            onClick={handleLeaveParty}
+                        >
+                            {t('party.leavePartyGame')}
                         </button>
                     </div>
                 </div>

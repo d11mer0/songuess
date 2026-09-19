@@ -393,7 +393,11 @@ const PartyHostPage: React.FC = () => {
                 roomId: currentRoom.id,
                 isPartyMode: false,
             });
-            navigate(`/game/${currentRoom.id}`);
+            if (currentRoom.state === RoomState.CREATING || currentRoom.state === RoomState.STARTED) {
+                navigate(`/game/${currentRoom.id}`);
+            } else {
+                navigate('/game');
+            }
         } else {
             navigate('/game');
         }

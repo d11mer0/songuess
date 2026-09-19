@@ -303,6 +303,11 @@ export const uk: TranslationDictionary = {
         checkingRoom: 'Перевірка кімнати...',
         roomIsFull: 'Кімната вже заповнена гравцями.',
         backHome: 'На головну',
+        modeDisabledTitle: '📺 Режим вечірки вимкнено',
+        modeDisabledDesc: 'Хост перевів гру у звичайний режим. У звичайному режимі музика та варіанти відповідей транслюються безпосередньо на вашому пристрої.',
+        continueInRegularMode: '🎮 Грати у звичайному режимі',
+        leavePartyGame: '🚪 Вийти з кімнати',
+        autoLeaveCountdown: 'Автоматичний вихід через {seconds} с...',
     },
     songsPage: {
         title: 'Колекція треків 🎵',
