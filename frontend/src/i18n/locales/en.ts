@@ -300,6 +300,9 @@ export const en: TranslationDictionary = {
         tryAgain: 'Try again',
         enterDifferentCode: 'Enter different code',
         connectingToRoom: 'Connecting to room...',
+        checkingRoom: 'Checking room...',
+        roomIsFull: 'Room is already full of players.',
+        backHome: 'Back to Home',
     },
     songsPage: {
         title: 'Song Library 🎵',

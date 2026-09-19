@@ -300,6 +300,9 @@ export const uk: TranslationDictionary = {
         tryAgain: 'Спробувати знову',
         enterDifferentCode: 'Ввести інший код',
         connectingToRoom: 'Підключення до кімнати...',
+        checkingRoom: 'Перевірка кімнати...',
+        roomIsFull: 'Кімната вже заповнена гравцями.',
+        backHome: 'На головну',
     },
     songsPage: {
         title: 'Колекція треків 🎵',

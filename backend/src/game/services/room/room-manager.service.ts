@@ -28,7 +28,10 @@ export class RoomManagerService implements OnModuleInit {
         try {
             const restored = await this.redisService.getAllActiveRooms();
             if (restored && restored.length > 0) {
-                this.rooms = restored;
+                this.rooms = restored.map((r) => ({
+                    ...r,
+                    players: r.players.map((p) => ({ ...p, isOnline: false })),
+                }));
                 console.log('[RoomManagerService] Відновлено ' + restored.length + ' активних кімнат із Redis');
             }
         } catch (err) {
@@ -89,11 +92,13 @@ export class RoomManagerService implements OnModuleInit {
         return id;
     }
 
-    async joinRoom(roomId: string, playerId: number, login: string): Promise<GameRoom | null> {
-        let room = this.roomHelperService.findRoom(roomId);
+    async getRoom(roomIdOrCode: string): Promise<GameRoom | null> {
+        if (!roomIdOrCode) return null;
+        const query = roomIdOrCode.trim();
+        let room = this.roomHelperService.findRoom(query);
         if (!room) {
             // Check Redis fallback in case room was persisted or shortCode lookup
-            const fromRedis = await this.redisService.getRoom(roomId);
+            const fromRedis = await this.redisService.getRoom(query);
             if (fromRedis) {
                 if (!this.rooms.some((r) => r.id === fromRedis.id)) {
                     this.rooms.push(fromRedis);
@@ -103,8 +108,8 @@ export class RoomManagerService implements OnModuleInit {
                 const allActive = (await this.redisService.getAllActiveRooms()) || [];
                 const matched = allActive.find(
                     (r) =>
-                        Boolean(r?.id && r.id.toLowerCase() === roomId.toLowerCase()) ||
-                        Boolean(r?.shortCode && r.shortCode.toUpperCase() === roomId.toUpperCase()),
+                        Boolean(r?.id && r.id.toLowerCase() === query.toLowerCase()) ||
+                        Boolean(r?.shortCode && r.shortCode.toUpperCase() === query.toUpperCase()),
                 );
                 if (matched) {
                     if (!this.rooms.some((r) => r.id === matched.id)) {
@@ -114,6 +119,11 @@ export class RoomManagerService implements OnModuleInit {
                 }
             }
         }
+        return room || null;
+    }
+
+    async joinRoom(roomId: string, playerId: number, login: string): Promise<GameRoom | null> {
+        let room = await this.getRoom(roomId);
         if (!room) return null;
         
         let player = room.players.find((p) => p.id === playerId);

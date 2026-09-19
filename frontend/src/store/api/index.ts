@@ -7,6 +7,7 @@ import { dailyApi } from './dailyApi';
 import { leaderboardApi } from './leaderboardApi';
 import { achievementsApi } from './achievementsApi';
 import { liqpayApi } from './liqpayApi';
+import { gameApi } from './gameApi';
 
 export const apiMiddlewares = [
     authApi.middleware,
@@ -18,6 +19,7 @@ export const apiMiddlewares = [
     leaderboardApi.middleware,
     achievementsApi.middleware,
     liqpayApi.middleware,
+    gameApi.middleware,
 ];
 
 export {
@@ -30,4 +32,5 @@ export {
     leaderboardApi,
     achievementsApi,
     liqpayApi,
+    gameApi,
 };

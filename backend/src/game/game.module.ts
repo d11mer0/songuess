@@ -25,9 +25,11 @@ import { MatchmakingService } from './services/room/matchmaking.service';
 import { RedisModule } from '../redis/redis.module';
 
 import { AchievementModule } from '../achievements/achievement.module';
+import { GameController } from './game.controller';
 
 @Module({
     imports: [PrismaModule, UserModule, TokenModule, DeezerModule, RedisModule, AchievementModule],
+    controllers: [GameController],
     providers: [
         GameGateway,
         RoomControlGateway,

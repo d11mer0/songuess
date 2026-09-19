@@ -86,6 +86,10 @@ export class RoomHelperService {
         this.cancelLeaderReassignment(roomId);
     }
 
+    hasActiveCleanupTimer(roomId: string): boolean {
+        return this.disconnectGraceTimers.has(roomId);
+    }
+
     scheduleRoomCleanup(roomId: string, delayMs = 10000) {
         this.cancelRoomCleanup(roomId);
         const timer = setTimeout(() => {

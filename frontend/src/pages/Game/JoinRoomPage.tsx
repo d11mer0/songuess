@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { useCheckRoomQuery } from '../../store/api/gameApi';
 import Button from '../../components/UI/Button/Button';
 import Loader from '../../components/UI/Loader/Loader/Loader';
 import styles from './JoinRoomPage.module.css';
@@ -16,34 +17,57 @@ const JoinRoomPage: React.FC = () => {
 
     const normalizedCode = (code || '').trim().toUpperCase();
 
+    const { data: roomCheck, isLoading: isCheckingRoom, error: checkError } = useCheckRoomQuery(
+        normalizedCode,
+        { skip: !normalizedCode }
+    );
+
     useEffect(() => {
         if (!normalizedCode) {
             navigate('/game', { replace: true });
             return;
         }
 
-        // Always store pending room code for post-login redirection if needed
-        sessionStorage.setItem('pendingJoinCode', normalizedCode);
+        if (roomCheck?.exists) {
+            sessionStorage.setItem('pendingJoinCode', normalizedCode);
 
-        // If user is already logged in, immediately redirect to game lobby with join parameter
-        if (isUserLoggedIn) {
-            navigate(`/game?join=${normalizedCode}`, { replace: true });
+            if (isUserLoggedIn) {
+                navigate(`/game?join=${normalizedCode}`, { replace: true });
+            }
         }
-    }, [normalizedCode, isUserLoggedIn, navigate]);
+    }, [normalizedCode, roomCheck, isUserLoggedIn, navigate]);
+
+    const isRoomNotFound = (!isCheckingRoom && roomCheck && !roomCheck.exists) || Boolean(checkError);
 
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-                <div className={styles.iconWrapper}>🎵</div>
+                <div className={styles.iconWrapper}>{isRoomNotFound ? '⚠️' : '🎵'}</div>
                 <h1 className={styles.title}>{t('joinPage.title')}</h1>
-                <p className={styles.subtitle}>{t('joinPage.subtitle')}</p>
+                <p className={styles.subtitle}>
+                    {isRoomNotFound ? t('party.roomNotFoundOrClosed') : t('joinPage.subtitle')}
+                </p>
 
                 <div className={styles.codeBox}>
                     <span className={styles.codeLabel}>{t('joinPage.roomCode')}</span>
                     <span className={styles.codeValue}>{normalizedCode}</span>
                 </div>
 
-                {isUserLoggedIn ? (
+                {isCheckingRoom ? (
+                    <div className={styles.joiningState}>
+                        <Loader />
+                        <span className={styles.joiningText}>{t('party.checkingRoom')}</span>
+                    </div>
+                ) : isRoomNotFound ? (
+                    <div className={styles.actions} style={{ marginTop: '20px' }}>
+                        <Button
+                            variant="primary"
+                            onClick={() => navigate('/game')}
+                        >
+                            {t('party.backToLobby')}
+                        </Button>
+                    </div>
+                ) : isUserLoggedIn ? (
                     <div className={styles.joiningState}>
                         <Loader />
                         <span className={styles.joiningText}>{t('joinPage.joining')}</span>

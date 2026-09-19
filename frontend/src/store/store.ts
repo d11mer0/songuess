@@ -13,6 +13,7 @@ import {
     leaderboardApi,
     achievementsApi,
     liqpayApi,
+    gameApi,
 } from './api';
 
 const store = configureStore({
@@ -26,6 +27,7 @@ const store = configureStore({
         [leaderboardApi.reducerPath]: leaderboardApi.reducer,
         [achievementsApi.reducerPath]: achievementsApi.reducer,
         [liqpayApi.reducerPath]: liqpayApi.reducer,
+        [gameApi.reducerPath]: gameApi.reducer,
         user: userReducer,
         gameplay: gameplayReducer,
     },
