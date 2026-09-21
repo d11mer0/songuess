@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGuestLoginMutation } from '../../store/api/authApi';
 import { useLazyCheckRoomQuery } from '../../store/api/gameApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -9,6 +9,8 @@ import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
 import { logout } from '../../store/users/userSlice';
 import { useTranslation } from '../../i18n/LanguageContext';
+import { useToast } from '../../components/UI/Toast/ToastContext';
+import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
 import { RoomState } from '../../types/roomTypes';
 import Loader from '../../components/UI/Loader/Loader/Loader';
 import confetti from 'canvas-confetti';
@@ -40,7 +42,9 @@ interface RoundResultPayload {
 
 const PartyControllerPage: React.FC = () => {
     const { code } = useParams<{ code: string }>();
-    const { t } = useTranslation();
+    const [searchParams] = useSearchParams();
+    const { t, setLanguage } = useTranslation();
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
@@ -67,6 +71,14 @@ const PartyControllerPage: React.FC = () => {
     const [isGameFinished, setIsGameFinished] = useState(false);
 
     useSocketConnection();
+
+    // Synchronize language from URL parameter (e.g., from TV host QR code)
+    useEffect(() => {
+        const langParam = searchParams.get('lang');
+        if (langParam === 'uk' || langParam === 'en') {
+            setLanguage(langParam);
+        }
+    }, [searchParams, setLanguage]);
 
     // Verify room existence upfront when code is in URL
     useEffect(() => {
@@ -114,7 +126,7 @@ const PartyControllerPage: React.FC = () => {
     }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
 
     // Safe leave handler when party mode ends or user leaves
-    const handleLeaveParty = useCallback(() => {
+    const handleLeaveParty = useCallback((message?: string) => {
         setPartyModeDisabledData(null);
         const targetId = currentRoom?.id || roomCode;
         if (targetId) {
@@ -124,13 +136,18 @@ const PartyControllerPage: React.FC = () => {
 
         const isGuestUser = Boolean(
             user?.email?.includes('@guest.') ||
-            user?.login?.includes('_guest_')
+            user?.login?.startsWith('guest_') ||
+            user?.login?.includes('_guest_') ||
+            currentRoom?.players?.find((p) => p.id === user?.id)?.isGuest
         );
         if (isGuestUser) {
             dispatch(logout());
         }
+        if (message) {
+            showToast(message, 'neutral');
+        }
         navigate('/');
-    }, [currentRoom?.id, dispatch, navigate, roomCode, user]);
+    }, [currentRoom?.id, currentRoom?.players, dispatch, navigate, roomCode, showToast, user]);
 
     // Continue in regular mode when host switched off TV mode
     const handleContinueRegularMode = useCallback(() => {
@@ -242,7 +259,18 @@ const PartyControllerPage: React.FC = () => {
                 dispatch(setCurrentRoom(data.room));
             }
             if (data?.isPartyMode === false) {
-                // Host turned off TV mode! Do not abruptly navigate; show smart choice screen
+                const isGuest = Boolean(
+                    user?.email?.includes('@guest.') ||
+                    user?.login?.startsWith('guest_') ||
+                    user?.login?.includes('_guest_') ||
+                    data?.room?.players?.find((p: any) => p.id === user?.id)?.isGuest ||
+                    currentRoom?.players?.find((p) => p.id === user?.id)?.isGuest
+                );
+                if (isGuest) {
+                    handleLeaveParty(t('party.guestKickedNotice'));
+                    return;
+                }
+                // Host turned off TV mode! For registered users: show smart choice screen
                 setPartyModeDisabledData(data);
             } else if (data?.isPartyMode === true) {
                 // Host turned TV mode back on!
@@ -260,7 +288,18 @@ const PartyControllerPage: React.FC = () => {
             const wasKicked = !room.players?.some((p: any) => p.id === user?.id);
             if (wasKicked) {
                 dispatch(setCurrentRoom(null));
-                navigate('/game');
+                const isGuest = Boolean(
+                    user?.email?.includes('@guest.') ||
+                    user?.login?.startsWith('guest_') ||
+                    user?.login?.includes('_guest_')
+                );
+                if (isGuest) {
+                    dispatch(logout());
+                    showToast(t('party.guestKickedNotice'), 'neutral');
+                    navigate('/');
+                } else {
+                    navigate('/game');
+                }
             } else {
                 dispatch(setCurrentRoom(room));
             }
@@ -293,7 +332,7 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('roomDeleted');
             socketHandlers.off('playerLeft');
         };
-    }, [dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, t, user?.id]);
+    }, [currentRoom?.players, dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, showToast, t, user]);
 
     // Ensure finished state is preserved if refreshed when game is ended
     useEffect(() => {
@@ -417,10 +456,17 @@ const PartyControllerPage: React.FC = () => {
         });
     }, [isAnswerSubmitted, currentRound, currentRoom]);
 
+    const renderLanguageBar = () => (
+        <div className={styles.topLanguageBar}>
+            <LanguageSwitcher />
+        </div>
+    );
+
     // View 0: Initial Room Check / Verification Loading
     if ((!initialCheckDone || (isCheckingRoom && !joinError)) && code) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.lobbyCard}>
                     <div className={styles.roomBadge}>#{code.toUpperCase()}</div>
                     <div className={styles.waitingPrompt} style={{ padding: '30px 20px' }}>
@@ -438,6 +484,7 @@ const PartyControllerPage: React.FC = () => {
     if (joinError) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.authCard}>
                     <div className={styles.authIcon}>⚠️</div>
                     <h1 className={styles.authTitle}>#{roomCode || code}</h1>
@@ -483,6 +530,7 @@ const PartyControllerPage: React.FC = () => {
     if (partyModeDisabledData) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.authCard}>
                     <div className={styles.authIcon}>📺</div>
                     <h1 className={styles.authTitle}>{t('party.modeDisabledTitle')}</h1>
@@ -519,6 +567,7 @@ const PartyControllerPage: React.FC = () => {
     if (!isAuthenticated) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.authCard}>
                     <div className={styles.authLogoWrapper}>
                         <img src="/logo.png" alt="SonGuess" className={styles.authLogoImg} />
@@ -563,6 +612,7 @@ const PartyControllerPage: React.FC = () => {
     if (isAuthenticated && !currentRoom && !roomCode) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.authCard}>
                     <div className={styles.authLogoWrapper}>
                         <img src="/logo.png" alt="SonGuess" className={styles.authLogoImg} />
@@ -597,6 +647,7 @@ const PartyControllerPage: React.FC = () => {
     if (isAuthenticated && !currentRoom) {
         return (
             <div className={styles.container}>
+                {renderLanguageBar()}
                 <div className={styles.lobbyCard}>
                     <div className={styles.roomBadge}>#{roomCode}</div>
                     {user?.avatar && (
@@ -628,6 +679,7 @@ const PartyControllerPage: React.FC = () => {
 
         return (
             <div className={`${styles.container} ${styles.finishedScreen}`}>
+                {renderLanguageBar()}
                 <div className={styles.finishedCard}>
                     <div className={styles.finishedMedal}>{medalEmoji}</div>
                     <h1 className={styles.finishedTitle}>{t('party.podiumTitle')}</h1>
@@ -675,6 +727,7 @@ const PartyControllerPage: React.FC = () => {
                     isCorrect ? styles.resultCorrect : styles.resultIncorrect
                 }`}
             >
+                {renderLanguageBar()}
                 <div className={styles.resultEmoji}>{isCorrect ? '🎉' : '❌'}</div>
                 <h2 className={styles.resultTitle}>
                     {isCorrect ? t('party.correct') : t('party.incorrect')}
@@ -746,6 +799,7 @@ const PartyControllerPage: React.FC = () => {
 
     return (
         <div className={styles.container}>
+            {renderLanguageBar()}
             <div className={styles.lobbyCard}>
                 <div className={styles.roomBadge}>#{roomCode}</div>
                 {user?.avatar && (

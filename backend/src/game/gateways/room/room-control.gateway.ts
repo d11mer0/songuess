@@ -163,6 +163,16 @@ export class RoomControlGateway {
             };
         }
         room.lobbyOptions.isPartyMode = Boolean(data.isPartyMode);
+
+        if (!room.lobbyOptions.isPartyMode) {
+            const guestPlayers = room.players.filter(
+                (p) => p.isGuest || p.login?.startsWith('guest_') || p.login?.includes('_guest_'),
+            );
+            for (const guest of guestPlayers) {
+                this.roomManagerService.leaveRoom(guest.id);
+            }
+        }
+
         await this.roomManagerService.syncRoom(room);
 
         const roomInfo = this.roomQueryService.getRoomInfo(

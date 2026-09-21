@@ -11,6 +11,7 @@ import { RoomState } from '../../types/roomTypes';
 import TrackSelectionBlock from '../../components/Game/Creating/CreatingGame/TrackSelectionBlock';
 import { GameType, SelectedTracks } from '../../types/gameTypes';
 import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
+import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
 import styles from './PartyHostPage.module.css';
@@ -40,7 +41,7 @@ const OPTION_CLASSES = [styles.optionRed, styles.optionBlue, styles.optionYellow
 const PartyHostPage: React.FC = () => {
     const { id: routeRoomId } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
@@ -144,7 +145,7 @@ const PartyHostPage: React.FC = () => {
     }, [currentRoom?.id, currentRoom?.leaderId, currentRoom?.shortCode, user?.id, navigate]);
 
     const displayCode = (currentRoom?.shortCode || currentRoom?.id || routeRoomId || '').toUpperCase();
-    const joinUrl = `${window.location.origin}/play/${displayCode}`;
+    const joinUrl = `${window.location.origin}/play/${displayCode}?lang=${language}`;
 
     // Render QR Code for big TV screen
     useEffect(() => {
@@ -482,6 +483,8 @@ const PartyHostPage: React.FC = () => {
                             {t('party.unmuteHint')}
                         </button>
                     )}
+
+                    <LanguageSwitcher />
 
                     <button
                         className={styles.fullscreenBtn}

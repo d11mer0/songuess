@@ -9,6 +9,7 @@ export interface Player {
     isPremium?: boolean;
     customTitle?: string | null;
     nameColor?: string | null;
+    isGuest?: boolean;
 }
 
 export type GameMode = 'CLASSIC' | 'HEARDLE' | 'DUEL';

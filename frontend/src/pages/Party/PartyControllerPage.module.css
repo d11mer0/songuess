@@ -19,6 +19,13 @@
     position: relative;
 }
 
+.topLanguageBar {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 100;
+}
+
 /* Guest Login Card */
 .authCard {
     background: rgba(30, 24, 46, 0.95);

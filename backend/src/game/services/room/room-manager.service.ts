@@ -149,6 +149,12 @@ export class RoomManagerService implements OnModuleInit {
         if (room.players.length < room.lobbyOptions.maxPlayers) {
             const userInfo = await this.userService.getUserById(playerId).catch(() => null);
             this.roomHelperService.removeUserFromOtherRooms(playerId);
+            const isGuest = Boolean(
+                userInfo?.email?.includes('@guest.') ||
+                userInfo?.email?.endsWith('@guest.songuess.local') ||
+                login?.startsWith('guest_') ||
+                login?.includes('_guest_')
+            );
             player = {
                 id: playerId,
                 login,
@@ -157,6 +163,7 @@ export class RoomManagerService implements OnModuleInit {
                 isPremium: userInfo?.isPremium || false,
                 customTitle: userInfo?.customTitle || null,
                 nameColor: userInfo?.nameColor || null,
+                isGuest,
             };
             room.players.push(player);
 

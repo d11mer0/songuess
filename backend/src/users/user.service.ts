@@ -62,6 +62,7 @@ export class UserService {
 
     async getUserById(userId: number) {
         const user = await this.findUserOrThrow(userId, {
+            email: true,
             avatar: true,
             record: true,
             isPremium: true,

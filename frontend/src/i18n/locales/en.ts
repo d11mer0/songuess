@@ -317,6 +317,7 @@ export const en: TranslationDictionary = {
         continueInRegularMode: '🎮 Play in Regular Mode',
         leavePartyGame: '🚪 Leave Room',
         autoLeaveCountdown: 'Auto-exit in {seconds}s...',
+        guestKickedNotice: 'Party mode was ended by the host. Guest accounts can only participate in TV party mode.',
         gameCompleted: 'Game Finished! 🏆',
         watchTvForPodium: 'Watch the big TV screen for the winners podium! 📺',
         waitingForRestart: 'Waiting for host action...',

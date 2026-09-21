@@ -317,6 +317,7 @@ export interface TranslationDictionary {
         continueInRegularMode: string;
         leavePartyGame: string;
         autoLeaveCountdown: string;
+        guestKickedNotice: string;
         gameCompleted: string;
         watchTvForPodium: string;
         waitingForRestart: string;
