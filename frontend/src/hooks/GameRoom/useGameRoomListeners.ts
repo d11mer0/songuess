@@ -88,7 +88,12 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         (data: Room) => {
             if (data) {
                 if (data.lobbyOptions?.isPartyMode) {
-                    navigate(`/play/${data.shortCode || data.id}`);
+                    const isLeader = Boolean(user?.id && data.leaderId && String(user.id) === String(data.leaderId));
+                    if (isLeader) {
+                        navigate(`/party/host/${data.id}`);
+                    } else {
+                        navigate(`/play/${data.shortCode || data.id}`);
+                    }
                     return;
                 }
                 if (data.state !== RoomState.ADDING) {
@@ -100,7 +105,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 dispatch(setCurrentRoom(null));
             }
         },
-        [navigate, dispatch],
+        [navigate, dispatch, user?.id],
     );
 
     const handleDuelMatchFound = useCallback(
@@ -128,15 +133,17 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             }
             if (data.isPartyMode) {
-                if (user && data.room?.leaderId && String(user.id) === String(data.room.leaderId)) {
+                const leaderId = data.room?.leaderId;
+                const isLeader = Boolean(user?.id && leaderId && String(user.id) === String(leaderId));
+                if (isLeader) {
                     navigate(`/party/host/${data.roomId}`);
-                } else if (user && data.room?.leaderId && String(user.id) !== String(data.room.leaderId)) {
+                } else {
                     const code = data.shortCode || data.roomId;
                     navigate(`/play/${code}`);
                 }
             }
         },
-        [dispatch, navigate, user],
+        [dispatch, navigate, user?.id],
     );
 
     useEffect(() => {

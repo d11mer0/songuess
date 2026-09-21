@@ -43,7 +43,7 @@ export const useGameplayListeners = () => {
 
     const handleSetTrackInfo = useCallback (
         (payload: GameRoundPublicData) => {
-            if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom?.leaderId && user.id !== currentRoom.leaderId) {
+            if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom?.leaderId && String(user.id) !== String(currentRoom.leaderId)) {
                 const code = currentRoom.shortCode || currentRoom.id;
                 navigate(`/play/${code}`);
                 return;
@@ -59,15 +59,17 @@ export const useGameplayListeners = () => {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             }
             if (data.isPartyMode) {
-                if (user && data.room?.leaderId && String(user.id) !== String(data.room.leaderId)) {
+                const leaderId = data.room?.leaderId || currentRoom?.leaderId;
+                const isLeader = Boolean(user?.id && leaderId && String(user.id) === String(leaderId));
+                if (isLeader) {
+                    navigate(`/party/host/${data.roomId}`);
+                } else {
                     const code = data.shortCode || data.roomId;
                     navigate(`/play/${code}`);
-                } else if (user && data.room?.leaderId && String(user.id) === String(data.room.leaderId)) {
-                    navigate(`/party/host/${data.roomId}`);
                 }
             }
         },
-        [dispatch, navigate, user],
+        [dispatch, navigate, user?.id, currentRoom?.leaderId],
     );
 
     const handleRoomDeleted = useCallback(
@@ -177,8 +179,10 @@ export const useGameplayListeners = () => {
         (room: Room) => {
             if (room && room.state !== RoomState.ADDING) {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
-                if (room.lobbyOptions?.isPartyMode && user?.id && room.leaderId) {
-                    if (String(user.id) === String(room.leaderId)) {
+                if (room.lobbyOptions?.isPartyMode) {
+                    const leaderId = room.leaderId || currentRoom?.leaderId;
+                    const isLeader = Boolean(user?.id && leaderId && String(user.id) === String(leaderId));
+                    if (isLeader) {
                         navigate(`/party/host/${room.id}`);
                     } else {
                         const code = room.shortCode || room.id;
@@ -189,13 +193,14 @@ export const useGameplayListeners = () => {
                 navigate('/game');
             }
         },
-        [navigate, dispatch, user?.id],
+        [navigate, dispatch, user?.id, currentRoom?.leaderId],
     );
 
     // If room is in TV / party mode, automatically route host to TV and player to gamepad
     useEffect(() => {
-        if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom.leaderId) {
-            if (String(user.id) === String(currentRoom.leaderId)) {
+        if (currentRoom?.lobbyOptions?.isPartyMode && currentRoom.leaderId) {
+            const isLeader = Boolean(user?.id && String(user.id) === String(currentRoom.leaderId));
+            if (isLeader) {
                 navigate(`/party/host/${currentRoom.id}`);
             } else {
                 const code = currentRoom.shortCode || currentRoom.id;

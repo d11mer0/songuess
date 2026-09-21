@@ -106,6 +106,13 @@ const PartyControllerPage: React.FC = () => {
         }
     }, [isAuthenticated, roomCode, currentRoom, joinError, initialCheckDone, isCheckingRoom]);
 
+    // Host should never be stuck on the mobile controller; redirect them to the TV host view
+    useEffect(() => {
+        if (currentRoom && user?.id && currentRoom.leaderId && String(user.id) === String(currentRoom.leaderId)) {
+            navigate(`/party/host/${currentRoom.id}`);
+        }
+    }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
+
     // Safe leave handler when party mode ends or user leaves
     const handleLeaveParty = useCallback(() => {
         setPartyModeDisabledData(null);

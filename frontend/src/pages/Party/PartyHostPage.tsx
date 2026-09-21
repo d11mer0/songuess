@@ -10,6 +10,7 @@ import { useGetCuratedThemesQuery, useLazyGetThemeTracksQuery } from '../../stor
 import { RoomState } from '../../types/roomTypes';
 import TrackSelectionBlock from '../../components/Game/Creating/CreatingGame/TrackSelectionBlock';
 import { GameType, SelectedTracks } from '../../types/gameTypes';
+import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
 import styles from './PartyHostPage.module.css';
@@ -95,13 +96,13 @@ const PartyHostPage: React.FC = () => {
 
         const handleRoomSync = (room: any) => {
             if (room) {
-                dispatch(setCurrentRoom(room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
         };
 
         const handleGameRestarted = (room: any) => {
             if (room) {
-                dispatch(setCurrentRoom(room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
             setIsGameFinished(false);
             setCurrentRound(null);
@@ -134,12 +135,13 @@ const PartyHostPage: React.FC = () => {
         };
     }, [routeRoomId, currentRoom?.id, dispatch, navigate]);
 
-    // Only the leader can host the TV page; redirect non-host players back to the game room
+    // Only the leader can host the TV page; redirect non-host players to the party controller
     useEffect(() => {
-        if (currentRoom && user && currentRoom.leaderId && String(currentRoom.leaderId) !== String(user.id)) {
-            navigate(`/game/${currentRoom.id}`);
+        if (currentRoom && user?.id && currentRoom.leaderId && String(currentRoom.leaderId) !== String(user.id)) {
+            const code = currentRoom.shortCode || currentRoom.id;
+            navigate(`/play/${code}`);
         }
-    }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
+    }, [currentRoom?.id, currentRoom?.leaderId, currentRoom?.shortCode, user?.id, navigate]);
 
     const displayCode = (currentRoom?.shortCode || currentRoom?.id || routeRoomId || '').toUpperCase();
     const joinUrl = `${window.location.origin}/play/${displayCode}`;
