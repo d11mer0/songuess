@@ -65,6 +65,12 @@ export const en: TranslationDictionary = {
         maxPlayers: 'Maximum number of players',
         autoJoinBtn: 'Auto join to free room',
         createRoomBtn: 'Create Room',
+        hostBadge: '👑 HOST',
+        playerBadge: 'PLAYER',
+        openSlot: 'Open Slot',
+        waitingForHost: 'Waiting for host to start the game...',
+        roomLobbyTitle: 'ROOM LOBBY',
+        clickToCopy: 'Click to copy',
     },
     genres: {
         all: 'All Genres',

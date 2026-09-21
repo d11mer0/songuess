@@ -65,6 +65,12 @@ export const uk: TranslationDictionary = {
         maxPlayers: 'Максимальна кількість гравців',
         autoJoinBtn: 'Авто-вхід у вільну кімнату',
         createRoomBtn: 'Створити кімнату',
+        hostBadge: '👑 ХОСТ',
+        playerBadge: 'ГРАВЕЦЬ',
+        openSlot: 'Вільне місце',
+        waitingForHost: 'Очікування хоста для старту гри...',
+        roomLobbyTitle: 'ЛОБІ КІМНАТИ',
+        clickToCopy: 'Натисніть, щоб скопіювати',
     },
     genres: {
         all: 'Всі жанри',

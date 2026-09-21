@@ -65,6 +65,12 @@ export interface TranslationDictionary {
         maxPlayers: string;
         autoJoinBtn: string;
         createRoomBtn: string;
+        hostBadge: string;
+        playerBadge: string;
+        openSlot: string;
+        waitingForHost: string;
+        roomLobbyTitle: string;
+        clickToCopy: string;
     };
     profile: {
         title: string;

@@ -1,30 +1,166 @@
 .roomContainer {
-    background-color: var(--background-secondary);
-    padding: 20px 24px;
-    border-radius: 12px;
-    max-width: 520px; /* було 960px */
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.3);
+    border-radius: 24px;
+    max-width: 520px;
     margin: 0 auto;
-    box-shadow: 0 4px 12px var(--primary-box-shadow-color);
+    padding: 26px 28px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
     display: flex;
     flex-direction: column;
     gap: 20px;
+    position: relative;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 🔹 Header Section */
+.lobbyHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    width: 100%;
+}
+
+.lobbyMetaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.lobbyBadge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #c084fc;
+    background: rgba(155, 93, 229, 0.15);
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.playerCountBadge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.35);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.metaIcon {
+    font-size: 13px;
+}
+
+/* 🔹 Interactive Room Code Card */
+.roomCodeCard {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid rgba(0, 243, 255, 0.35);
+    border-radius: 18px;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    user-select: none;
+}
+
+.roomCodeCard:hover {
+    border-color: #00f3ff;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.codeLabel {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    margin-bottom: 2px;
+}
+
+.codeDisplay {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.codeText {
+    font-family: var(--font-mono, monospace);
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #00f3ff;
+    text-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
+}
+
+.codeCopyBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #00f3ff;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.codeCopiedSuccess {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 10px #10b981;
+}
+
+.internalIdHint {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+    font-family: var(--font-mono, monospace);
 }
 
 .roomTitle {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: var(--text-main);
     text-align: center;
-    margin-bottom: 24px;
 }
 
+/* 🔹 Player Grid */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
+    gap: 24px 16px;
     list-style: none;
-    padding: 0;
+    padding: 12px 0 6px;
     margin: 0 auto;
+    width: 100%;
 }
 
 @media (max-width: 480px) {
@@ -33,24 +169,15 @@
     }
 }
 
-@media (max-width: 320px) {
-    .grid {
-        grid-template-columns: repeat(1, 1fr);
-    }
-}
-
 .playerSlot {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    aspect-ratio: 1 / 1;
-    max-width: 140px;
     margin: 0 auto;
     position: relative;
     padding: 0;
 }
-
 
 .playerInfo {
     position: relative;
@@ -58,13 +185,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    width: 100%;
 }
 
 .avatarWrapper {
     position: relative;
-    width: 100px;
-    height: 100px;
-    margin-bottom: 2px;
+    width: 84px;
+    height: 84px;
+    margin-bottom: 6px;
 }
 
 .avatar {
@@ -72,98 +200,382 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--primary-color);
-    background-color: var(--background-highlight);
+    border: 2px solid rgba(0, 243, 255, 0.5);
+    background-color: var(--background-highlight, #1f1833);
     user-select: none;
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.avatarWrapper:hover .avatar {
+    transform: scale(1.04);
+}
+
+/* 👑 The Sleek Glowing Golden Crown */
+.leaderBadge {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: crownFloat 3s ease-in-out infinite;
+}
+
+.crownGlow {
+    position: absolute;
+    width: 24px;
+    height: 14px;
+    background: radial-gradient(ellipse, rgba(255, 215, 0, 0.8) 0%, rgba(255, 170, 0, 0) 75%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(4px);
+}
+
+.crownIcon {
+    font-size: 26px;
+    color: #ffd700;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8))
+            drop-shadow(0 0 10px rgba(255, 215, 0, 0.9))
+            drop-shadow(0 0 20px rgba(255, 170, 0, 0.6));
+    transform: rotate(-7deg);
+}
+
+@keyframes crownFloat {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0) rotate(-7deg);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-3px) rotate(-3deg);
+    }
+}
+
+.leaderAvatar {
+    border: 2.5px solid #ffd700 !important;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6), inset 0 0 8px rgba(255, 215, 0, 0.2) !important;
+}
+
+.premiumAvatar {
+    border-color: #ffd700 !important;
+}
+
+/* Status Dot */
+.statusDot {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid #1a1528;
+    z-index: 3;
+    transition: all 0.2s ease;
+}
+
+.statusOnline {
+    background-color: #10b981;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.statusOffline {
+    background-color: #6b7280;
+}
+
+/* Kick Icon */
 .kickIcon {
     position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: var(--danger-color);
+    top: -2px;
+    right: -2px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
-    border: none;
+    border: 2px solid #1a1528;
     border-radius: 50%;
     width: 24px;
     height: 24px;
-    font-size: 18px;
+    font-size: 11px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    z-index: 4;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .kickIcon:hover {
-    background-color: var(--danger-hover);
+    background: #b91c1c;
+    transform: scale(1.18);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
 }
 
-
+/* Username & Role Tag */
 .login {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-main);
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
     text-align: center;
-    max-width: 90px;
+    max-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 18px;
-    line-height: 18px;
-}
-.leaderLabel {
-    color: var(--primary-color);
+    line-height: 1.3;
 }
 
-.statusDot {
-    position: absolute;
-    bottom: 4px;
-    right: 0px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--background-secondary);
+.roleTagWrapper {
+    margin-top: 3px;
+    display: flex;
+    justify-content: center;
 }
 
+.hostRoleBadge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 170, 0, 0.1));
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    color: #ffd700;
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+    letter-spacing: 0.5px;
+}
+
+.playerRoleBadge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.5px;
+}
+
+/* Empty Slot */
 .emptySlot {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 2px dashed #555;
+    border: 2px dashed rgba(255, 255, 255, 0.16);
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: transparent;
-    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.25s ease;
+}
+
+.emptySlot:hover {
+    border-color: rgba(0, 243, 255, 0.45);
+    background: rgba(0, 243, 255, 0.04);
 }
 
 .emptyIcon {
-    font-size: 38px;
-    opacity: 0.25;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.2);
+    transition: all 0.25s ease;
 }
 
-.leaderBadge {
-    position: absolute;
-    top: -37px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    z-index: 2;
+.emptySlot:hover .emptyIcon {
+    color: #00f3ff;
+    transform: scale(1.1);
 }
 
+.emptyLabel {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    margin-top: 5px;
+}
 
+/* 🔹 Share Section */
+.shareSection {
+    width: 100%;
+}
 
-.buttonGroup {
+.shareRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.inviteFriendsBtn {
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.25), rgba(155, 93, 229, 0.15));
+    border: 1px solid rgba(155, 93, 229, 0.5);
+    color: #e9d5ff;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
     display: flex;
-    flex-direction: row;
+    align-items: center;
     justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.inviteFriendsBtn:hover {
+    background: rgba(155, 93, 229, 0.35);
+    border-color: #9b5de5;
+    box-shadow: 0 0 14px rgba(155, 93, 229, 0.45);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.quickCopyBtn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #d1d5db;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.quickCopyBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.quickCopySuccess {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+
+.actionBtnIcon {
+    font-size: 14px;
+}
+
+/* 🔹 Control Section */
+.controlsSection {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+    width: 100%;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.buttonGroup button {
-    white-space: nowrap;
+.leaveBtn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.leaveBtn:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.leaderBtnGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tvBtn {
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    color: #00f3ff;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.tvBtn:hover {
+    background: rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.45);
+}
+
+.startBtn {
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    border: none;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.4);
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.startBtn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 22px rgba(155, 93, 229, 0.65);
+}
+
+.waitingForLeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+.waitingPulseDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #00f3ff;
+    animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.4);
+        opacity: 0.5;
+    }
+}
+
+.btnIcon {
+    font-size: 13px;
+}
+
+.emptyNotice {
+    color: #9ca3af;
+    text-align: center;
+    padding: 24px;
 }

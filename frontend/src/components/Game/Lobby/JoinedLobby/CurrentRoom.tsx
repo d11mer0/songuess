@@ -1,11 +1,13 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaUsers, FaCopy, FaCheck, FaSignOutAlt, FaTv, FaPlay } from 'react-icons/fa';
 import styles from './JoinedLobby.module.css';
 import RoomPlayerList from './RoomPlayerList';
 import InviteLink from './InviteLink';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
-import Button from '../../../UI/Button/Button';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import { useToast } from '../../../UI/Toast/ToastContext';
 import { socketEmitter } from '../../../../services/socket';
 
 interface Props {
@@ -17,8 +19,10 @@ interface Props {
 const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { showToast } = useToast();
     const { user } = useAppSelector(state => state.user);
     const roomInfo = useAppSelector(selectCurrentRoom);
+    const [isCodeCopied, setIsCodeCopied] = useState(false);
 
     const handleSwitchToTv = () => {
         if (!roomInfo) return;
@@ -29,56 +33,103 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
         navigate(`/party/host/${roomInfo.id}`);
     };
 
-    if(!roomInfo) return <div>{t('gameplay.noRoomsAvailable')}</div>;
+    const handleCopyCode = async () => {
+        const codeToCopy = roomInfo?.shortCode || roomInfo?.id;
+        if (!codeToCopy) return;
+        try {
+            await navigator.clipboard.writeText(codeToCopy.toUpperCase());
+            setIsCodeCopied(true);
+            showToast(t('shareModal.codeCopied'), 'success');
+            setTimeout(() => setIsCodeCopied(false), 2000);
+        } catch {
+            showToast(t('common.error'), 'danger');
+        }
+    };
+
+    if (!roomInfo) return <div className={styles.emptyNotice}>{t('gameplay.noRoomsAvailable')}</div>;
+
+    const isLeader = roomInfo.leaderId === user?.id;
+
     return (
         <div className={styles.roomContainer}>
-            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                <h3 className={styles.roomTitle} style={{ marginBottom: '8px' }}>
-                    {t('gameplay.roomNumber')}{roomInfo.id}
-                </h3>
-                {roomInfo.shortCode && (
-                    <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '6px 16px',
-                        background: 'rgba(0, 243, 255, 0.1)',
-                        border: '1px solid rgba(0, 243, 255, 0.4)',
-                        borderRadius: '20px',
-                        color: '#00f3ff',
-                        fontSize: '14px',
-                        fontWeight: 700,
-                        letterSpacing: '1px'
-                    }}>
-                        <span>{t('joinPage.roomCode')}</span>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', letterSpacing: '2px' }}>
-                            {roomInfo.shortCode.toUpperCase()}
+            {/* Lobby Header */}
+            <div className={styles.lobbyHeader}>
+                <div className={styles.lobbyMetaRow}>
+                    <span className={styles.lobbyBadge}>
+                        {t('lobby.roomLobbyTitle')}
+                    </span>
+                    <span className={styles.playerCountBadge}>
+                        <FaUsers className={styles.metaIcon} />
+                        <span>{roomInfo.players.length} / {roomInfo.lobbyOptions.maxPlayers}</span>
+                    </span>
+                </div>
+
+                {/* Big interactive Room Code Card */}
+                <div
+                    className={styles.roomCodeCard}
+                    onClick={handleCopyCode}
+                    title={t('lobby.clickToCopy')}
+                >
+                    <div className={styles.codeLabel}>{t('joinPage.roomCode')}</div>
+                    <div className={styles.codeDisplay}>
+                        <span className={styles.codeText}>
+                            {(roomInfo.shortCode || roomInfo.id).toUpperCase()}
+                        </span>
+                        <span className={`${styles.codeCopyBadge} ${isCodeCopied ? styles.codeCopiedSuccess : ''}`}>
+                            {isCodeCopied ? <FaCheck /> : <FaCopy />}
                         </span>
                     </div>
-                )}
+                    {roomInfo.shortCode && (
+                        <div className={styles.internalIdHint}>ID: #{roomInfo.id}</div>
+                    )}
+                </div>
             </div>
-            <RoomPlayerList
-                kickMember={kickMember}
-            />
-            <div className={styles.buttonGroup}>
-                <InviteLink roomId={roomInfo.id} shortCode={roomInfo.shortCode} />
-                <Button variant="danger" onClick={leaveRoom}>
-                    {t('gameplay.leaveRoom')}
-                </Button>
 
-                {roomInfo.leaderId === user?.id && (
-                    <>
-                        <Button
-                            variant="neutral"
+            {/* Players Grid with Crown & Role Badges */}
+            <RoomPlayerList kickMember={kickMember} />
+
+            {/* Invite & Share Action Bar */}
+            <div className={styles.shareSection}>
+                <InviteLink roomId={roomInfo.id} shortCode={roomInfo.shortCode} />
+            </div>
+
+            {/* Game Controls Bar */}
+            <div className={styles.controlsSection}>
+                <button
+                    type="button"
+                    className={styles.leaveBtn}
+                    onClick={leaveRoom}
+                    title={t('gameplay.leaveRoom')}
+                >
+                    <FaSignOutAlt className={styles.btnIcon} />
+                    <span>{t('gameplay.leaveRoom')}</span>
+                </button>
+
+                {isLeader ? (
+                    <div className={styles.leaderBtnGroup}>
+                        <button
+                            type="button"
+                            className={styles.tvBtn}
                             onClick={handleSwitchToTv}
                             title={t('party.hostTitle')}
                         >
-                            📺 TV
-                        </Button>
-                        <Button variant="primary" onClick={startGame}>
-                            {t('gameplay.startGame')}
-                        </Button>
-                    </>
+                            <FaTv className={styles.btnIcon} />
+                            <span>TV</span>
+                        </button>
+                        <button
+                            type="button"
+                            className={styles.startBtn}
+                            onClick={startGame}
+                        >
+                            <FaPlay className={styles.btnIcon} />
+                            <span>{t('gameplay.startGame')}</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className={styles.waitingForLeader}>
+                        <span className={styles.waitingPulseDot} />
+                        <span>{t('lobby.waitingForHost')}</span>
+                    </div>
                 )}
             </div>
         </div>
