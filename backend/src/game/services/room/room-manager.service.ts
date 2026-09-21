@@ -152,8 +152,7 @@ export class RoomManagerService implements OnModuleInit {
             const isGuest = Boolean(
                 userInfo?.email?.includes('@guest.') ||
                 userInfo?.email?.endsWith('@guest.songuess.local') ||
-                login?.startsWith('guest_') ||
-                login?.includes('_guest_')
+                (!userInfo?.email && (login?.startsWith('guest_') || login?.includes('_guest_')))
             );
             player = {
                 id: playerId,

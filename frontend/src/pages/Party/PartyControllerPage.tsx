@@ -135,19 +135,22 @@ const PartyControllerPage: React.FC = () => {
         dispatch(setCurrentRoom(null));
 
         const isGuestUser = Boolean(
-            user?.email?.includes('@guest.') ||
-            user?.login?.startsWith('guest_') ||
-            user?.login?.includes('_guest_') ||
-            currentRoom?.players?.find((p) => p.id === user?.id)?.isGuest
+            user?.email?.endsWith('@guest.songuess.local') ||
+            user?.email?.includes('@guest.')
         );
         if (isGuestUser) {
             dispatch(logout());
+            if (message) {
+                showToast(message, 'neutral');
+            }
+            navigate('/');
+        } else {
+            if (message) {
+                showToast(message, 'neutral');
+            }
+            navigate('/game');
         }
-        if (message) {
-            showToast(message, 'neutral');
-        }
-        navigate('/');
-    }, [currentRoom?.id, currentRoom?.players, dispatch, navigate, roomCode, showToast, user]);
+    }, [currentRoom?.id, dispatch, navigate, roomCode, showToast, user?.email]);
 
     // Continue in regular mode when host switched off TV mode
     const handleContinueRegularMode = useCallback(() => {
@@ -259,19 +262,22 @@ const PartyControllerPage: React.FC = () => {
                 dispatch(setCurrentRoom(data.room));
             }
             if (data?.isPartyMode === false) {
-                const isGuest = Boolean(
-                    user?.email?.includes('@guest.') ||
-                    user?.login?.startsWith('guest_') ||
-                    user?.login?.includes('_guest_') ||
-                    data?.room?.players?.find((p: any) => p.id === user?.id)?.isGuest ||
-                    currentRoom?.players?.find((p) => p.id === user?.id)?.isGuest
+                const isGuestUser = Boolean(
+                    user?.email?.endsWith('@guest.songuess.local') ||
+                    user?.email?.includes('@guest.')
                 );
-                if (isGuest) {
+                if (isGuestUser) {
                     handleLeaveParty(t('party.guestKickedNotice'));
                     return;
                 }
-                // Host turned off TV mode! For registered users: show smart choice screen
-                setPartyModeDisabledData(data);
+                // Host turned off TV mode! For registered users: smoothly transition to regular lobby
+                const targetState = data?.room?.state || currentRoom?.state;
+                const targetId = data?.roomId || data?.room?.id || currentRoom?.id || roomCode;
+                if (targetState === RoomState.CREATING || targetState === RoomState.STARTED) {
+                    navigate(`/game/${targetId}`);
+                } else {
+                    navigate('/game');
+                }
             } else if (data?.isPartyMode === true) {
                 // Host turned TV mode back on!
                 setPartyModeDisabledData(null);
@@ -285,15 +291,14 @@ const PartyControllerPage: React.FC = () => {
 
         const handlePlayerLeft = (room: any) => {
             if (!room) return;
-            const wasKicked = !room.players?.some((p: any) => p.id === user?.id);
+            const wasKicked = !room.players?.some((p: any) => String(p.id) === String(user?.id));
             if (wasKicked) {
                 dispatch(setCurrentRoom(null));
-                const isGuest = Boolean(
-                    user?.email?.includes('@guest.') ||
-                    user?.login?.startsWith('guest_') ||
-                    user?.login?.includes('_guest_')
+                const isGuestUser = Boolean(
+                    user?.email?.endsWith('@guest.songuess.local') ||
+                    user?.email?.includes('@guest.')
                 );
-                if (isGuest) {
+                if (isGuestUser) {
                     dispatch(logout());
                     showToast(t('party.guestKickedNotice'), 'neutral');
                     navigate('/');
@@ -672,8 +677,8 @@ const PartyControllerPage: React.FC = () => {
         const sortedPlayers = currentRoom?.players
             ? [...currentRoom.players].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0))
             : [];
-        const myRank = sortedPlayers.findIndex((p) => p.id === user?.id) + 1;
-        const myPlayer = sortedPlayers.find((p) => p.id === user?.id);
+        const myRank = sortedPlayers.findIndex((p) => String(p.id) === String(user?.id)) + 1;
+        const myPlayer = sortedPlayers.find((p) => String(p.id) === String(user?.id));
         const medals = ['🥇', '🥈', '🥉'];
         const medalEmoji = myRank > 0 && myRank <= 3 ? medals[myRank - 1] : '🎖️';
 
@@ -716,10 +721,10 @@ const PartyControllerPage: React.FC = () => {
 
     // View 3: Round Result
     if (roundResult) {
-        const myResult = roundResult.results.find((r) => r.playerId === user?.id);
+        const myResult = roundResult.results.find((r) => String(r.playerId) === String(user?.id));
         const isCorrect = myResult ? myResult.score > 0 : false;
         const sorted = [...roundResult.results].sort((a, b) => b.totalScore - a.totalScore);
-        const myRank = sorted.findIndex((r) => r.playerId === user?.id) + 1;
+        const myRank = sorted.findIndex((r) => String(r.playerId) === String(user?.id)) + 1;
 
         return (
             <div
@@ -755,7 +760,7 @@ const PartyControllerPage: React.FC = () => {
                     <div className={styles.gamepadHeader}>
                         <span>{user?.login}</span>
                         <span>
-                            {t('gameplay.roundNumber')} #{currentRound.roundNumber + 1}
+                            {t('gameplay.round')} #{currentRound.roundNumber + 1}
                         </span>
                     </div>
 

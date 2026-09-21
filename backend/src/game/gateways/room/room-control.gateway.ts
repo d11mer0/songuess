@@ -165,8 +165,15 @@ export class RoomControlGateway {
         room.lobbyOptions.isPartyMode = Boolean(data.isPartyMode);
 
         if (!room.lobbyOptions.isPartyMode) {
+            if (room.state === GameRoomState.ENDED || room.state === GameRoomState.STARTED) {
+                room.state = GameRoomState.ADDING;
+                room.gameData = undefined;
+                room.gameProgress = undefined;
+                room.players = room.players.map((player) => ({ ...player, totalScore: 0 }));
+            }
+
             const guestPlayers = room.players.filter(
-                (p) => p.isGuest || p.login?.startsWith('guest_') || p.login?.includes('_guest_'),
+                (p) => Boolean(p.isGuest),
             );
             for (const guest of guestPlayers) {
                 this.roomManagerService.leaveRoom(guest.id);

@@ -186,6 +186,7 @@ export const uk: TranslationDictionary = {
     },
     gameplay: {
         round: 'Раунд',
+        roundNumber: 'Раунд',
         timer: 'Час',
         score: 'Бали',
         comboStreak: 'Стрік',

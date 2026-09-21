@@ -186,6 +186,7 @@ export const en: TranslationDictionary = {
     },
     gameplay: {
         round: 'Round',
+        roundNumber: 'Round',
         timer: 'Time',
         score: 'Score',
         comboStreak: 'Streak',

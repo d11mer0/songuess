@@ -186,6 +186,7 @@ export interface TranslationDictionary {
     };
     gameplay: {
         round: string;
+        roundNumber: string;
         timer: string;
         score: string;
         comboStreak: string;

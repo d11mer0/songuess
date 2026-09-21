@@ -46,7 +46,7 @@ export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersP
         (room: Room) => {
             if (!room) return;
             const wasKicked = !room.players?.some(
-                (player) => player.id === user?.id,
+                (player) => String(player.id) === String(user?.id),
             );
             dispatch(setCurrentRoom(wasKicked ? null : mapBackendRoomToFrontend(room)));
             socketEmitter.emit('getRooms');
