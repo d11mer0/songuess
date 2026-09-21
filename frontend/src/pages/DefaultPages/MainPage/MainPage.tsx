@@ -15,9 +15,9 @@ const MainPage: React.FC = React.memo(() => {
         <div className={styles.container}>
             <div className={styles.hero}>
                 <div className={styles.badgeRow}>
-                    <span className={styles.neonPill}>🎵 Realtime Music Trivia</span>
-                    <span className={styles.neonPill}>⚡ 1v1 Blitz</span>
-                    <span className={styles.neonPill}>🎧 Heardle</span>
+                    <span className={styles.neonPill}>{t('mainPage.badgeTrivia')}</span>
+                    <span className={styles.neonPill}>{t('mainPage.badgeBlitz')}</span>
+                    <span className={styles.neonPill}>{t('mainPage.badgeHeardle')}</span>
                 </div>
 
                 <div className={styles.titleWrapper}>

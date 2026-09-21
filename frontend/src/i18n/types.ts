@@ -23,6 +23,9 @@ export interface TranslationDictionary {
         vipBadge: string;
     };
     mainPage: {
+        badgeTrivia: string;
+        badgeBlitz: string;
+        badgeHeardle: string;
         heroTitle: string;
         heroSubtitle: string;
         heroDesc: string;

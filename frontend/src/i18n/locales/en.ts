@@ -23,6 +23,9 @@ export const en: TranslationDictionary = {
         vipBadge: 'VIP',
     },
     mainPage: {
+        badgeTrivia: '🎵 Realtime Music Trivia',
+        badgeBlitz: '⚡ 1v1 Blitz',
+        badgeHeardle: '🎧 Heardle',
         heroTitle: 'SONGUESS',
         heroSubtitle: 'Real-Time Music Trivia Battle',
         heroDesc: 'Listen to snippets, guess tracks in split seconds, duel friends in 1v1 blitz showdowns, and solve daily musical challenges!',

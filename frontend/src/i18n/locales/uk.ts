@@ -23,6 +23,9 @@ export const uk: TranslationDictionary = {
         vipBadge: 'VIP',
     },
     mainPage: {
+        badgeTrivia: '🎵 Музична вікторина наживо',
+        badgeBlitz: '⚡ 1v1 Бліц',
+        badgeHeardle: '🎧 Вгадай трек',
         heroTitle: 'SONGUESS',
         heroSubtitle: 'Битва Меломанів у Реальному Часі',
         heroDesc: 'Слухай уривки, вгадуй треки за долі секунди, змагайся з друзями в 1v1 дуелях та розгадуй щоденні музичні челенджі!',
