@@ -68,7 +68,7 @@ export const en: TranslationDictionary = {
         hostBadge: '👑 HOST',
         playerBadge: 'PLAYER',
         openSlot: 'Open Slot',
-        waitingForHost: 'Waiting for host to start the game...',
+        waitingForHost: 'Waiting for the game to start...',
         roomLobbyTitle: 'ROOM LOBBY',
         clickToCopy: 'Click to copy',
     },

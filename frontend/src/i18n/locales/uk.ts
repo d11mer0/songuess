@@ -68,7 +68,7 @@ export const uk: TranslationDictionary = {
         hostBadge: '👑 ХОСТ',
         playerBadge: 'ГРАВЕЦЬ',
         openSlot: 'Вільне місце',
-        waitingForHost: 'Очікування хоста для старту гри...',
+        waitingForHost: 'Очікування початку гри...',
         roomLobbyTitle: 'ЛОБІ КІМНАТИ',
         clickToCopy: 'Натисніть, щоб скопіювати',
     },

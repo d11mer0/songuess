@@ -543,12 +543,17 @@
 }
 
 .waitingForLeader {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: #9ca3af;
+    gap: 10px;
+    font-size: 13px;
+    color: #cbd5e1;
     font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.08);
 }
 
 .waitingPulseDot {
@@ -556,6 +561,8 @@
     height: 8px;
     border-radius: 50%;
     background-color: #00f3ff;
+    box-shadow: 0 0 8px #00f3ff;
+    flex-shrink: 0;
     animation: pulseDot 1.5s infinite;
 }
 
