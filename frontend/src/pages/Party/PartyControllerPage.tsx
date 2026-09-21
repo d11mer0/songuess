@@ -513,7 +513,9 @@ const PartyControllerPage: React.FC = () => {
         return (
             <div className={styles.container}>
                 <div className={styles.authCard}>
-                    <div className={styles.authIcon}>🎮</div>
+                    <div className={styles.authLogoWrapper}>
+                        <img src="/logo.png" alt="SonGuess" className={styles.authLogoImg} />
+                    </div>
                     <h1 className={styles.authTitle}>{t('party.controllerTitle')}</h1>
                     <p className={styles.authSubtitle}>{t('party.enterNickname')}</p>
 
@@ -555,7 +557,9 @@ const PartyControllerPage: React.FC = () => {
         return (
             <div className={styles.container}>
                 <div className={styles.authCard}>
-                    <div className={styles.authIcon}>🎮</div>
+                    <div className={styles.authLogoWrapper}>
+                        <img src="/logo.png" alt="SonGuess" className={styles.authLogoImg} />
+                    </div>
                     <h1 className={styles.authTitle}>{t('party.controllerTitle')}</h1>
                     <p className={styles.authSubtitle}>{t('party.roomCodePlaceholder')}</p>
 

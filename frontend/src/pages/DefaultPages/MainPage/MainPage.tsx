@@ -20,7 +20,10 @@ const MainPage: React.FC = React.memo(() => {
                     <span className={styles.neonPill}>🎧 Heardle</span>
                 </div>
 
-                <h1 className={styles.title}>{t('mainPage.heroTitle')}</h1>
+                <div className={styles.titleWrapper}>
+                    <img src="/logo.png" alt="SonGuess" className={styles.heroLogo} />
+                    <h1 className={styles.title}>{t('mainPage.heroTitle')}</h1>
+                </div>
                 <p className={styles.subtitle}>{t('mainPage.heroSubtitle')}</p>
                 <p className={styles.description}>{t('mainPage.heroDesc')}</p>
 

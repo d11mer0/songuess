@@ -71,6 +71,20 @@
     background: rgba(0, 243, 255, 0.15);
 }
 
+.brandLogo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tvLogoImg {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    filter: drop-shadow(0 0 12px rgba(0, 243, 255, 0.7));
+}
+
 .logoText {
     font-family: var(--font-title, sans-serif);
     font-size: 38px;

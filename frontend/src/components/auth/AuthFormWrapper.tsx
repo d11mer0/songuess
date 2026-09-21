@@ -32,7 +32,10 @@ const AuthFormWrapper: React.FC<AuthFormWrapperProps> = ({
 }) => {
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>{title}</h2>
+            <div className={styles.titleWrapper}>
+                <img src="/logo.png" alt="SonGuess" className={styles.authLogo} />
+                <h2 className={styles.title}>{title}</h2>
+            </div>
             <form onSubmit={onSubmit} className={styles.form}>
                 <AuthFormInputs
                     inputs={inputs}

@@ -35,7 +35,18 @@
 .iconWrapper {
     font-size: 56px;
     margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     animation: pulse 2s infinite ease-in-out;
+}
+
+.joinLogoImg {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    filter: drop-shadow(0 0 14px rgba(0, 243, 255, 0.6));
 }
 
 @keyframes pulse {

@@ -42,7 +42,9 @@ const JoinRoomPage: React.FC = () => {
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-                <div className={styles.iconWrapper}>{isRoomNotFound ? '⚠️' : '🎵'}</div>
+                <div className={styles.iconWrapper}>
+                    {isRoomNotFound ? '⚠️' : <img src="/logo.png" alt="SonGuess" className={styles.joinLogoImg} />}
+                </div>
                 <h1 className={styles.title}>{t('joinPage.title')}</h1>
                 <p className={styles.subtitle}>
                     {isRoomNotFound ? t('party.roomNotFoundOrClosed') : t('joinPage.subtitle')}

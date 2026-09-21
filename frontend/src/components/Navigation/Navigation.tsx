@@ -57,7 +57,8 @@ const Navigation: React.FC = () => {
                 <div className={styles.navTop}>
                     <div className={styles.navLeft}>
                         <Link to="/game" className={styles.logo}>
-                            Songuess
+                            <img src="/logo.png" alt="SonGuess" className={styles.logoImg} />
+                            <span>SonGuess</span>
                         </Link>
                         <div className={styles.navLinks}>
                             <NavLinks />

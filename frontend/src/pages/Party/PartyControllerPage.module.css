@@ -32,6 +32,30 @@
     animation: fadeIn 0.3s ease-out;
 }
 
+.authLogoWrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.authLogoImg {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    filter: drop-shadow(0 0 14px rgba(0, 243, 255, 0.6));
+    animation: pulseLogo 3s ease-in-out infinite;
+}
+
+@keyframes pulseLogo {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
 .authIcon {
     font-size: 52px;
     margin-bottom: 12px;

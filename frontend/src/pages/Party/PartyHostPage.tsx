@@ -467,7 +467,10 @@ const PartyHostPage: React.FC = () => {
                     <button className={styles.backBtn} onClick={handleBackToLobby}>
                         {t('party.backToLobby')}
                     </button>
-                    <span className={styles.logoText}>SonGuess</span>
+                    <div className={styles.brandLogo}>
+                        <img src="/logo.png" alt="SonGuess" className={styles.tvLogoImg} />
+                        <span className={styles.logoText}>SonGuess</span>
+                    </div>
                     <span className={styles.partyBadge}>TV PARTY MODE 📺</span>
                 </div>
 
