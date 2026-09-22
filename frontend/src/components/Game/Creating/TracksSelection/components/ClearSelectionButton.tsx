@@ -12,14 +12,25 @@ interface ClearSelectionButtonProps {
 
 const ClearSelectionButton: React.FC<ClearSelectionButtonProps> = ({
     onClear,
-    width = '170px',
+    width,
 }) => {
     const { t } = useTranslation();
 
     return (
         <div className={styles.clearButtonWrapper}>
-            <Button variant="neutral" onClick={onClear} width={width}>
-                <BsTrash style={{ marginRight: '0.3rem' }} />
+            <Button
+                variant="neutral"
+                onClick={onClear}
+                style={{
+                    width: width || 'auto',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '10px 18px',
+                }}
+            >
+                <BsTrash style={{ marginRight: '0.4rem', flexShrink: 0 }} />
                 {t('gameCreation.clearSelection')}
             </Button>
         </div>

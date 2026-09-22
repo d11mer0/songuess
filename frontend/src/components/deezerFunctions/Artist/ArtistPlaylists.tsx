@@ -8,6 +8,7 @@ import PlaylistTracks from '../Playlist/PlaylistTracks';
 import { SelectedTracks } from '../../../types/gameTypes';
 import StartGameButtonBlock from '../../Game/Creating/TracksSelection/components/StartGameButtonBlock';
 import Loader from '../../UI/Loader/Loader/Loader';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 import styles from './Artist.module.css';
 
@@ -22,6 +23,7 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
     onSendTracks,
     isList = true,
 }) => {
+    const { t } = useTranslation();
     const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(
         null,
     );
@@ -40,15 +42,22 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
 
     if (!artistName) return null;
 
+    const titleTemplate = t('gameCreation.topPlaylistsOf', { artist: '___ARTIST___' });
+    const [titlePrefix, titleSuffix] = titleTemplate.split('___ARTIST___');
+
     return (
         <div>
             <div className={styles.header}>
-                <h2 className={styles.playlistsTitle}>Top 5 playlists of <span className={styles.artist}>{artistName}</span></h2>
+                <h2 className={styles.playlistsTitle}>
+                    {titlePrefix}
+                    <span className={styles.artist}>{artistName}</span>
+                    {titleSuffix}
+                </h2>
             </div>
             
              <div className={styles.list}>
                 {isLoadingPlaylists ? (
-                    <Loader text="Searching playlists..." />
+                    <Loader text={t('gameCreation.searchingPlaylists')} />
                 ) : (
                     <PlaylistList
                         playlists={playlists || []}
@@ -61,7 +70,7 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
             {(selectedPlaylistId && !isLoadingPlaylists) && (
                 <div className={styles.details}>
                     {isLoadingTracks ? (
-                        <Loader text="Loading selected playlist..." />
+                        <Loader text={t('gameCreation.loadingPlaylistTracks')} />
                     ) : (
                         <PlaylistTracks
                             tracks={playlistData?.tracks?.data || []}

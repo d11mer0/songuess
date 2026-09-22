@@ -11,12 +11,13 @@ const Button: React.FC<ButtonProps> = ({
     variant = 'primary',
     width,
     isNotAdaptive,
+    style,
     ...props
 }) => {
     return (
         <button
             className={`${styles.button} ${styles[variant] || ''} ${!isNotAdaptive ? styles.responsive : ''}`}
-            style={{ width: width || 'auto' }}
+            style={{ width: width || 'auto', ...style }}
             {...props}
         >
             {children}

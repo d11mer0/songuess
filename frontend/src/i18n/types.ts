@@ -410,7 +410,9 @@ export interface TranslationDictionary {
         selectAlbumToView: string;
         pleaseSelectAlbum: string;
         searchPlaylistTitle: string;
+        searchingPlaylists: string;
         loadingPlaylistTracks: string;
+        topPlaylistsOf: string;
         searchAlbumTitle: string;
         searchAlbumPlaceholder: string;
         importUrlTitle: string;
