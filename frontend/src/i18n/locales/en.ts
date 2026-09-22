@@ -77,6 +77,7 @@ export const en: TranslationDictionary = {
         roomFull: 'Room is full',
         roomWaiting: 'Waiting',
         roomInGame: 'In Game',
+        clickToCopyCode: 'Click to copy code',
     },
     genres: {
         all: 'All Genres',

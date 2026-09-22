@@ -68,8 +68,24 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
                 <div
                     className={styles.roomCodeCard}
                     onClick={handleCopyCode}
-                    title={t('lobby.clickToCopy')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleCopyCode();
+                        }
+                    }}
                 >
+                    {/* Glowing Interactive Tooltip */}
+                    <div className={`${styles.codeTooltip} ${isCodeCopied ? styles.codeTooltipCopied : ''}`}>
+                        {isCodeCopied ? (
+                            <span>✅ {t('shareModal.codeCopied')}</span>
+                        ) : (
+                            <span>📋 {t('lobby.clickToCopyCode') || t('lobby.clickToCopy')}</span>
+                        )}
+                    </div>
+
                     <div className={styles.codeLabel}>{t('joinPage.roomCode')}</div>
                     <div className={styles.codeDisplay}>
                         <span className={styles.codeText}>

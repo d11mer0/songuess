@@ -77,6 +77,7 @@ export interface TranslationDictionary {
         roomFull: string;
         roomWaiting: string;
         roomInGame: string;
+        clickToCopyCode: string;
     };
     profile: {
         title: string;

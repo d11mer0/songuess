@@ -77,6 +77,7 @@ export const uk: TranslationDictionary = {
         roomFull: 'Кімната заповнена',
         roomWaiting: 'Очікування',
         roomInGame: 'У грі',
+        clickToCopyCode: 'Натисніть, щоб скопіювати код',
     },
     genres: {
         all: 'Всі жанри',
