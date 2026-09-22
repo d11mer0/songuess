@@ -35,6 +35,18 @@ export const useAudioPlayer = ({
     const [isPlaying, setIsPlaying] = useState(false);
     const [isAutoplayBlocked, setIsAutoplayBlocked] = useState(false);
 
+    // Refs — завжди містять актуальні значення без залежності від useCallback deps.
+    // Це ключово для resumeAudio: час рахується ЗАРАЗ, а не в момент створення closure.
+    const startedAtRef = useRef<number | null>(startedAt);
+    const previewUrlRef = useRef<string | null>(previewUrl);
+    const volumeRef = useRef<number>(volume);
+    // Захист від double-call (window capture + overlay onClick спрацьовують разом)
+    const isResumingRef = useRef(false);
+
+    startedAtRef.current = startedAt;
+    previewUrlRef.current = previewUrl;
+    volumeRef.current = volume;
+
     const setVolume = useCallback((newVolume: number) => {
         setVolumeState(newVolume);
         if (typeof window !== 'undefined') {
@@ -45,29 +57,51 @@ export const useAudioPlayer = ({
         }
     }, []);
 
+    /**
+     * resumeAudio — відновлення після autoplay block.
+     *
+     * Час рахується ЩОРАЗУ при виклику (refs актуальні), тому
+     * затримка між блокуванням і кліком коректно враховується.
+     * isResumingRef запобігає double-call від window listener + onClick.
+     */
     const resumeAudio = useCallback(() => {
+        if (isResumingRef.current) return; // захист від double-call
         const audio = audioRef.current;
-        if (!audio || !previewUrl || !startedAt) return;
+        const currentPreviewUrl = previewUrlRef.current;
+        const currentStartedAt = startedAtRef.current;
+        const currentVolume = volumeRef.current;
 
-        const currentTargetTime = calculateStartTime(startedAt);
-        if (Number.isFinite(currentTargetTime)) {
+        if (!audio || !currentPreviewUrl || !currentStartedAt) return;
+
+        isResumingRef.current = true;
+
+        // Рахуємо ПОТОЧНИЙ час — враховує час очікування на оверлеї
+        const seekTo = calculateStartTime(currentStartedAt);
+        if (Number.isFinite(seekTo)) {
             try {
-                audio.currentTime = currentTargetTime;
+                audio.currentTime = seekTo;
             } catch (e) {
                 console.warn('Could not seek audio on resume', e);
             }
         }
 
-        audio.volume = volume;
+        audio.volume = currentVolume;
         audio.play()
             .then(() => {
+                // Мікрокорекція після реального старту відтворення
+                const correctedSeek = calculateStartTime(currentStartedAt);
+                if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
+                    try { audio.currentTime = correctedSeek; } catch {}
+                }
                 setIsPlaying(true);
                 setIsAutoplayBlocked(false);
+                isResumingRef.current = false;
             })
             .catch((err) => {
                 console.warn('Playback still prevented on resume', err);
+                isResumingRef.current = false;
             });
-    }, [previewUrl, startedAt, volume]);
+    }, []); // Порожній deps — всі значення беруться з refs
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -107,6 +141,7 @@ export const useAudioPlayer = ({
         audio.volume = volume;
 
         const applySeekAndPlay = () => {
+            // Час рахується ЗАРАЗ — важливо якщо loadedmetadata затримався
             const playbackStartTime = calculateStartTime(startedAt);
             if (Number.isFinite(playbackStartTime)) {
                 try {
@@ -120,6 +155,11 @@ export const useAudioPlayer = ({
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
+                        // Мікрокорекція після старту
+                        const correctedTime = calculateStartTime(startedAt);
+                        if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
+                            try { audio.currentTime = correctedTime; } catch {}
+                        }
                         setIsPlaying(true);
                         setIsAutoplayBlocked(false);
                         if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
@@ -148,10 +188,8 @@ export const useAudioPlayer = ({
         };
     }, [previewUrl, startedAt]);
 
-    // Автоматичне зняття блокування при першій взаємодії користувача.
-    // БАГ-ФІК: НЕ використовуємо { once: true } — якщо resumeAudio поверне early
-    // (бо previewUrl/startedAt ще не готові), слухач НЕ видаляється і спробує знову.
-    // Видаляємо слухачі вручну лише після успішного play().
+    // Window listeners — спрацьовують на будь-який жест.
+    // Refs гарантують свіжий startedAt без стейл-closure.
     useEffect(() => {
         if (!isAutoplayBlocked) return;
 
@@ -163,12 +201,7 @@ export const useAudioPlayer = ({
         };
 
         const handleUserGesture = () => {
-            const audio = audioRef.current;
-            if (!audio || !previewUrl || !startedAt) {
-                // Дані ще не готові — не видаляємо слухачі, чекаємо наступного жесту
-                return;
-            }
-            // Дані готові — видаляємо слухачі і запускаємо
+            if (!audioRef.current || !previewUrlRef.current || !startedAtRef.current) return;
             removeListeners();
             resumeAudio();
         };
@@ -179,7 +212,7 @@ export const useAudioPlayer = ({
         window.addEventListener('pointerdown', handleUserGesture, { capture: true });
 
         return removeListeners;
-    }, [isAutoplayBlocked, resumeAudio, previewUrl, startedAt]);
+    }, [isAutoplayBlocked, resumeAudio]);
 
     useEffect(() => {
         const audio = audioRef.current;
