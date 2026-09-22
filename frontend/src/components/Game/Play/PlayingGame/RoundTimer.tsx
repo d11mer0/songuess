@@ -23,9 +23,12 @@ const RoundTimer: React.FC = () => {
     useEffect(() => {
         if (!trackInfo?.startedAt || roundResult) return;
 
+        // Якщо бекенд передає endsAt — використовуємо його (враховує clock skew між сервером і клієнтом).
+        // Fallback: startedAt + TOTAL_ROUND_MS (для зворотної сумісності).
+        const deadline = trackInfo.endsAt ?? (trackInfo.startedAt + TOTAL_ROUND_MS);
+
         const updateTimer = () => {
-            const elapsed = Date.now() - trackInfo.startedAt;
-            const remaining = Math.max(0, TOTAL_ROUND_MS - elapsed);
+            const remaining = Math.max(0, deadline - Date.now());
             setRemainingMs(remaining);
 
             const secondsLeft = Math.ceil(remaining / 1000);
@@ -43,11 +46,16 @@ const RoundTimer: React.FC = () => {
         const interval = setInterval(updateTimer, 100);
 
         return () => clearInterval(interval);
-    }, [trackInfo?.startedAt, roundResult]);
+    }, [trackInfo?.startedAt, trackInfo?.endsAt, roundResult]);
 
     if (!trackInfo || roundResult) return null;
 
-    const percent = Math.min(100, Math.max(0, (remainingMs / TOTAL_ROUND_MS) * 100));
+    const deadline = trackInfo.endsAt ?? (trackInfo.startedAt + TOTAL_ROUND_MS);
+    const totalMs = trackInfo.endsAt
+        ? (trackInfo.endsAt - trackInfo.startedAt)
+        : TOTAL_ROUND_MS;
+
+    const percent = Math.min(100, Math.max(0, (remainingMs / totalMs) * 100));
     const secondsLeft = Math.ceil(remainingMs / 1000);
     const isUrgent = secondsLeft <= 3 && secondsLeft > 0;
 

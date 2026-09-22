@@ -5,6 +5,7 @@ export interface GameRoundPublicData {
     preview: string; // URL прев'ю треку
     roundNumber: number; // номер раунду
     startedAt: number; // таймстемп старту раунду (у мілісекундах)
+    endsAt?: number; // таймстемп завершення раунду — використовується для точного таймера
 }
 
 export interface ArtistInfo {
