@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useGuestLoginMutation } from '../../store/api/authApi';
 import { useLazyCheckRoomQuery } from '../../store/api/gameApi';
@@ -52,11 +52,27 @@ const PartyControllerPage: React.FC = () => {
     const isAuthenticated = Boolean(user && user.id);
     const currentRoom = useAppSelector(selectCurrentRoom);
 
+    const normalizedCode = (code || '').trim().toUpperCase();
     const [nickname, setNickname] = useState('');
-    const [roomCode, setRoomCode] = useState(code ? code.trim().toUpperCase() : '');
-    const [joinError, setJoinError] = useState<string | null>(null);
+    const [roomCode, setRoomCode] = useState(normalizedCode);
+    const [joinErrorKey, setJoinErrorKey] = useState<string | null>(null);
+    const [joinErrorCustom, setJoinErrorCustom] = useState<string | null>(null);
+    const joinError = joinErrorKey ? t(joinErrorKey) : joinErrorCustom;
+
+    const clearJoinError = useCallback(() => {
+        setJoinErrorKey(null);
+        setJoinErrorCustom(null);
+    }, []);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [initialCheckDone, setInitialCheckDone] = useState(!code);
+    const [initialCheckDone, setInitialCheckDone] = useState(!normalizedCode);
+    const checkedCodeRef = useRef<string | null>(null);
+    const initialLangSyncedRef = useRef(false);
+    const tRef = useRef(t);
+
+    useEffect(() => {
+        tRef.current = t;
+    }, [t]);
 
     const [partyModeDisabledData, setPartyModeDisabledData] = useState<any | null>(null);
     const [autoLeaveSeconds, setAutoLeaveSeconds] = useState(20);
@@ -72,43 +88,53 @@ const PartyControllerPage: React.FC = () => {
 
     useSocketConnection();
 
-    // Synchronize language from URL parameter (e.g., from TV host QR code)
+    // Synchronize language from URL parameter (e.g., from TV host QR code) once on mount
     useEffect(() => {
-        const langParam = searchParams.get('lang');
-        if (langParam === 'uk' || langParam === 'en') {
-            setLanguage(langParam);
+        if (!initialLangSyncedRef.current) {
+            const langParam = searchParams.get('lang');
+            if (langParam === 'uk' || langParam === 'en') {
+                setLanguage(langParam);
+            }
+            initialLangSyncedRef.current = true;
         }
     }, [searchParams, setLanguage]);
 
-    // Verify room existence upfront when code is in URL
+    // Verify room existence upfront when code is in URL (without re-triggering on language changes)
     useEffect(() => {
-        if (code && code.trim()) {
-            const targetCode = code.trim().toUpperCase();
-            setRoomCode(targetCode);
-            setJoinError(null);
-            setInitialCheckDone(false);
-
-            triggerCheckRoom(targetCode)
-                .unwrap()
-                .then((res) => {
-                    if (!res.exists) {
-                        setJoinError(t('party.roomNotFoundOrClosed'));
-                    } else if (res.isFull) {
-                        setJoinError(t('party.roomIsFull'));
-                    } else {
-                        setJoinError(null);
-                    }
-                })
-                .catch(() => {
-                    setJoinError(t('party.roomNotFoundOrClosed'));
-                })
-                .finally(() => {
-                    setInitialCheckDone(true);
-                });
-        } else {
+        if (!normalizedCode) {
             setInitialCheckDone(true);
+            return;
         }
-    }, [code, triggerCheckRoom, t]);
+
+        // Avoid re-checking if this code was already checked or if already verified
+        if (checkedCodeRef.current === normalizedCode) {
+            return;
+        }
+
+        setRoomCode(normalizedCode);
+        clearJoinError();
+        setInitialCheckDone(false);
+
+        triggerCheckRoom(normalizedCode)
+            .unwrap()
+            .then((res) => {
+                checkedCodeRef.current = normalizedCode;
+                if (!res.exists) {
+                    setJoinErrorKey('party.roomNotFoundOrClosed');
+                } else if (res.isFull) {
+                    setJoinErrorKey('party.roomIsFull');
+                } else {
+                    clearJoinError();
+                }
+            })
+            .catch(() => {
+                checkedCodeRef.current = normalizedCode;
+                setJoinErrorKey('party.roomNotFoundOrClosed');
+            })
+            .finally(() => {
+                setInitialCheckDone(true);
+            });
+    }, [normalizedCode, triggerCheckRoom, clearJoinError]);
 
     // Join room when authenticated, room code available, verified, and no error
     useEffect(() => {
@@ -189,9 +215,9 @@ const PartyControllerPage: React.FC = () => {
         const handleJoinedRoom = (room: any) => {
             if (room) {
                 dispatch(setCurrentRoom(room));
-                setJoinError(null);
+                clearJoinError();
             } else {
-                setJoinError(t('party.roomNotFoundOrClosed'));
+                setJoinErrorKey('party.roomNotFoundOrClosed');
             }
         };
 
@@ -254,7 +280,7 @@ const PartyControllerPage: React.FC = () => {
             setRoundResult(null);
             setIsAnswerSubmitted(false);
             setSelectedOptionIndex(null);
-            setJoinError(null);
+            clearJoinError();
         };
 
         const handlePartyModeSwitched = (data: any) => {
@@ -267,7 +293,7 @@ const PartyControllerPage: React.FC = () => {
                     user?.email?.includes('@guest.')
                 );
                 if (isGuestUser) {
-                    handleLeaveParty(t('party.guestKickedNotice'));
+                    handleLeaveParty(tRef.current('party.guestKickedNotice'));
                     return;
                 }
                 // Host turned off TV mode! For registered users: smoothly transition to regular lobby
@@ -300,7 +326,7 @@ const PartyControllerPage: React.FC = () => {
                 );
                 if (isGuestUser) {
                     dispatch(logout());
-                    showToast(t('party.guestKickedNotice'), 'neutral');
+                    showToast(tRef.current('party.guestKickedNotice'), 'neutral');
                     navigate('/');
                 } else {
                     navigate('/game');
@@ -337,7 +363,7 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('roomDeleted');
             socketHandlers.off('playerLeft');
         };
-    }, [currentRoom?.players, dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, showToast, t, user]);
+    }, [clearJoinError, currentRoom?.players, dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, showToast, user]);
 
     // Ensure finished state is preserved if refreshed when game is ended
     useEffect(() => {
@@ -353,18 +379,19 @@ const PartyControllerPage: React.FC = () => {
         if (!trimmedName || !targetCode) return;
 
         setIsSubmitting(true);
-        setJoinError(null);
+        clearJoinError();
 
         try {
             // 1. Verify room exists BEFORE creating a guest account
             const checkRes = await triggerCheckRoom(targetCode).unwrap();
+            checkedCodeRef.current = targetCode;
             if (!checkRes.exists) {
-                setJoinError(t('party.roomNotFoundOrClosed'));
+                setJoinErrorKey('party.roomNotFoundOrClosed');
                 setIsSubmitting(false);
                 return;
             }
             if (checkRes.isFull) {
-                setJoinError(t('party.roomIsFull'));
+                setJoinErrorKey('party.roomIsFull');
                 setIsSubmitting(false);
                 return;
             }
@@ -379,8 +406,11 @@ const PartyControllerPage: React.FC = () => {
         } catch (err: any) {
             console.error('Guest login failed', err);
             const msg = err?.data?.message;
-            const displayMsg = Array.isArray(msg) ? msg.join(', ') : (msg || t('party.roomNotFoundOrClosed'));
-            setJoinError(displayMsg);
+            if (msg) {
+                setJoinErrorCustom(Array.isArray(msg) ? msg.join(', ') : msg);
+            } else {
+                setJoinErrorKey('party.roomNotFoundOrClosed');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -392,17 +422,18 @@ const PartyControllerPage: React.FC = () => {
         if (!targetCode) return;
 
         setIsSubmitting(true);
-        setJoinError(null);
+        clearJoinError();
 
         try {
             const checkRes = await triggerCheckRoom(targetCode).unwrap();
+            checkedCodeRef.current = targetCode;
             if (!checkRes.exists) {
-                setJoinError(t('party.roomNotFoundOrClosed'));
+                setJoinErrorKey('party.roomNotFoundOrClosed');
                 setIsSubmitting(false);
                 return;
             }
             if (checkRes.isFull) {
-                setJoinError(t('party.roomIsFull'));
+                setJoinErrorKey('party.roomIsFull');
                 setIsSubmitting(false);
                 return;
             }
@@ -410,25 +441,27 @@ const PartyControllerPage: React.FC = () => {
             socketInstance.connect();
             socketEmitter.emit('joinRoom', { id: targetCode });
         } catch {
-            setJoinError(t('party.roomNotFoundOrClosed'));
+            checkedCodeRef.current = targetCode;
+            setJoinErrorKey('party.roomNotFoundOrClosed');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleTryAgain = async () => {
-        setJoinError(null);
-        const targetCode = (roomCode || code || '').trim().toUpperCase();
+        clearJoinError();
+        const targetCode = (roomCode || normalizedCode).trim().toUpperCase();
         if (!targetCode) return;
 
         try {
             const res = await triggerCheckRoom(targetCode).unwrap();
+            checkedCodeRef.current = targetCode;
             if (!res.exists) {
-                setJoinError(t('party.roomNotFoundOrClosed'));
+                setJoinErrorKey('party.roomNotFoundOrClosed');
                 return;
             }
             if (res.isFull) {
-                setJoinError(t('party.roomIsFull'));
+                setJoinErrorKey('party.roomIsFull');
                 return;
             }
             if (isAuthenticated) {
@@ -436,7 +469,8 @@ const PartyControllerPage: React.FC = () => {
                 socketEmitter.emit('joinRoom', { id: targetCode });
             }
         } catch {
-            setJoinError(t('party.roomNotFoundOrClosed'));
+            checkedCodeRef.current = targetCode;
+            setJoinErrorKey('party.roomNotFoundOrClosed');
         }
     };
 
@@ -467,13 +501,13 @@ const PartyControllerPage: React.FC = () => {
         </div>
     );
 
-    // View 0: Initial Room Check / Verification Loading
-    if ((!initialCheckDone || (isCheckingRoom && !joinError)) && code) {
+    // View 0: Initial Room Check / Verification Loading (only on initial load before check finishes)
+    if (!initialCheckDone && Boolean(normalizedCode)) {
         return (
             <div className={styles.container}>
                 {renderLanguageBar()}
                 <div className={styles.lobbyCard}>
-                    <div className={styles.roomBadge}>#{code.toUpperCase()}</div>
+                    <div className={styles.roomBadge}>#{normalizedCode}</div>
                     <div className={styles.waitingPrompt} style={{ padding: '30px 20px' }}>
                         <Loader />
                         <div className={styles.waitingText} style={{ marginTop: '16px' }}>
@@ -492,7 +526,7 @@ const PartyControllerPage: React.FC = () => {
                 {renderLanguageBar()}
                 <div className={styles.authCard}>
                     <div className={styles.authIcon}>⚠️</div>
-                    <h1 className={styles.authTitle}>#{roomCode || code}</h1>
+                    <h1 className={styles.authTitle}>#{roomCode || normalizedCode}</h1>
                     <p className={styles.authSubtitle} style={{ color: '#ff6b6b', lineHeight: 1.5 }}>
                         {joinError}
                     </p>
@@ -510,8 +544,9 @@ const PartyControllerPage: React.FC = () => {
                             className={styles.submitBtn}
                             style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
                             onClick={() => {
-                                setJoinError(null);
+                                clearJoinError();
                                 setRoomCode('');
+                                checkedCodeRef.current = null;
                                 navigate('/play');
                             }}
                         >
