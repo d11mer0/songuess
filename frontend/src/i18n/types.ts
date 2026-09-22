@@ -71,6 +71,12 @@ export interface TranslationDictionary {
         waitingForHost: string;
         roomLobbyTitle: string;
         clickToCopy: string;
+        roomItemTitle: string;
+        roomCode: string;
+        playersInRoom: string;
+        roomFull: string;
+        roomWaiting: string;
+        roomInGame: string;
     };
     profile: {
         title: string;

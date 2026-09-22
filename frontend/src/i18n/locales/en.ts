@@ -71,6 +71,12 @@ export const en: TranslationDictionary = {
         waitingForHost: 'Waiting for host to start the game...',
         roomLobbyTitle: 'ROOM LOBBY',
         clickToCopy: 'Click to copy',
+        roomItemTitle: 'Room #{index}',
+        roomCode: 'Code: {code}',
+        playersInRoom: 'Players ({current}/{max})',
+        roomFull: 'Room is full',
+        roomWaiting: 'Waiting',
+        roomInGame: 'In Game',
     },
     genres: {
         all: 'All Genres',

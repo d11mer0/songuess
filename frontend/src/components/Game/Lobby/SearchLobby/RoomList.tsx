@@ -25,8 +25,13 @@ const RoomList = ({ joinRoom }: Props) => {
                 <>
                     <h3 className={styles.sectionTitle}>{t('lobby.availableRooms')}</h3>
                     <ul className={styles.roomList}>
-                        {rooms.map((room) => (
-                            <RoomItem key={room.id} room={room} onJoin={joinRoom} />
+                        {rooms.map((room, index) => (
+                            <RoomItem
+                                key={room.id}
+                                room={room}
+                                index={index + 1}
+                                onJoin={joinRoom}
+                            />
                         ))}
                     </ul>
                 </>

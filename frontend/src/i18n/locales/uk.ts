@@ -71,6 +71,12 @@ export const uk: TranslationDictionary = {
         waitingForHost: 'Очікування початку гри...',
         roomLobbyTitle: 'ЛОБІ КІМНАТИ',
         clickToCopy: 'Натисніть, щоб скопіювати',
+        roomItemTitle: 'Кімната №{index}',
+        roomCode: 'Код: {code}',
+        playersInRoom: 'Гравці ({current}/{max})',
+        roomFull: 'Кімната заповнена',
+        roomWaiting: 'Очікування',
+        roomInGame: 'У грі',
     },
     genres: {
         all: 'Всі жанри',
