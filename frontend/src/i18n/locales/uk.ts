@@ -281,6 +281,8 @@ export const uk: TranslationDictionary = {
     },
     party: {
         hostTitle: 'Режим вечірки (TV Host)',
+        partyBadge: 'РЕЖИМ ВЕЧІРКИ 📺',
+        partyTag: '📺 Вечірка',
         controllerTitle: 'Геймпад вечірки 🎮',
         enterNickname: 'Введіть ваш ігровий нікнейм (без реєстрації):',
         nicknamePlaceholder: 'Ваш нікнейм...',

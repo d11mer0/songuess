@@ -48,8 +48,8 @@ export const deezerApi = createApi({
                 `/deezer/search?query=${query}&type=${type}`,
         }),
 
-        getCuratedThemes: builder.query<any[], void>({
-            query: () => `/deezer/curated-themes`,
+        getCuratedThemes: builder.query<any[], string | void>({
+            query: (lang) => (lang ? `/deezer/curated-themes?lang=${lang}` : `/deezer/curated-themes`),
         }),
 
         getThemeTracks: builder.query<any, string>({

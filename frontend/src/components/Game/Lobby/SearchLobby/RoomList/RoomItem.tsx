@@ -55,7 +55,7 @@ const RoomItem = ({ room, index, onJoin }: Props) => {
                         : t('lobby.modeOptions')}
                 </span>
                 {room.lobbyOptions?.isPartyMode && (
-                    <span className={styles.partyTag}>📺 Party</span>
+                    <span className={styles.partyTag}>{t('party.partyTag')}</span>
                 )}
             </div>
 

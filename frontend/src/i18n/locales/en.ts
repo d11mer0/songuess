@@ -281,6 +281,8 @@ export const en: TranslationDictionary = {
     },
     party: {
         hostTitle: 'Party Mode (TV Host)',
+        partyBadge: 'TV PARTY MODE 📺',
+        partyTag: '📺 Party',
         controllerTitle: 'Party Gamepad 🎮',
         enterNickname: 'Enter your party nickname (no registration required):',
         nicknamePlaceholder: 'Your nickname...',

@@ -14,10 +14,10 @@ interface Props {
 }
 
 const ThemesSelection: FC<Props> = ({ handleStart }) => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
 
-    const { data: themes = [], isLoading: isLoadingThemes } = useGetCuratedThemesQuery();
+    const { data: themes = [], isLoading: isLoadingThemes } = useGetCuratedThemesQuery(language);
 
     const {
         data: themeDetails,

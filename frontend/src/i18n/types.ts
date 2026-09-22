@@ -281,6 +281,8 @@ export interface TranslationDictionary {
     };
     party: {
         hostTitle: string;
+        partyBadge: string;
+        partyTag: string;
         controllerTitle: string;
         enterNickname: string;
         nicknamePlaceholder: string;

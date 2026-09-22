@@ -87,8 +87,19 @@ const PartyHostPage: React.FC = () => {
     const [isHostAnswerSubmitted, setIsHostAnswerSubmitted] = useState(false);
     const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
 
-    const { data: curatedThemes = [] } = useGetCuratedThemesQuery();
+    const { data: curatedThemes = [] } = useGetCuratedThemesQuery(language);
     const [triggerGetThemeTracks] = useLazyGetThemeTracksQuery();
+
+    const getThemeTitle = (theme: { id: string; title: string }) => {
+        switch (theme.id) {
+            case 'hits-2000s': return t('themes.hits2000sTitle');
+            case 'legendary-80s': return t('themes.legendary80sTitle');
+            case 'ukrainian-hits': return t('themes.ukrainianHitsTitle');
+            case 'rock-ballads': return t('themes.rockBalladsTitle');
+            case 'soundtracks-ost': return t('themes.soundtracksOstTitle');
+            default: return theme.title;
+        }
+    };
 
     useSocketConnection();
 
@@ -490,7 +501,7 @@ const PartyHostPage: React.FC = () => {
                         <img src="/logo.png" alt="SonGuess" className={styles.tvLogoImg} />
                         <span className={styles.logoText}>SonGuess</span>
                     </div>
-                    <span className={styles.partyBadge}>TV PARTY MODE 📺</span>
+                    <span className={styles.partyBadge}>{t('party.partyBadge')}</span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -653,7 +664,7 @@ const PartyHostPage: React.FC = () => {
                                                     className={`${styles.themeChip} ${selectedThemeId === theme.id ? styles.themeChipActive : ''}`}
                                                     onClick={() => setSelectedThemeId(theme.id)}
                                                 >
-                                                    <span className={styles.themeChipTitle}>{theme.title}</span>
+                                                    <span className={styles.themeChipTitle}>{getThemeTitle(theme)}</span>
                                                 </button>
                                             ))}
                                         </div>
