@@ -3,6 +3,36 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Cross-browser scrollbar for modern standards (Firefox, Chrome 121+, Edge, Safari 18+) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 93, 229, 0.45) rgba(0, 0, 0, 0.2);
+}
+
+/* WebKit / Blink legacy & refined scrollbars (Chrome, Edge, Safari, Opera) */
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: rgba(155, 93, 229, 0.45);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(155, 93, 229, 0.75);
+    background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 html,
