@@ -5,10 +5,11 @@
     color: #ffffff;
     display: flex;
     flex-direction: column;
-    padding: 32px 48px;
+    padding: 24px 48px 56px 48px;
     box-sizing: border-box;
     font-family: var(--font-main, sans-serif);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
 }
 
@@ -18,8 +19,8 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 20px;
-    margin-bottom: 32px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .brand {
@@ -42,6 +43,30 @@
 
 .backBtn:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+.finishGameBtn {
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.22), rgba(193, 18, 31, 0.35));
+    border: 1px solid rgba(230, 57, 70, 0.55);
+    color: #ff8591;
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(230, 57, 70, 0.2);
+}
+
+.finishGameBtn:hover {
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.45), rgba(193, 18, 31, 0.6));
+    border-color: #ff4d5e;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
 }
 
 .unmuteBtn {
@@ -488,45 +513,49 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    min-height: 0;
+    padding-bottom: 24px;
 }
 
 .roundTopBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .timerBox {
     font-family: var(--font-mono, monospace);
-    font-size: 48px;
+    font-size: clamp(36px, 4.5vh, 48px);
     font-weight: 900;
     color: #00f3ff;
     text-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
 }
 
 .answersCounter {
-    font-size: 24px;
+    font-size: clamp(18px, 2.2vh, 24px);
     font-weight: 800;
     background: rgba(255, 255, 255, 0.08);
-    padding: 12px 28px;
+    padding: 10px 24px;
     border-radius: 30px;
 }
 
 .visualizerArea {
     flex: 1;
+    min-height: 80px;
+    max-height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
 .vinylDisc {
-    width: 180px;
-    height: 180px;
+    width: clamp(100px, 15vh, 160px);
+    height: clamp(100px, 15vh, 160px);
     border-radius: 50%;
     background: radial-gradient(circle, #333 15%, #111 16%, #222 45%, #111 70%);
-    box-shadow: 0 0 40px rgba(155, 93, 229, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 35px rgba(155, 93, 229, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.8);
     animation: spin 3s infinite linear;
 }
 
@@ -539,18 +568,19 @@
 .optionsGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
 .optionBlock {
-    padding: 22px 30px;
-    border-radius: 20px;
+    padding: clamp(14px, 2vh, 20px) 24px;
+    border-radius: 18px;
     border: 2px solid transparent;
     display: flex;
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    font-size: 24px;
+    font-size: clamp(18px, 2.2vh, 22px);
     font-weight: 800;
     color: #ffffff;
     cursor: pointer;
@@ -568,7 +598,7 @@
 .optionLeft {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     flex: 1;
     overflow: hidden;
 }
@@ -588,7 +618,7 @@
 
 .keyHint {
     font-family: var(--font-mono, monospace);
-    font-size: 15px;
+    font-size: 14px;
     background: rgba(0, 0, 0, 0.35);
     padding: 4px 10px;
     border-radius: 8px;
@@ -596,7 +626,7 @@
 }
 
 .hostBadge {
-    font-size: 14px;
+    font-size: 13px;
     background: rgba(0, 0, 0, 0.6);
     color: #00f3ff;
     padding: 4px 12px;
@@ -611,7 +641,7 @@
 .optionGreen { background: linear-gradient(135deg, #2a9d8f, #1b4332); }
 
 .optionShape {
-    font-size: 36px;
+    font-size: clamp(24px, 3vh, 32px);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
@@ -627,14 +657,14 @@
 
 .hostStatusBanner {
     text-align: center;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #00f3ff;
     background: rgba(0, 243, 255, 0.12);
     border: 1px solid rgba(0, 243, 255, 0.35);
-    padding: 10px 24px;
+    padding: 8px 22px;
     border-radius: 20px;
-    margin-top: 16px;
+    margin-top: 10px;
     align-self: center;
     animation: fadeIn 0.3s ease-out;
 }
@@ -848,4 +878,92 @@
 @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
+}
+
+/* Finish Game Confirmation Modal (TV-Style) */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+    background: linear-gradient(145deg, #1e1333, #120b20);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 28px;
+    padding: 36px 40px;
+    width: min(520px, 90vw);
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(230, 57, 70, 0.25);
+    animation: scaleIn 0.25s ease-out;
+}
+
+.modalIcon {
+    font-size: 52px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(230, 57, 70, 0.5));
+}
+
+.modalTitle {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.modalText {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #b0a8c5;
+    margin-bottom: 28px;
+}
+
+.modalActions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.modalCancelBtn {
+    flex: 1;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.modalCancelBtn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+
+.modalConfirmBtn {
+    flex: 1;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #e63946, #c1121f);
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.modalConfirmBtn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(230, 57, 70, 0.6);
 }

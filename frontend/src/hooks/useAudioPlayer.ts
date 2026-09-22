@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { calculateStartTime } from '../utils/calculateStartTime';
+import {
+    blockMediaSessionHardwareKeys,
+    clearMediaSessionPlayback,
+} from '../utils/audio/blockMediaSessionHardwareKeys';
 
 interface UseAudioPlayerArgs {
     previewUrl: string | null;
@@ -69,6 +73,8 @@ export const useAudioPlayer = ({
         const audio = audioRef.current;
         if (!audio) return;
 
+        blockMediaSessionHardwareKeys(audio);
+
         const onPlay = () => setIsPlaying(true);
         const onPause = () => setIsPlaying(false);
         const onEnded = () => setIsPlaying(false);
@@ -81,6 +87,7 @@ export const useAudioPlayer = ({
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
+            clearMediaSessionPlayback(audio);
         };
     }, []);
 
@@ -89,7 +96,7 @@ export const useAudioPlayer = ({
         if (!audio) return;
 
         if (!previewUrl || !startedAt) {
-            audio.pause();
+            clearMediaSessionPlayback(audio);
             setIsPlaying(false);
             setIsAutoplayBlocked(false);
             return;
@@ -115,6 +122,11 @@ export const useAudioPlayer = ({
                     .then(() => {
                         setIsPlaying(true);
                         setIsAutoplayBlocked(false);
+                        if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+                            try {
+                                navigator.mediaSession.playbackState = 'playing';
+                            } catch {}
+                        }
                     })
                     .catch((err) => {
                         console.warn('Autoplay blocked by browser policy:', err);
@@ -132,6 +144,7 @@ export const useAudioPlayer = ({
 
         return () => {
             audio.removeEventListener('loadedmetadata', applySeekAndPlay);
+            clearMediaSessionPlayback(audio);
         };
     }, [previewUrl, startedAt]);
 

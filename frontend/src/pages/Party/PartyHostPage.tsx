@@ -14,6 +14,10 @@ import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
+import {
+    blockMediaSessionHardwareKeys,
+    clearMediaSessionPlayback,
+} from '../../utils/audio/blockMediaSessionHardwareKeys';
 import styles from './PartyHostPage.module.css';
 
 interface RoundPayload {
@@ -81,11 +85,17 @@ const PartyHostPage: React.FC = () => {
     // Host gameplay state
     const [hostSelectedOptionIndex, setHostSelectedOptionIndex] = useState<number | null>(null);
     const [isHostAnswerSubmitted, setIsHostAnswerSubmitted] = useState(false);
+    const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
 
     const { data: curatedThemes = [] } = useGetCuratedThemesQuery();
     const [triggerGetThemeTracks] = useLazyGetThemeTracksQuery();
 
     useSocketConnection();
+
+    // Prevent headphone / hardware media keys from playing audio
+    useEffect(() => {
+        blockMediaSessionHardwareKeys(audioRef.current);
+    }, []);
 
     // Sync room on mount or route param change
     useEffect(() => {
@@ -202,6 +212,11 @@ const PartyHostPage: React.FC = () => {
                 audioRef.current.muted = isMuted;
                 audioRef.current.play().then(() => {
                     setIsAudioBlocked(false);
+                    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+                        try {
+                            navigator.mediaSession.playbackState = 'playing';
+                        } catch {}
+                    }
                 }).catch(() => {
                     setIsAudioBlocked(true);
                 });
@@ -214,13 +229,12 @@ const PartyHostPage: React.FC = () => {
 
         const handleRoundResult = (payload: RoundResultPayload) => {
             setRoundResult(payload);
-            if (audioRef.current) {
-                audioRef.current.pause();
-            }
+            clearMediaSessionPlayback(audioRef.current);
         };
 
         const handleGameFinished = () => {
             setIsGameFinished(true);
+            clearMediaSessionPlayback(audioRef.current);
             try {
                 confetti({
                     particleCount: 250,
@@ -254,6 +268,11 @@ const PartyHostPage: React.FC = () => {
                 }
                 audioRef.current.play().then(() => {
                     setIsAudioBlocked(false);
+                    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+                        try {
+                            navigator.mediaSession.playbackState = 'playing';
+                        } catch {}
+                    }
                 }).catch(() => setIsAudioBlocked(true));
             }
         };
@@ -272,10 +291,7 @@ const PartyHostPage: React.FC = () => {
             socketHandlers.off('gameFinished');
             socketHandlers.off('gameEnded');
             socketHandlers.off('reconnectToRound');
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.src = '';
-            }
+            clearMediaSessionPlayback(audioRef.current);
         };
     }, []);
 
@@ -467,8 +483,8 @@ const PartyHostPage: React.FC = () => {
             {/* Top Bar on TV */}
             <div className={styles.header}>
                 <div className={styles.brand}>
-                    <button className={styles.backBtn} onClick={handleBackToLobby}>
-                        {t('party.backToLobby')}
+                    <button className={styles.finishGameBtn} onClick={() => setIsFinishModalOpen(true)}>
+                        🚪 {t('party.finishGame')}
                     </button>
                     <div className={styles.brandLogo}>
                         <img src="/logo.png" alt="SonGuess" className={styles.tvLogoImg} />
@@ -791,9 +807,39 @@ const PartyHostPage: React.FC = () => {
                         <button className={styles.startPartyBtn} onClick={handleRestart}>
                             🔄 {t('gameplay.restartGame') || 'Зіграти ще раз'}
                         </button>
-                        <button className={styles.customTracksBtn} onClick={handleBackToLobby}>
-                            {t('party.backToLobby')}
+                        <button className={styles.finishGameBtn} onClick={() => setIsFinishModalOpen(true)}>
+                            🚪 {t('party.finishGame')}
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Finish Game Confirmation Modal */}
+            {isFinishModalOpen && (
+                <div className={styles.modalOverlay} onClick={() => setIsFinishModalOpen(false)}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalIcon}>⚠️</div>
+                        <h2 className={styles.modalTitle}>{t('party.finishGameConfirmTitle')}</h2>
+                        <p className={styles.modalText}>{t('party.finishGameConfirmText')}</p>
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className={styles.modalCancelBtn}
+                                onClick={() => setIsFinishModalOpen(false)}
+                            >
+                                {t('common.cancel')}
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.modalConfirmBtn}
+                                onClick={() => {
+                                    setIsFinishModalOpen(false);
+                                    handleBackToLobby();
+                                }}
+                            >
+                                {t('party.finishGame')}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

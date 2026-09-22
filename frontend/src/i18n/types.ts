@@ -319,6 +319,9 @@ export interface TranslationDictionary {
         leavePartyGame: string;
         autoLeaveCountdown: string;
         guestKickedNotice: string;
+        finishGame: string;
+        finishGameConfirmTitle: string;
+        finishGameConfirmText: string;
         gameCompleted: string;
         watchTvForPodium: string;
         waitingForRestart: string;

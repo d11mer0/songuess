@@ -9,6 +9,8 @@ import styles from './AudioPlayer.module.css';
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 
+import { clearMediaSessionPlayback } from '../../../../utils/audio/blockMediaSessionHardwareKeys';
+
 interface AudioPlayerProps {
     maxPlayDuration?: number;
     onPlayingChange?: (isPlaying: boolean) => void;
@@ -32,10 +34,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         onPlayingChange?.(isPlaying);
     }, [isPlaying, onPlayingChange]);
 
-    // Коли раунд закінчується і показуються результати, ставимо аудіо на паузу
+    // Коли раунд закінчується і показуються результати, ставимо аудіо на паузу та очищаємо сесію
     useEffect(() => {
         if (roundResult && audioRef.current) {
-            audioRef.current.pause();
+            clearMediaSessionPlayback(audioRef.current);
         }
     }, [roundResult, audioRef]);
 
