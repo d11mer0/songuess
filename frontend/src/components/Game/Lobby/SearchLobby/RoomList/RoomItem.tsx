@@ -1,6 +1,7 @@
 import { Room } from '../../../../../types/roomTypes'; // або звідки в тебе тип
 import Button from '../../../../UI/Button/Button';
 import PlayerList from './PlayerList';
+import { useTranslation } from '../../../../../i18n/LanguageContext';
 import styles from '../RoomList.module.css';
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 }
 
 const RoomItem = ({ room, onJoin }: Props) => {
+    const { t } = useTranslation();
+
     return (
         <li className={styles.roomItem}>
             <div>
@@ -21,7 +24,7 @@ const RoomItem = ({ room, onJoin }: Props) => {
                     )}
                     {room.lobbyOptions?.answerMode === 'TYPE_IN' && (
                         <span style={{ marginLeft: '6px', fontSize: '12px', background: 'rgba(241,91,181,0.2)', color: '#f15bb5', padding: '2px 8px', borderRadius: '10px', border: '1px solid #f15bb5', fontWeight: 700 }}>
-                            ⌨️ Hardcore
+                            {t('lobby.modeHardcore')}
                         </span>
                     )}
                 </p>
