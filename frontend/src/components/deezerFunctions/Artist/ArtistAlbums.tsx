@@ -22,7 +22,8 @@ const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
     onSelectAlbum,
     selectedAlbumId,
 }) => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
+    const dateLocale = language === 'uk' ? 'uk-UA' : 'en-US';
     const {
         data: albumsData,
         isLoading,
@@ -53,7 +54,7 @@ const ArtistAlbums: React.FC<ArtistAlbumsProps> = ({
                                 <p className={styles.albumTitle}>{album.title}</p>
                                 <p className={styles.fans}>{t('gameplay.fansCount')} {album.fans.toLocaleString()}</p>
                                 <p className={styles.releaseDate}>
-                                    {new Date(album.release_date).toLocaleDateString(undefined, {
+                                    {new Date(album.release_date).toLocaleDateString(dateLocale, {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',

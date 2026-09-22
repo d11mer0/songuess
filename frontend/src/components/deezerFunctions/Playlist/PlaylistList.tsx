@@ -1,4 +1,6 @@
+import React from 'react';
 import styles from './PlaylistList.module.css';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface Playlist {
     id: number;
@@ -18,6 +20,9 @@ const PlaylistList: React.FC<PlaylistListProps> = ({
     onSelect,
     selectedId,
 }) => {
+    const { language } = useTranslation();
+    const dateLocale = language === 'uk' ? 'uk-UA' : 'en-US';
+
     return (
         <div className={styles.listWrapper}>
             {playlists.map((playlist) => (
@@ -36,7 +41,7 @@ const PlaylistList: React.FC<PlaylistListProps> = ({
                     <div className={styles.info}>
                         <h3 className={styles.title} title={playlist.title}>{playlist.title}</h3>
                         <p className={styles.trackDate}>
-                            {new Date(playlist.creation_date).toLocaleDateString(undefined, {
+                            {new Date(playlist.creation_date).toLocaleDateString(dateLocale, {
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric',
