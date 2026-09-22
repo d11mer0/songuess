@@ -112,7 +112,8 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 243, 255, 0.3);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
     z-index: 100;
 }
 
@@ -126,21 +127,16 @@
     border-top-color: #00f3ff;
 }
 
-.roomCodeCard:hover .codeTooltip {
+.roomCodeCard:hover .codeTooltip:not(.codeTooltipCopied) {
     opacity: 1;
+    visibility: visible;
     transform: translateX(-50%) translateY(0);
 }
 
 .codeTooltipCopied {
-    opacity: 1 !important;
-    transform: translateX(-50%) translateY(0) !important;
-    border-color: #10b981 !important;
-    color: #10b981 !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(16, 185, 129, 0.4) !important;
-}
-
-.codeTooltipCopied::after {
-    border-top-color: #10b981 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateX(-50%) translateY(4px) !important;
 }
 
 .codeLabel {
