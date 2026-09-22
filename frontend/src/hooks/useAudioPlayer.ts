@@ -148,26 +148,38 @@ export const useAudioPlayer = ({
         };
     }, [previewUrl, startedAt]);
 
-    // Автоматичне зняття блокування звуку при першому кліку / взаємодії користувача
+    // Автоматичне зняття блокування при першій взаємодії користувача.
+    // БАГ-ФІК: НЕ використовуємо { once: true } — якщо resumeAudio поверне early
+    // (бо previewUrl/startedAt ще не готові), слухач НЕ видаляється і спробує знову.
+    // Видаляємо слухачі вручну лише після успішного play().
     useEffect(() => {
         if (!isAutoplayBlocked) return;
 
-        const handleUserGesture = () => {
-            resumeAudio();
-        };
-
-        window.addEventListener('click', handleUserGesture, { once: true, capture: true });
-        window.addEventListener('keydown', handleUserGesture, { once: true, capture: true });
-        window.addEventListener('touchstart', handleUserGesture, { once: true, capture: true });
-        window.addEventListener('pointerdown', handleUserGesture, { once: true, capture: true });
-
-        return () => {
+        const removeListeners = () => {
             window.removeEventListener('click', handleUserGesture, { capture: true });
             window.removeEventListener('keydown', handleUserGesture, { capture: true });
             window.removeEventListener('touchstart', handleUserGesture, { capture: true });
             window.removeEventListener('pointerdown', handleUserGesture, { capture: true });
         };
-    }, [isAutoplayBlocked, resumeAudio]);
+
+        const handleUserGesture = () => {
+            const audio = audioRef.current;
+            if (!audio || !previewUrl || !startedAt) {
+                // Дані ще не готові — не видаляємо слухачі, чекаємо наступного жесту
+                return;
+            }
+            // Дані готові — видаляємо слухачі і запускаємо
+            removeListeners();
+            resumeAudio();
+        };
+
+        window.addEventListener('click', handleUserGesture, { capture: true });
+        window.addEventListener('keydown', handleUserGesture, { capture: true });
+        window.addEventListener('touchstart', handleUserGesture, { capture: true });
+        window.addEventListener('pointerdown', handleUserGesture, { capture: true });
+
+        return removeListeners;
+    }, [isAutoplayBlocked, resumeAudio, previewUrl, startedAt]);
 
     useEffect(() => {
         const audio = audioRef.current;

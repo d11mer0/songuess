@@ -226,6 +226,9 @@ export interface TranslationDictionary {
         startNewGame: string;
         noRoomsAvailable: string;
         unmuteAlert: string;
+        tapToUnmuteTitle: string;
+        tapToUnmuteSubtitle: string;
+        tapToUnmuteHint: string;
         heardleModeTitle: string;
         potentialPoints: string;
         revealMoreAudio: string;

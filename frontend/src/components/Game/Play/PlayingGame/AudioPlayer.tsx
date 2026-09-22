@@ -63,68 +63,75 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
     if (!trackInfo) return null;
 
     return (
-        <div className={styles.controlsRow}>
-            <audio ref={audioRef} style={{ display: 'none' }} />
-
+        <>
+            {/* Fullscreen overlay — з'являється коли браузер блокує autoplay */}
             {isAutoplayBlocked && (
-                <button
-                    type="button"
+                <div
+                    className={styles.autoplayOverlay}
                     onClick={resumeAudio}
-                    className={styles.unmuteBanner}
-                    title={t('gameplay.unmuteAlert')}
+                    role="button"
+                    aria-label={t('gameplay.tapToUnmuteTitle')}
                 >
-                    <FaVolumeMute className={styles.pulseMuteIcon} />
-                    <span>{t('gameplay.unmuteAlert')}</span>
-                </button>
+                    <div className={styles.autoplayCard}>
+                        <span className={styles.autoplayIcon}>🔊</span>
+                        <p className={styles.autoplayTitle}>{t('gameplay.tapToUnmuteTitle')}</p>
+                        <p className={styles.autoplaySubtitle}>{t('gameplay.tapToUnmuteSubtitle')}</p>
+                    </div>
+                    <p className={styles.autoplayHint}>{t('gameplay.tapToUnmuteHint')}</p>
+                </div>
             )}
 
-            <div
-                className={styles.volumeContainer}
-                onMouseEnter={() => setShowSlider(true)}
-                onMouseLeave={() => setShowSlider(false)}
-            >
-                {volume === 0 ? (
-                    <FaVolumeMute className={styles.volumeIcon} />
-                ) : (
-                    <FaVolumeUp className={styles.volumeIcon} />
-                )}
-                {showSlider && (
-                    <div className={styles.sliderPopup}>
-                        <span className={styles.sliderLabel}>Music</span>
-                        <div className={styles.sliderRow}>
-                            <MdVolumeOff className={styles.sideIcon} />
-                            <input
-                                type="range"
-                                className={`${styles.volumeSlider} ${styles.volumeSliderDynamicTrack}`}
-                                min={0}
-                                max={1}
-                                step={0.01}
-                                value={volume}
-                                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                                style={{
-                                    ['--slider-track-fill' as any]: getSliderBackground(volume),
-                                }}
-                            />
-                            <MdVolumeUp className={styles.sideIcon} />
-                        </div>
-                    </div>
-                )}
-            </div>
+            <div className={styles.controlsRow}>
+                <audio ref={audioRef} style={{ display: 'none' }} />
 
-            <button
-                type="button"
-                onClick={toggleSfx}
-                className={styles.sfxButton}
-                title={sfxMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
-            >
-                {sfxMuted ? (
-                    <FaBellSlash className={styles.sfxIconMuted} />
-                ) : (
-                    <FaBell className={styles.sfxIcon} />
-                )}
-                <span className={styles.sfxLabel}>SFX</span>
-            </button>
-        </div>
+                <div
+                    className={styles.volumeContainer}
+                    onMouseEnter={() => setShowSlider(true)}
+                    onMouseLeave={() => setShowSlider(false)}
+                >
+                    {volume === 0 ? (
+                        <FaVolumeMute className={styles.volumeIcon} />
+                    ) : (
+                        <FaVolumeUp className={styles.volumeIcon} />
+                    )}
+                    {showSlider && (
+                        <div className={styles.sliderPopup}>
+                            <span className={styles.sliderLabel}>Music</span>
+                            <div className={styles.sliderRow}>
+                                <MdVolumeOff className={styles.sideIcon} />
+                                <input
+                                    type="range"
+                                    className={`${styles.volumeSlider} ${styles.volumeSliderDynamicTrack}`}
+                                    min={0}
+                                    max={1}
+                                    step={0.01}
+                                    value={volume}
+                                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                                    style={{
+                                        ['--slider-track-fill' as any]: getSliderBackground(volume),
+                                    }}
+                                />
+                                <MdVolumeUp className={styles.sideIcon} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <button
+                    type="button"
+                    onClick={toggleSfx}
+                    className={styles.sfxButton}
+                    title={sfxMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+                >
+                    {sfxMuted ? (
+                        <FaBellSlash className={styles.sfxIconMuted} />
+                    ) : (
+                        <FaBell className={styles.sfxIcon} />
+                    )}
+                    <span className={styles.sfxLabel}>SFX</span>
+                </button>
+            </div>
+        </>
     );
 };
 
