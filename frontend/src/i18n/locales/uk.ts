@@ -402,6 +402,7 @@ export const uk: TranslationDictionary = {
         minTracksWarning: 'Для початку гри оберіть щонайменше {{min}} треків.',
         tracksInSelection: 'Треки в обраній добірці',
         fansLabel: 'Слухачі',
+        albumsLabel: 'альбоми',
         searchArtist: 'Пошук виконавця',
         selectArtistTracksFormat: 'Як саме обрати треки?',
         formatFromAlbum: 'З альбому',

@@ -402,6 +402,7 @@ export interface TranslationDictionary {
         minTracksWarning: string;
         tracksInSelection: string;
         fansLabel: string;
+        albumsLabel: string;
         searchArtist: string;
         selectArtistTracksFormat: string;
         formatFromAlbum: string;

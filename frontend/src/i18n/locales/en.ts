@@ -402,6 +402,7 @@ export const en: TranslationDictionary = {
         minTracksWarning: 'To start the game, select at least {{min}} tracks.',
         tracksInSelection: 'Tracks in selected playlist',
         fansLabel: 'Fans',
+        albumsLabel: 'albums',
         searchArtist: 'Search for an artist',
         selectArtistTracksFormat: 'How would you like to select tracks?',
         formatFromAlbum: 'From album',

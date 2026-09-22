@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Artist.module.css';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface ArtistProfileProps {
     artist: {
@@ -14,6 +15,7 @@ interface ArtistProfileProps {
 }
 
 const ArtistDetails: React.FC<ArtistProfileProps> = ({ artist }) => {
+    const { t } = useTranslation();
     return (
         <div className={styles.wrapper}>
             <h2 className={styles.name}>{artist.name}</h2>
@@ -24,10 +26,10 @@ const ArtistDetails: React.FC<ArtistProfileProps> = ({ artist }) => {
             />
             <div className={styles.stats}>
                 {artist.nb_album !== undefined && (
-                    <p><strong>{artist.nb_album}</strong> albums</p>
+                    <p><strong>{artist.nb_album}</strong> {t('gameCreation.albumsLabel')}</p>
                 )}
                 {artist.nb_fan !== undefined && (
-                    <p><strong>{(artist.nb_fan / 1000000).toFixed(1)}M</strong> fans</p>
+                    <p><strong>{(artist.nb_fan / 1000000).toFixed(1)}M</strong> {t('gameCreation.fansLabel')}</p>
                 )}
             </div>
         </div>
