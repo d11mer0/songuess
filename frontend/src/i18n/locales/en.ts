@@ -218,6 +218,7 @@ export const en: TranslationDictionary = {
         leaveRoom: 'Leave Room',
         startGame: 'Start Game',
         roomNumber: 'Room #',
+        roomTitle: 'Game Room',
         inviteFriends: 'Invite Friends',
         confirmFinish: 'Confirm Finish',
         confirmFinishText: 'Are you sure you want to finish the game early for all participants?',

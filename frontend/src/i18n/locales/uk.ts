@@ -218,6 +218,7 @@ export const uk: TranslationDictionary = {
         leaveRoom: 'Вийти з кімнати',
         startGame: 'Почати гру',
         roomNumber: 'Кімната №',
+        roomTitle: 'Ігрова кімната',
         inviteFriends: 'Запросити друзів',
         confirmFinish: 'Підтвердження завершення',
         confirmFinishText: 'Ви впевнені, що хочете достроково завершити гру для всіх учасників?',

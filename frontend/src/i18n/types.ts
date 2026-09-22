@@ -218,6 +218,7 @@ export interface TranslationDictionary {
         leaveRoom: string;
         startGame: string;
         roomNumber: string;
+        roomTitle: string;
         inviteFriends: string;
         confirmFinish: string;
         confirmFinishText: string;
