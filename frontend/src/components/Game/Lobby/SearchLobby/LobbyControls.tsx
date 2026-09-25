@@ -181,7 +181,7 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
                     <div className={styles.modeSelectContainer}>
                         <label className={styles.modeLabel}>{t('lobby.roundDurationLabel')}</label>
                         <div className={styles.durationButtonGroup}>
-                            {[5, 10, 15, 20, 25, 30].map((sec) => (
+                            {[5, 10, 15, 20, 25].map((sec) => (
                                 <button
                                     key={sec}
                                     type="button"

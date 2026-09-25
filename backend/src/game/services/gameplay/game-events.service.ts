@@ -21,8 +21,8 @@ export class GameEventsService {
 
     emitRoundEvent(roomId: string, round: GameRound) {
         const room = this.getRoom(roomId);
-        const durationMs = (room?.lobbyOptions?.roundDuration || 25) * 1000;
-        const payload = formatRoundPayload(round, durationMs);
+        const durationSec = Math.min(25, Math.max(5, room?.lobbyOptions?.roundDuration || 25));
+        const payload = formatRoundPayload(round, durationSec * 1000);
         this.server?.to(roomId).emit('roundStarted', payload);
     }
 

@@ -28,10 +28,10 @@ export class RoundSyncService {
         const playerResults = room.gameProgress.playerResults[userId];
         const roundResult = playerResults?.[round.roundNumber];
 
-        const durationMs = (room.lobbyOptions?.roundDuration || 25) * 1000;
+        const durationSec = Math.min(25, Math.max(5, room.lobbyOptions?.roundDuration || 25));
 
         client.emit('reconnectToRound', {
-            ...formatRoundPayload(round, durationMs),
+            ...formatRoundPayload(round, durationSec * 1000),
             answer: roundResult?.answer ?? null,
         });
     }

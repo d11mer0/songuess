@@ -90,8 +90,8 @@ export class RoundManagerService {
     private startRoundTimeout(roomId: string, roundNumber: number) {
         this.clearExistingTimeout(roomId);
         const room = this.gameEvents.getRoom(roomId);
-        const durationMs = (room?.lobbyOptions?.roundDuration || 25) * 1000;
-        const timeout = setTimeout(() => this.finishRound(roomId, roundNumber), durationMs);
+        const durationSec = Math.min(25, Math.max(5, room?.lobbyOptions?.roundDuration || 25));
+        const timeout = setTimeout(() => this.finishRound(roomId, roundNumber), durationSec * 1000);
         this.roundTimeouts.set(roomId, timeout);
     }
 

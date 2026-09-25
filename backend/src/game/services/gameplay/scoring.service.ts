@@ -13,7 +13,8 @@ export class ScoringService {
     calculateRoundScores(room: GameRoom, roundNumber: number) {
         const { playerResults } = room.gameProgress!;
         const gameMode = room.lobbyOptions?.gameMode || 'CLASSIC';
-        const roundDurationMs = (room.lobbyOptions?.roundDuration || 25) * 1000;
+        const durationSec = Math.min(25, Math.max(5, room.lobbyOptions?.roundDuration || 25));
+        const roundDurationMs = durationSec * 1000;
 
         if (!room.gameProgress!.streaks) {
             room.gameProgress!.streaks = {};
