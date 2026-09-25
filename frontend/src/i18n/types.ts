@@ -10,6 +10,7 @@ export interface TranslationDictionary {
         success: string;
         pts: string;
         days: string;
+        secondsShort: string;
     };
     nav: {
         daily: string;

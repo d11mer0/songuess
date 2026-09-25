@@ -33,7 +33,7 @@ const PodiumCard = ({ player, rank, isYou }: PodiumCardProps) => {
                 <span className={styles.podiumName}>
                     {isYou ? t('gameplay.youUpper') : player.login}
                 </span>
-                <span className={styles.podiumScore}>{player.totalScore?.toFixed(2) ?? 0} pts</span>
+                <span className={styles.podiumScore}>{player.totalScore?.toFixed(2) ?? 0} {t('common.pts')}</span>
             </div>
         </div>
     );

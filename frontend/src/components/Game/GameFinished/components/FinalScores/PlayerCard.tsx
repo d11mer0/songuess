@@ -34,7 +34,7 @@ const PlayerCard = ({ player, rank, isYou }: PlayerCardProps) => {
                 {isYou ? t('gameplay.youUpper') : player.login}
             </span>
             <span className={styles.playerScore}>
-                {player.totalScore?.toFixed(2) ?? 0} pts
+                {player.totalScore?.toFixed(2) ?? 0} {t('common.pts')}
             </span>
         </div>
     );

@@ -66,7 +66,7 @@ const RoundTimer: React.FC = () => {
                     <FaRegClock /> {t('gameplay.timeLeft')}
                 </div>
                 <div className={`${styles.secondsNumber} ${isUrgent ? styles.danger : ''}`}>
-                    {secondsLeft}s
+                    {secondsLeft}{t('common.secondsShort')}
                 </div>
             </div>
             <div className={styles.timerBarWrapper}>

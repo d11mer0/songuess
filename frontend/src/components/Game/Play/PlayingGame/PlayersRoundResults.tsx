@@ -88,7 +88,7 @@ const PlayersRoundResults = () => {
                                 {r.isCorrect === false && <div className={styles.incorrectText}>{t('gameplay.incorrectAnswer')}</div>}
                                 <div className={styles.playerTime}>
                                     {t('gameplay.timeTaken')} {typeof r.timeTaken === 'number'
-                                        ? `${(r.timeTaken / 1000).toFixed(2)}s`
+                                        ? `${(r.timeTaken / 1000).toFixed(2)}${t('common.secondsShort')}`
                                         : '—'}
                                 </div>
                             </>

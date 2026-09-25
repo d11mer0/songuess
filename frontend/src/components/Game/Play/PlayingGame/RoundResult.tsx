@@ -57,7 +57,7 @@ const RoundResult = () => {
 
             {result.myResult.timeTaken !== null && result.myResult.timeTaken > 0 && (
                 <div className={styles.responseTime}>
-                    {t('gameplay.answeredIn')} {(result.myResult.timeTaken / 1000).toFixed(2)}s
+                    {t('gameplay.answeredIn')} {(result.myResult.timeTaken / 1000).toFixed(2)}{t('common.secondsShort')}
                 </div>
             )}
         </div>

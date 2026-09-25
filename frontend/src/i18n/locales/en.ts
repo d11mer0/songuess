@@ -10,6 +10,7 @@ export const en: TranslationDictionary = {
         success: 'Success!',
         pts: 'pts',
         days: 'days',
+        secondsShort: 's',
     },
     nav: {
         daily: '🎵 Song of the Day',
