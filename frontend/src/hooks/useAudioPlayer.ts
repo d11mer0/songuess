@@ -139,8 +139,14 @@ export const useAudioPlayer = ({
         audio.pause();
         audio.src = previewUrl;
         audio.volume = volume;
+        setIsPlaying(false);
+
+        let hasStarted = false;
 
         const applySeekAndPlay = () => {
+            if (hasStarted) return;
+            hasStarted = true;
+
             // Час рахується ЗАРАЗ — важливо якщо loadedmetadata затримався
             const playbackStartTime = calculateStartTime(startedAt);
             if (Number.isFinite(playbackStartTime)) {
@@ -180,10 +186,13 @@ export const useAudioPlayer = ({
             applySeekAndPlay();
         } else {
             audio.addEventListener('loadedmetadata', applySeekAndPlay, { once: true });
+            audio.addEventListener('canplay', applySeekAndPlay, { once: true });
         }
 
         return () => {
+            hasStarted = true;
             audio.removeEventListener('loadedmetadata', applySeekAndPlay);
+            audio.removeEventListener('canplay', applySeekAndPlay);
             clearMediaSessionPlayback(audio);
         };
     }, [previewUrl, startedAt]);

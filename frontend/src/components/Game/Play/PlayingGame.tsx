@@ -35,7 +35,6 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     useEffect(() => {
         setUnlockedSeconds(1);
         setHasAnswered(false);
-        setIsPlayingAudio(false);
     }, [trackInfo?.roundNumber]);
 
     const handleUnlockNext = () => {

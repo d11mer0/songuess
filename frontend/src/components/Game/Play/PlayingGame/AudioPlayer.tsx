@@ -34,9 +34,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         onPlayingChange?.(isPlaying);
     }, [isPlaying, onPlayingChange]);
 
+    useEffect(() => {
+        return () => {
+            onPlayingChange?.(false);
+        };
+    }, [onPlayingChange]);
+
     // Коли раунд закінчується і показуються результати, ставимо аудіо на паузу та очищаємо сесію
     useEffect(() => {
         if (roundResult && audioRef.current) {
+            audioRef.current.pause();
             clearMediaSessionPlayback(audioRef.current);
         }
     }, [roundResult, audioRef]);
