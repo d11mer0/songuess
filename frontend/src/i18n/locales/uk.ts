@@ -57,6 +57,7 @@ export const uk: TranslationDictionary = {
         modeClassic: '🎵 Класичний',
         modeHeardle: '⏱️ По фрагментах',
         answerModeLabel: 'Формат відповіді:',
+        roundDurationLabel: 'Час на раунд:',
         modeOptions: '🔘 4 Варіанти',
         modeHardcore: '⌨️ Ввід тексту',
         availableRooms: 'Доступні кімнати',

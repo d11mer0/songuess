@@ -476,6 +476,46 @@
     font-size: 14px;
 }
 
+/* 🔹 Room Settings Bar */
+.roomSettingsBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: 100%;
+}
+
+.settingTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px 10px;
+    color: #e2e8f0;
+}
+
+.settingIcon {
+    font-size: 14px;
+}
+
+.settingLabel {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.settingValue {
+    color: #00f3ff;
+    font-weight: 700;
+}
+
 /* 🔹 Control Section */
 .controlsSection {
     display: flex;

@@ -30,7 +30,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
     const roundDurationSec = trackInfo?.endsAt && trackInfo?.startedAt
         ? Math.max(1, Math.round((trackInfo.endsAt - trackInfo.startedAt) / 1000))
-        : 25;
+        : (currentRoom?.lobbyOptions?.roundDuration || 25);
 
     const effectiveMaxDuration = gameMode === 'HEARDLE'
         ? unlockedSeconds

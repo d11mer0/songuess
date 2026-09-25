@@ -109,6 +109,35 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
                 <InviteLink roomId={roomInfo.id} shortCode={roomInfo.shortCode} />
             </div>
 
+            {/* Room Settings Info Bar */}
+            <div className={styles.roomSettingsBar}>
+                <div className={styles.settingTag}>
+                    <span className={styles.settingIcon}>⏱️</span>
+                    <span className={styles.settingLabel}>{t('lobby.roundDurationLabel')}</span>
+                    <span className={styles.settingValue}>
+                        {roomInfo.lobbyOptions.roundDuration || 25}{t('common.secondsShort')}
+                    </span>
+                </div>
+                <div className={styles.settingTag}>
+                    <span className={styles.settingIcon}>🎮</span>
+                    <span className={styles.settingLabel}>{t('lobby.gameModeLabel')}</span>
+                    <span className={styles.settingValue}>
+                        {roomInfo.lobbyOptions.gameMode === 'HEARDLE'
+                            ? t('lobby.modeHeardle')
+                            : t('lobby.modeClassic')}
+                    </span>
+                </div>
+                <div className={styles.settingTag}>
+                    <span className={styles.settingIcon}>🎯</span>
+                    <span className={styles.settingLabel}>{t('lobby.answerModeLabel')}</span>
+                    <span className={styles.settingValue}>
+                        {roomInfo.lobbyOptions.answerMode === 'TYPE_IN'
+                            ? t('lobby.modeHardcore')
+                            : t('lobby.modeOptions')}
+                    </span>
+                </div>
+            </div>
+
             {/* Game Controls Bar */}
             <div className={styles.controlsSection}>
                 <button

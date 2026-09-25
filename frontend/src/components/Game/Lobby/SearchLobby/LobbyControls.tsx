@@ -20,6 +20,7 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
         maxPlayers: 3,
         gameMode: 'CLASSIC',
         answerMode: 'MULTIPLE_CHOICE',
+        roundDuration: 25,
     });
 
     const [isSearchingDuel, setIsSearchingDuel] = useState<boolean>(false);
@@ -56,6 +57,9 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
 
     const setAnswerMode = (mode: AnswerMode) =>
         setLobbyOptions(prev => ({ ...prev, answerMode: mode }));
+
+    const setRoundDuration = (duration: number) =>
+        setLobbyOptions(prev => ({ ...prev, roundDuration: duration }));
 
     const handleStartDuelSearch = () => {
         setIsSearchingDuel(true);
@@ -170,6 +174,23 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
                             >
                                 {t('lobby.modeHardcore')}
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Вибір тривалості раунду */}
+                    <div className={styles.modeSelectContainer}>
+                        <label className={styles.modeLabel}>{t('lobby.roundDurationLabel')}</label>
+                        <div className={styles.durationButtonGroup}>
+                            {[5, 10, 15, 20, 25, 30].map((sec) => (
+                                <button
+                                    key={sec}
+                                    type="button"
+                                    className={`${styles.durationBtn} ${(lobbyOptions.roundDuration ?? 25) === sec ? styles.active : ''}`}
+                                    onClick={() => setRoundDuration(sec)}
+                                >
+                                    {sec}{t('common.secondsShort')}
+                                </button>
+                            ))}
                         </div>
                     </div>
 

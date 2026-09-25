@@ -21,6 +21,7 @@ export interface LobbyOptions {
     gameMode?: GameMode;
     answerMode?: AnswerMode;
     roundsCount?: number;
+    roundDuration?: number;
     isPartyMode?: boolean;
 }
 

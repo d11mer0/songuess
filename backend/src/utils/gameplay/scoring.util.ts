@@ -6,13 +6,17 @@ export function calculateScore(
     isFirst: boolean,
     gameMode: GameMode = 'CLASSIC',
     snippetDurationUsed?: number,
+    roundDurationMs: number = 25000,
 ): number {
     if (!isCorrect || timeTaken === null) return 0;
+
+    const safeDuration = roundDurationMs > 0 ? roundDurationMs : 25000;
+    const timeRatio = Math.max(0, (safeDuration - timeTaken) / safeDuration);
 
     // Режим Бліц-Дуель 1v1: Бали забирає виключно перший гравець, що дав правильну відповідь!
     if (gameMode === 'DUEL') {
         if (!isFirst) return 0;
-        const timeBonus = Math.max(0, Math.floor((25000 - timeTaken) / 250));
+        const timeBonus = Math.floor(timeRatio * 100);
         return 150 + timeBonus;
     }
 
@@ -33,15 +37,14 @@ export function calculateScore(
             basePoints = 100;
         }
 
-        const timeBonus = Math.max(0, Math.floor((25000 - timeTaken) / 500));
+        const timeBonus = Math.floor(timeRatio * 50);
         let score = basePoints + timeBonus;
         if (isFirst) score += 25;
         return score;
     }
 
     // Класичний режим: залежність від швидкості реакції
-    const rawScore = Math.max(0, 25000 - timeTaken) / 10;
-    const normalizedScore = parseFloat((rawScore / 25).toFixed(2));
+    const normalizedScore = parseFloat((timeRatio * 100).toFixed(2));
 
     let finalScore = normalizedScore + 100;
     if (isFirst) finalScore += 20;

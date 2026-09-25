@@ -13,6 +13,7 @@ export class ScoringService {
     calculateRoundScores(room: GameRoom, roundNumber: number) {
         const { playerResults } = room.gameProgress!;
         const gameMode = room.lobbyOptions?.gameMode || 'CLASSIC';
+        const roundDurationMs = (room.lobbyOptions?.roundDuration || 25) * 1000;
 
         if (!room.gameProgress!.streaks) {
             room.gameProgress!.streaks = {};
@@ -37,6 +38,7 @@ export class ScoringService {
                 isFirst,
                 gameMode,
                 snippetDurationUsed,
+                roundDurationMs,
             );
 
             // Обробка стріків (Combo Multiplier):

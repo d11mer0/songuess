@@ -57,6 +57,7 @@ export interface TranslationDictionary {
         modeClassic: string;
         modeHeardle: string;
         answerModeLabel: string;
+        roundDurationLabel: string;
         modeOptions: string;
         modeHardcore: string;
         availableRooms: string;

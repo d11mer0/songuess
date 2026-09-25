@@ -57,6 +57,7 @@ export const en: TranslationDictionary = {
         modeClassic: '🎵 Classic',
         modeHeardle: '⏱️ Heardle',
         answerModeLabel: 'Answer Format:',
+        roundDurationLabel: 'Round Duration:',
         modeOptions: '🔘 4 Options',
         modeHardcore: '⌨️ Hardcore (Text)',
         availableRooms: 'Available Rooms',

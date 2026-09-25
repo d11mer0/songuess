@@ -44,6 +44,9 @@ const RoomItem = ({ room, index, onJoin }: Props) => {
 
             {/* Game mode and answer tags */}
             <div className={styles.roomTags}>
+                <span className={styles.durationTag}>
+                    ⏱️ {room.lobbyOptions?.roundDuration || 25}{t('common.secondsShort')}
+                </span>
                 <span className={styles.modeTag}>
                     {room.lobbyOptions?.gameMode === 'HEARDLE'
                         ? t('lobby.modeHeardle')
