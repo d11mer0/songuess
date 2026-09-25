@@ -10,7 +10,7 @@ import NeonVisualizer from './PlayingGame/NeonVisualizer';
 import RoundTimer from './PlayingGame/RoundTimer';
 
 import { useAppSelector } from '../../../store/hooks';
-import { selectTrackInfo, selectCurrentRoom } from '../../../store/gameplay/gameplaySelectors';
+import { selectTrackInfo, selectCurrentRoom, selectRoundResult } from '../../../store/gameplay/gameplaySelectors';
 import { useTranslation } from '../../../i18n/LanguageContext';
 import Loader from '../../UI/Loader/Loader/Loader';
 import styles from './PlayingGame.module.css';
@@ -23,9 +23,18 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const trackInfo = useAppSelector(selectTrackInfo);
+    const roundResult = useAppSelector(selectRoundResult);
 
     const gameMode = currentRoom?.lobbyOptions?.gameMode || 'CLASSIC';
     const answerMode = currentRoom?.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
+
+    const roundDurationSec = trackInfo?.endsAt && trackInfo?.startedAt
+        ? Math.max(1, Math.round((trackInfo.endsAt - trackInfo.startedAt) / 1000))
+        : 25;
+
+    const effectiveMaxDuration = gameMode === 'HEARDLE'
+        ? unlockedSeconds
+        : roundDurationSec;
 
     const [unlockedSeconds, setUnlockedSeconds] = useState<number>(1);
     const [hasAnswered, setHasAnswered] = useState<boolean>(false);
@@ -82,7 +91,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
                             <RoundTimer />
 
-                            <NeonVisualizer isPlaying={isPlayingAudio} />
+                            <NeonVisualizer isPlaying={isPlayingAudio && !roundResult} />
 
                             {gameMode === 'HEARDLE' && (
                                 <HeardleControls
@@ -105,7 +114,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
                                 <div className={styles.audioControl}>
                                     <AudioPlayer
-                                        maxPlayDuration={gameMode === 'HEARDLE' ? unlockedSeconds : undefined}
+                                        maxPlayDuration={effectiveMaxDuration}
                                         onPlayingChange={setIsPlayingAudio}
                                     />
                                 </div>

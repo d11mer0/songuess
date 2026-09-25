@@ -45,8 +45,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         if (roundResult && audioRef.current) {
             audioRef.current.pause();
             clearMediaSessionPlayback(audioRef.current);
+            onPlayingChange?.(false);
         }
-    }, [roundResult, audioRef]);
+    }, [roundResult, audioRef, onPlayingChange]);
 
     useEffect(() => {
         const unsubscribe = soundEffects.onMuteChange(setSfxMuted);

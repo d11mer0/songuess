@@ -112,15 +112,22 @@ export const useAudioPlayer = ({
         const onPlay = () => setIsPlaying(true);
         const onPause = () => setIsPlaying(false);
         const onEnded = () => setIsPlaying(false);
+        const onWaiting = () => {
+            if (audio.ended || (audio.duration && audio.currentTime >= audio.duration - 0.2)) {
+                setIsPlaying(false);
+            }
+        };
 
         audio.addEventListener('play', onPlay);
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
+        audio.addEventListener('waiting', onWaiting);
 
         return () => {
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
+            audio.removeEventListener('waiting', onWaiting);
             clearMediaSessionPlayback(audio);
         };
     }, []);
@@ -228,6 +235,10 @@ export const useAudioPlayer = ({
         if (!audio) return;
 
         const handleTimeUpdate = () => {
+            if (audio.paused || audio.ended) {
+                setIsPlaying(false);
+                return;
+            }
             if (maxPlayDuration && audio.currentTime >= maxPlayDuration) {
                 audio.pause();
                 setIsPlaying(false);
