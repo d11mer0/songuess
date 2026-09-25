@@ -79,6 +79,7 @@ export class RoomManagerService implements OnModuleInit {
             }],
             lobbyOptions: {
                 ...lobbyOptions,
+                roundDuration: Math.min(25, Math.max(5, lobbyOptions?.roundDuration || 25)),
                 allowAutoJoin: lobbyOptions.publicLobby
                     ? lobbyOptions.allowAutoJoin
                     : false,

@@ -40,6 +40,7 @@ export class RoundManagerService {
     }
 
     startRound(roomId: string, roundNumber: number, round: GameRound) {
+        round.startedAt = Date.now();
         this.startRoundTimeout(roomId, roundNumber);
         this.gameEvents.emitRoundEvent(roomId, round);
     }

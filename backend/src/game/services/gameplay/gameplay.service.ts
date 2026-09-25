@@ -66,7 +66,7 @@ export class GameplayService {
         };
 
         this.roomManager.syncRoom(room);
-        this.roundManager.startRound(roomId, 0, rounds[0]);
+        this.roundManager.startRound(room.id, 0, rounds[0]);
     }
 
     handleAnswer(client: Socket, roomId: string, roundNumber: number, answer: string, snippetDurationUsed?: number) {
@@ -113,7 +113,7 @@ export class GameplayService {
         const targetCount = Math.max(1, onlineCount);
         const allAnswered = checkAllPlayersAnswered(playerResults, roundNumber, targetCount);
         if (allAnswered) {
-            this.roundManager.finishRound(roomId, roundNumber);
+            this.roundManager.finishRound(room.id, roundNumber);
         }
     }
 
@@ -135,6 +135,6 @@ export class GameplayService {
         this.roomHelperService.cancelRoomCleanup(room.id);
         this.roomManager.syncRoom(room);
         this.roomManager.broadcastRoomsList();
-        this.server?.to(roomId).emit('gameRestarted', room);
+        this.server?.to(room.id).emit('gameRestarted', room);
     }
 }
