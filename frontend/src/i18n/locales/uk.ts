@@ -398,7 +398,7 @@ export const uk: TranslationDictionary = {
         typeArtist: '🎤 Виконавець',
         typePlaylist: '🎵 Плейлист',
         typeAlbum: '💿 Альбом',
-        typeUrl: '🔗 Посилання / URL',
+        typeUrl: '🔗 Лінк / URL',
         hostPreparingTitle: 'Ведучий налаштовує гру',
         hostPreparingSubtext: 'Зачекайте, поки лідер кімнати обере треки!',
         clearSelection: 'Очистити вибір',
