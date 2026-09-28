@@ -32,10 +32,11 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
             style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                borderRadius: '20px',
-                padding: '2px',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                backgroundColor: 'rgba(28, 22, 44, 0.85)',
+                borderRadius: '24px',
+                padding: '3px',
+                border: '1.5px solid rgba(155, 93, 229, 0.35)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(155, 93, 229, 0.1)',
             }}
         >
             <button
@@ -44,16 +45,17 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
                 style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    background: language === 'uk' ? 'linear-gradient(135deg, #0057b7 0%, #ffd700 100%)' : 'transparent',
-                    color: language === 'uk' ? '#ffffff' : '#aaaaaa',
-                    border: 'none',
+                    background: language === 'uk' ? 'linear-gradient(135deg, rgba(0, 87, 183, 0.9) 0%, rgba(255, 215, 0, 0.9) 100%)' : 'transparent',
+                    color: language === 'uk' ? '#ffffff' : 'rgba(255, 255, 255, 0.6)',
+                    border: language === 'uk' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
                     borderRadius: '16px',
-                    padding: '3px 8px',
+                    padding: '4px 10px',
                     fontSize: '0.8rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textShadow: language === 'uk' ? '0 1px 2px rgba(0,0,0,0.6)' : 'none',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: language === 'uk' ? '0 0 12px rgba(0, 243, 255, 0.4)' : 'none',
+                    textShadow: language === 'uk' ? '0 1px 3px rgba(0,0,0,0.8)' : 'none',
                     whiteSpace: 'nowrap',
                 }}
                 title="Українська"
@@ -66,16 +68,17 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
                 style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    background: language === 'en' ? 'linear-gradient(135deg, #c8102e 0%, #012169 100%)' : 'transparent',
-                    color: language === 'en' ? '#ffffff' : '#aaaaaa',
-                    border: 'none',
+                    background: language === 'en' ? 'linear-gradient(135deg, rgba(200, 16, 46, 0.9) 0%, rgba(1, 33, 105, 0.9) 100%)' : 'transparent',
+                    color: language === 'en' ? '#ffffff' : 'rgba(255, 255, 255, 0.6)',
+                    border: language === 'en' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
                     borderRadius: '16px',
-                    padding: '3px 8px',
+                    padding: '4px 10px',
                     fontSize: '0.8rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textShadow: language === 'en' ? '0 1px 2px rgba(0,0,0,0.6)' : 'none',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: language === 'en' ? '0 0 12px rgba(241, 91, 181, 0.4)' : 'none',
+                    textShadow: language === 'en' ? '0 1px 3px rgba(0,0,0,0.8)' : 'none',
                     whiteSpace: 'nowrap',
                 }}
                 title="English"

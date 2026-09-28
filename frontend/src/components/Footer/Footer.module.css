@@ -1,130 +1,464 @@
 .footer {
-    background-color: var(--background-primary);
-    padding: 20px;
-    text-align: center;
-    border-top: 1px solid var(--background-secondary);
+    background: linear-gradient(180deg, rgba(16, 12, 26, 0.98) 0%, rgba(9, 6, 16, 1) 100%);
+    border-top: 1px solid rgba(155, 93, 229, 0.28);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5), 0 -1px 20px rgba(155, 93, 229, 0.08);
+    padding: 48px 24px 28px 24px;
+    box-sizing: border-box;
+    color: var(--text-main);
+    width: 100%;
+}
+
+.footerInner {
+    max-width: 1260px;
+    margin: 0 auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    gap: 36px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1.4fr;
+    gap: 36px;
+    align-items: flex-start;
+}
+
+/* Brand Column */
+.brandCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.brandLogo {
+    display: inline-flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+    text-decoration: none;
+    font-family: var(--font-title);
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 40%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
 }
 
-/* Навігація */
-.footerNav ul {
+.brandLogo:hover {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5));
+}
+
+.logoImg {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    object-fit: cover;
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.65));
+}
+
+.brandTagline {
+    color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-main);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 12px 0 16px 0;
+    max-width: 300px;
+}
+
+.statusIndicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(0, 243, 255, 0.08);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+.statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00f3ff;
+    box-shadow: 0 0 8px #00f3ff;
+    animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 1;
+    }
+}
+
+.statusText {
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+    font-weight: 700;
+    color: #00f3ff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Links Columns */
+.linksCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.colTitle {
+    font-family: var(--font-title);
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+}
+
+.colIcon {
+    color: #9b5de5;
+    font-size: 15px;
+}
+
+.linksList {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap; /* Додає адаптивність, якщо бракує місця */
-}
-
-.footerNav a {
-    text-decoration: none;
-    color: var(--secondary-color);
-    transition: color 0.2s ease-in-out;
-}
-
-.footerNav a:hover {
-    color: var(--secondary-hover);
-}
-
-/* Соцмережі */
-.footerSocials {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.footerSocials a {
-    color: var(--text-main);
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-}
-
-.footerSocials a:hover {
-    color: var(--text-hover);
-}
-
-/* Форма підписки */
-.newsletter {
-    display: flex;
-    justify-content: center;
+    flex-direction: column;
     gap: 10px;
 }
 
-.newsletter input {
-    padding: 8px;
-    border: 1px solid var(--background-tertiary);
-    background-color: var(--background-secondary);
-    color: var(--text-main);
-    border-radius: 4px;
-    width: 200px;
-}
-
-.newsletter input::placeholder {
-    color: var(--text-secondary);
-}
-
-.newsletter input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 5px var(--primary-color);
-}
-
-.newsletter button {
-    background-color: var(--primary-color);
-    color: white;
+.footerLink,
+.modalTriggerBtn {
+    background: none;
     border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition:
-        background-color 0.2s ease-in-out,
-        transform 0.1s ease-in-out;
-}
-
-.newsletter button:hover {
-    background-color: var(--primary-hover);
-    transform: scale(1.05);
-}
-
-.newsletter button:active {
-    background-color: var(--primary-active);
-}
-
-/* Копірайт */
-.copyright {
+    padding: 0;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-main);
     font-size: 14px;
-    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
 }
 
-/* ---- АДАПТИВНІСТЬ ---- */
-@media (max-width: 600px) {
-    .footerNav ul {
-        flex-direction: column; /* Робить навігацію вертикальною */
-        gap: 10px;
+.footerLink:hover,
+.modalTriggerBtn:hover {
+    color: #00f3ff;
+    transform: translateX(3px);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+}
+
+/* Newsletter Column */
+.newsletterCol {
+    display: flex;
+    flex-direction: column;
+}
+
+.newsletterDesc {
+    color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-main);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
+}
+
+.newsletterForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputWrapper {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.newsletterInput {
+    flex: 1;
+    min-width: 160px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(155, 93, 229, 0.35);
+    color: #ffffff;
+    font-family: var(--font-main);
+    font-size: 13.5px;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.newsletterInput::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.newsletterInput:focus {
+    border-color: #00f3ff;
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.subscribeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #9b5de5 0%, #f15bb5 100%);
+    border: 1px solid rgba(241, 91, 181, 0.4);
+    color: #ffffff;
+    font-family: var(--font-title);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(155, 93, 229, 0.35);
+}
+
+.subscribeBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(241, 91, 181, 0.5);
+    border-color: #f15bb5;
+}
+
+.subscribeBtn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.subscribedState {
+    background: linear-gradient(135deg, #00f3ff 0%, #00b4d8 100%) !important;
+    border-color: #00f3ff !important;
+    color: #000000 !important;
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.5) !important;
+}
+
+.btnIcon {
+    font-size: 13px;
+}
+
+/* Socials Row */
+.socialsRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding-top: 4px;
+}
+
+.socialPill {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid rgba(155, 93, 229, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.socialPill:hover {
+    background: rgba(155, 93, 229, 0.2);
+    border-color: #00f3ff;
+    color: #00f3ff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 243, 255, 0.3);
+}
+
+.discord:hover {
+    border-color: #5865F2;
+    color: #5865F2;
+    box-shadow: 0 6px 18px rgba(88, 101, 242, 0.35);
+}
+
+.twitter:hover {
+    border-color: #1DA1F2;
+    color: #1DA1F2;
+    box-shadow: 0 6px 18px rgba(29, 161, 242, 0.35);
+}
+
+.telegram:hover {
+    border-color: #0088cc;
+    color: #0088cc;
+    box-shadow: 0 6px 18px rgba(0, 136, 204, 0.35);
+}
+
+.divider {
+    height: 1px;
+    border: none;
+    background: linear-gradient(90deg, transparent, rgba(155, 93, 229, 0.35), transparent);
+    margin: 0;
+    width: 100%;
+}
+
+/* Bottom Bar */
+.bottomBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-main);
+}
+
+.copyright {
+    margin: 0;
+}
+
+.craftedWith {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Info Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+.modalCard {
+    background: linear-gradient(160deg, rgba(28, 22, 44, 0.98) 0%, rgba(16, 12, 28, 0.99) 100%);
+    border: 1.5px solid rgba(155, 93, 229, 0.45);
+    border-radius: 20px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(155, 93, 229, 0.2);
+    padding: 26px 28px;
+    box-sizing: border-box;
+    animation: popScaleModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popScaleModal {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(155, 93, 229, 0.25);
+}
+
+.modalTitle {
+    font-family: var(--font-title);
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 40%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.closeBtn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+    background: rgba(255, 0, 127, 0.2);
+    border-color: #ff3366;
+    color: #ff3366;
+}
+
+.modalBody {
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-main);
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
     }
 
-    .footerSocials {
-        flex-direction: column; /* Соцмережі в стовпчик */
+    .brandCol {
+        grid-column: span 2;
+    }
+
+    .newsletterCol {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 580px) {
+    .footer {
+        padding: 36px 16px 24px 16px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 26px;
+    }
+
+    .brandCol,
+    .newsletterCol {
+        grid-column: auto;
+    }
+
+    .bottomBar {
+        flex-direction: column;
+        text-align: center;
         gap: 8px;
-    }
-
-    .newsletter {
-        flex-direction: column; /* Форма підписки в колонку */
-        gap: 8px;
-    }
-
-    .newsletter input {
-        width: 100%; /* Розтягується на всю доступну ширину */
-        max-width: 250px; /* Але не більше ніж 250px */
-    }
-
-    .newsletter button {
-        width: 100%;
-        max-width: 250px;
     }
 }

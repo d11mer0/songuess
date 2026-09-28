@@ -10,6 +10,7 @@ import { socketInstance } from '../../services/socket';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../assets/avatars/presetAvatars';
+import { FaChevronDown, FaUserCircle, FaSignOutAlt, FaBars } from 'react-icons/fa';
 
 const Navigation: React.FC = () => {
     const { isAuthenticated, user } = useSelector(
@@ -100,11 +101,9 @@ const Navigation: React.FC = () => {
                                     {isPremium && '⭐ '}
                                     {user?.login}
                                 </span>
-                                <span
+                                <FaChevronDown
                                     className={`${styles.arrow} ${isDropdownOpen ? styles.rotate : ''}`}
-                                >
-                                    &#9662;
-                                </span>
+                                />
 
                                 {isDropdownOpen && (
                                     <div className={styles.dropdownMenu}>
@@ -113,19 +112,21 @@ const Navigation: React.FC = () => {
                                             className={styles.dropdownItem}
                                             onClick={() => setIsDropdownOpen(false)}
                                         >
-                                            {t('nav.editProfile')}
+                                            <FaUserCircle className={styles.dropdownIcon} />
+                                            <span>{t('nav.editProfile')}</span>
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className={styles.dropdownItem}
+                                            className={`${styles.dropdownItem} ${styles.logoutItem}`}
                                         >
-                                            {t('nav.logout')}
+                                            <FaSignOutAlt className={styles.dropdownIcon} />
+                                            <span>{t('nav.logout')}</span>
                                         </button>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <Link to="/auth/login" className={styles.navLink}>
+                            <Link to="/auth/login" className={styles.loginBtn}>
                                 {t('nav.login')}
                             </Link>
                         )}
@@ -139,7 +140,8 @@ const Navigation: React.FC = () => {
                         className={styles.burger}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
-                        {t('nav.menu')}
+                        <FaBars />
+                        <span>{t('nav.menu')}</span>
                     </button>
                     <div
                         className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}
