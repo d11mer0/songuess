@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from '../../UI/Button/Button';
 import RoomShareModal from './RoomShareModal';
-import { FaQrcode } from 'react-icons/fa';
+import { FaQrcode, FaGamepad, FaCopy, FaCheck } from 'react-icons/fa';
 import styles from '../../../pages/Game/Gameplay.module.css';
 import { useTranslation } from '../../../i18n/LanguageContext';
 
@@ -28,79 +28,52 @@ const GameplayHeader = ({ roomId, shortCode, showPlayers, togglePlayers }: Gamep
     return (
         <>
             <div className={styles.headerRow}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, flexWrap: 'wrap' }}>
-                    <h3 className={styles.title}>🎮 {t('gameplay.roomTitle')}</h3>
+                <div className={styles.headerLeft}>
+                    <h3 className={styles.headerTitle}>
+                        <FaGamepad className={styles.gamepadIcon} />
+                        <span>{t('gameplay.roomTitle')}</span>
+                    </h3>
                     {shortCode && (
                         <div style={{ position: 'relative', display: 'inline-block' }}>
                             <button
                                 onClick={handleCopyCode}
                                 title={t('lobby.clickToCopy')}
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(0,243,255,0.15), rgba(139,92,246,0.15))',
-                                    border: '1.5px solid #00f3ff',
-                                    borderRadius: '8px',
-                                    padding: '5px 12px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                onMouseEnter={e => (e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,243,255,0.25), rgba(139,92,246,0.25))')}
-                                onMouseLeave={e => (e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,243,255,0.15), rgba(139,92,246,0.15))')}
+                                className={styles.codeButton}
                             >
-                                <span style={{ fontSize: '13px', color: '#aaa', fontWeight: 500 }}>
+                                <span className={styles.codeLabel}>
                                     {t('gameplay.roomCode')}:
                                 </span>
-                                <span style={{
-                                    fontSize: '16px',
-                                    fontWeight: '800',
-                                    color: '#00f3ff',
-                                    letterSpacing: '2px',
-                                    fontFamily: 'monospace',
-                                }}>
+                                <span className={styles.codeValue}>
                                     {shortCode}
                                 </span>
-                                <span style={{ fontSize: '13px' }}>
-                                    {copied ? '✅' : '📋'}
+                                <span className={styles.codeIcon}>
+                                    {copied ? <FaCheck /> : <FaCopy />}
                                 </span>
                             </button>
                             {copied && (
-                                <span style={{
-                                    position: 'absolute',
-                                    bottom: '-28px',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    background: 'rgba(0,0,0,0.8)',
-                                    color: '#00f3ff',
-                                    fontSize: '12px',
-                                    padding: '3px 8px',
-                                    borderRadius: '4px',
-                                    whiteSpace: 'nowrap',
-                                    pointerEvents: 'none',
-                                }}>
+                                <span className={styles.copiedBadge}>
                                     {t('shareModal.codeCopied')}
                                 </span>
                             )}
                         </div>
                     )}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                <div className={styles.headerRight}>
                     <Button
                         variant="primary"
                         onClick={() => setIsShareOpen(true)}
-                        style={{ whiteSpace: 'nowrap', padding: '8px 14px', fontSize: '14px' }}
+                        className={styles.headerBtn}
                     >
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <FaQrcode /> {t('gameplay.qrAndCode')}
                         </span>
                     </Button>
                     <Button
-                        variant="neutral"
+                        variant={showPlayers ? 'secondary' : 'neutral'}
                         onClick={togglePlayers}
                         aria-expanded={showPlayers}
                         aria-controls="players-section"
-                        style={{ whiteSpace: 'nowrap', padding: '8px 14px', fontSize: '14px' }}
+                        className={styles.headerBtn}
                     >
                         {showPlayers ? t('gameplay.hidePlayers') : t('gameplay.showPlayers')}
                     </Button>

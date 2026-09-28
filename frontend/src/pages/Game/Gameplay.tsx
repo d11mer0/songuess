@@ -4,8 +4,7 @@ import { useGameplay } from '../../hooks/Gameplay/useGameplay';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
 import { useAppSelector } from '../../store/hooks';
 import RoomPlayerList from '../../components/Game/Lobby/JoinedLobby/RoomPlayerList';
-import Button from '../../components/UI/Button/Button';
-import CustomModal from '../../components/UI/Modal/Modal';
+import { FaFlagCheckered, FaDoorOpen } from 'react-icons/fa';
 import GameplayHeader from '../../components/Game/Gameplay/GameplayHeader';
 import GameContent from '../../components/Game/Gameplay/GameContent';
 
@@ -50,13 +49,21 @@ const Gameplay = () => {
                     />
                     <div className={styles.finishButtonWrapper}>
                         {currentRoom?.leaderId === user?.id ? (
-                            <Button width="300px" variant="danger" onClick={() => setShowFinishModal(true)}>
-                                {t('gameplay.finishGame')}
-                            </Button>
+                            <button
+                                className={styles.finishGameBtn}
+                                onClick={() => setShowFinishModal(true)}
+                            >
+                                <FaFlagCheckered />
+                                <span>{t('gameplay.finishGame')}</span>
+                            </button>
                         ) : (
-                            <Button width="300px" variant="danger" onClick={() => leaveRoom()}>
-                                {t('gameplay.leaveGame')}
-                            </Button>
+                            <button
+                                className={styles.finishGameBtn}
+                                onClick={() => leaveRoom()}
+                            >
+                                <FaDoorOpen />
+                                <span>{t('gameplay.leaveGame')}</span>
+                            </button>
                         )}
                     </div>
                 </div>

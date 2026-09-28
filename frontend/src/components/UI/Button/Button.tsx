@@ -12,11 +12,12 @@ const Button: React.FC<ButtonProps> = ({
     width,
     isNotAdaptive,
     style,
+    className,
     ...props
 }) => {
     return (
         <button
-            className={`${styles.button} ${styles[variant] || ''} ${!isNotAdaptive ? styles.responsive : ''}`}
+            className={`${styles.button} ${styles[variant] || ''} ${!isNotAdaptive ? styles.responsive : ''} ${className || ''}`}
             style={{ width: width || 'auto', ...style }}
             {...props}
         >

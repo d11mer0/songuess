@@ -1,31 +1,167 @@
-.loaderWrapper {
+.loaderContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.fullScreen {
+    min-height: calc(100vh - 180px);
+}
+
+.glowCard {
+    background: linear-gradient(160deg, rgba(28, 22, 44, 0.95) 0%, rgba(16, 12, 28, 0.98) 100%);
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
+    padding: 36px 44px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 20px;
+    min-width: 260px;
+    max-width: 380px;
+    width: 100%;
+    box-sizing: border-box;
+    animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.spinnerWrapper {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px;
 }
 
-.spinner {
-    width: 80px;
-    height: 80px;
-    border: 8px solid var(--primary-color);
-    border-top: 8px solid var(--primary-hover);
+.outerRing {
+    position: absolute;
+    inset: 0;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    border: 3px solid transparent;
+    border-top-color: #00f3ff;
+    border-right-color: #9b5de5;
+    animation: spinClockwise 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.5));
 }
 
-.text {
-    font-size: 18px;
-    color: var(--text-main);
-    font-weight: bold;
+.innerRing {
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    border-bottom-color: #f15bb5;
+    border-left-color: #9b5de5;
+    animation: spinCounterClockwise 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    filter: drop-shadow(0 0 6px rgba(241, 91, 181, 0.45));
 }
 
-@keyframes spin {
+.centerIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulseIcon 1.5s ease-in-out infinite;
+}
+
+.musicIcon {
+    font-size: 22px;
+    color: #ffffff;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}
+
+@keyframes spinClockwise {
     0% {
         transform: rotate(0deg);
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes spinCounterClockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes pulseIcon {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.18);
+        opacity: 1;
+        filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.8));
+    }
+}
+
+.textWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.title {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    background: linear-gradient(135deg, #ffffff 40%, #00f3ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.subtext {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+.pulseBarWrapper {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.pulseBar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, #00f3ff, #9b5de5, transparent);
+    border-radius: 4px;
+    animation: slideProgress 1.6s ease-in-out infinite;
+}
+
+@keyframes slideProgress {
+    0% {
+        left: -40%;
+    }
+    100% {
+        left: 100%;
     }
 }

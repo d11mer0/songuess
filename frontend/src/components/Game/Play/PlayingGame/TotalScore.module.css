@@ -1,9 +1,11 @@
 .wrapper {
-    background-color: var(--background-secondary);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px var(--primary-box-shadow-color);
-    padding: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(160deg, rgba(28, 22, 44, 0.95) 0%, rgba(16, 12, 28, 0.98) 100%);
+    border-radius: 22px;
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(155, 93, 229, 0.12);
+    padding: 22px 18px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .header {
@@ -12,15 +14,17 @@
     justify-content: space-between;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(155, 93, 229, 0.2);
 }
 
 .title {
     font-family: var(--font-title);
-    font-size: 26px;
-    color: var(--primary-color);
-    letter-spacing: 1.2px;
-    text-shadow: 1px 1px var(--text-shadow-color);
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffd700 0%, #ff8c00 45%, #f15bb5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.8px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -45,17 +49,18 @@
 }
 
 .playerCountBadge {
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 3px 8px;
-    border-radius: 12px;
-    letter-spacing: 0.5px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.35);
+    padding: 4px 10px;
+    border-radius: 14px;
+    letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    text-transform: uppercase;
 }
 
 .list {
@@ -75,41 +80,42 @@
     gap: 12px;
     min-height: 58px;
     padding: 8px 12px;
-    border-radius: 12px;
-    background-color: var(--background-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
 }
 
 .item:hover {
-    background-color: rgba(255, 255, 255, 0.07);
-    border-color: rgba(155, 93, 229, 0.35);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(155, 93, 229, 0.45);
+    transform: translateX(2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Current User Highlight (.me) ── */
 .me {
-    border: 1.5px solid #28c76f;
-    box-shadow: 0 0 14px rgba(40, 199, 111, 0.3), inset 0 0 10px rgba(40, 199, 111, 0.06);
-    background: linear-gradient(90deg, rgba(40, 199, 111, 0.16) 0%, rgba(20, 40, 30, 0.35) 100%);
+    border: 1.5px solid #00f3ff;
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.25), inset 0 0 10px rgba(0, 243, 255, 0.06);
+    background: linear-gradient(90deg, rgba(0, 243, 255, 0.14) 0%, rgba(155, 93, 229, 0.12) 100%);
 }
 
 .me:hover {
-    border-color: #3dbf74;
-    box-shadow: 0 0 20px rgba(40, 199, 111, 0.45), inset 0 0 14px rgba(40, 199, 111, 0.1);
+    border-color: #00f3ff;
+    box-shadow: 0 0 22px rgba(0, 243, 255, 0.4), inset 0 0 14px rgba(0, 243, 255, 0.1);
 }
 
 .onStreakItem {
-    border-color: rgba(255, 85, 0, 0.5);
-    background: linear-gradient(90deg, rgba(255, 85, 0, 0.14), var(--background-tertiary));
+    border-color: rgba(255, 85, 0, 0.6);
+    background: linear-gradient(90deg, rgba(255, 85, 0, 0.18) 0%, rgba(28, 22, 44, 0.6) 100%);
 }
 
 /* ── Rank Badge ── */
 .rank {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,25 +139,25 @@
 .top1 {
     background: linear-gradient(135deg, #ffd700 0%, #ff9900 100%);
     color: #1a1200;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.55);
 }
 
 .top2 {
-    background: linear-gradient(135deg, #f0f0f0 0%, #a0a0a0 100%);
-    color: #1a1a1a;
-    box-shadow: 0 0 8px rgba(220, 220, 220, 0.35);
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    color: #0f172a;
+    box-shadow: 0 0 10px rgba(226, 232, 240, 0.35);
 }
 
 .top3 {
-    background: linear-gradient(135deg, #e69138 0%, #b45f06 100%);
+    background: linear-gradient(135deg, #f97316 0%, #b45309 100%);
     color: #ffffff;
-    box-shadow: 0 0 8px rgba(230, 145, 56, 0.4);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
 }
 
 .topNormal {
     background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ── Name & Avatar Block ── */
@@ -177,13 +183,14 @@
     height: 42px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--primary-color);
+    border: 2px solid rgba(155, 93, 229, 0.4);
     display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .me .avatar {
-    border-color: #28c76f;
-    box-shadow: 0 0 8px rgba(40, 199, 111, 0.4);
+    border-color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
 }
 
 .flameAvatar .avatar {
@@ -226,10 +233,9 @@
 
 .name {
     font-family: var(--font-title);
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-hover, #ffffff);
-    text-shadow: 1px 1px var(--background-highlight);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -238,10 +244,11 @@
 }
 
 .nameMe {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #00f3ff !important;
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
 }
 
 /* ── Streak Pill ── */
@@ -279,19 +286,21 @@
 }
 
 .scoreValue {
-    font-family: var(--font-mono, monospace);
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--secondary-color, #f15bb5);
-    text-shadow: 0 0 10px rgba(241, 91, 181, 0.3);
+    font-family: var(--font-title);
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #f15bb5, #ff007f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
 }
 
 .scoreUnit {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: rgba(255, 255, 255, 0.45);
     text-transform: lowercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
 }
 
 @keyframes flamePulse {
@@ -306,10 +315,11 @@
 @media (max-width: 600px) {
     .wrapper {
         padding: 14px;
+        border-radius: 16px;
     }
 
     .title {
-        font-size: 22px;
+        font-size: 20px;
     }
 
     .item {
@@ -317,12 +327,14 @@
         gap: 8px;
         padding: 6px 10px;
         min-height: 50px;
+        border-radius: 10px;
     }
 
     .rank {
         width: 28px;
         height: 28px;
         font-size: 12px;
+        border-radius: 8px;
     }
 
     .avatarContainer,
@@ -340,6 +352,6 @@
     }
 
     .scoreValue {
-        font-size: 1rem;
+        font-size: 1.15rem;
     }
 }

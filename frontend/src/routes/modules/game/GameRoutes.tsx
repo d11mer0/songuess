@@ -12,7 +12,7 @@ const LeaderboardPage = lazy(() => import('../../../pages/Game/Leaderboard/Leade
 
 const GameRoutes: React.FC = () => (
     <ErrorBoundary fallbackTitle="Помилка ігрової кімнати">
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loader isFullScreen />}>
             <Routes>
                 <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<GameLobby />} />
