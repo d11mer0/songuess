@@ -328,6 +328,14 @@ export interface TranslationDictionary {
         musicDetailsViewAllSpotifySub: string;
         musicDetailsViewAllDeezer: string;
         musicDetailsViewAllDeezerSub: string;
+        musicDetailsRecordTypeAlbum: string;
+        musicDetailsRecordTypeSingle: string;
+        musicDetailsRecordTypeEP: string;
+        musicDetailsRecordTypeCompilation: string;
+        musicDetailsDragToSeek: string;
+        musicDetailsLiveBadge: string;
+        musicDetailsExplicitBadge: string;
+        musicDetailsCleanBadge: string;
     };
     shareModal: {
         title: string;

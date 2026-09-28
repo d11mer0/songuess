@@ -41,13 +41,15 @@ interface ArtistDetailsViewProps {
 const DEFAULT_ARTIST_AVATAR = 'https://e-cdns-images.dzcdn.net/images/artist/d41d8cd98f00b204e9800998ecf8427e/250x250-000000-80-0-0.jpg';
 const DEFAULT_ALBUM_COVER = 'https://e-cdns-images.dzcdn.net/images/cover/d41d8cd98f00b204e9800998ecf8427e/250x250-000000-80-0-0.jpg';
 
-const formatFansCount = (fans: number) => {
+const formatFansCount = (fans: number, lang: 'uk' | 'en' = 'uk') => {
     if (!fans || isNaN(fans)) return '0';
     if (fans >= 1_000_000) {
-        return `${(fans / 1_000_000).toFixed(1)}M`;
+        const val = (fans / 1_000_000).toFixed(1);
+        return lang === 'uk' ? `${val} млн` : `${val}M`;
     }
     if (fans >= 1_000) {
-        return `${(fans / 1_000).toFixed(1)}K`;
+        const val = (fans / 1_000).toFixed(1);
+        return lang === 'uk' ? `${val} тис.` : `${val}K`;
     }
     return fans.toLocaleString();
 };
@@ -201,6 +203,23 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
         ? relatedData.data.slice(0, 6)
         : [];
 
+    const formatRecordType = (recordType?: string) => {
+        const type = recordType?.toLowerCase();
+        switch (type) {
+            case 'album':
+                return t('gameplay.musicDetailsRecordTypeAlbum');
+            case 'single':
+                return t('gameplay.musicDetailsRecordTypeSingle');
+            case 'ep':
+                return t('gameplay.musicDetailsRecordTypeEP');
+            case 'compile':
+            case 'compilation':
+                return t('gameplay.musicDetailsRecordTypeCompilation');
+            default:
+                return recordType ? recordType.toUpperCase() : '';
+        }
+    };
+
     const isGlobalLoading = (isNumericId && isArtistLoading) || (shouldSearch && isSearchLoading);
 
     return (
@@ -232,7 +251,7 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
                                 title={`${nbFans.toLocaleString()} ${t('gameplay.musicDetailsArtistFans')}`}
                             >
                                 <FaUsers style={{ color: '#00f3ff' }} />
-                                <span>{formatFansCount(nbFans)} {t('gameplay.musicDetailsArtistFans')}</span>
+                                <span>{formatFansCount(nbFans, language === 'uk' ? 'uk' : 'en')} {t('gameplay.musicDetailsArtistFans')}</span>
                             </span>
                         )}
                         {nbAlbums !== undefined && (
@@ -393,7 +412,7 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
                                             {releaseYear && <span>{releaseYear}</span>}
                                             {album.record_type && (
                                                 <span className={styles.albumTypeChip}>
-                                                    {album.record_type.toUpperCase()}
+                                                    {formatRecordType(album.record_type)}
                                                 </span>
                                             )}
                                         </div>
@@ -508,7 +527,7 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
                                 <span className={styles.relatedArtistName}>{artist.name}</span>
                                 {artist.nb_fan ? (
                                     <span className={styles.relatedArtistFans}>
-                                        {formatFansCount(artist.nb_fan)}
+                                        {formatFansCount(artist.nb_fan, language === 'uk' ? 'uk' : 'en')}
                                     </span>
                                 ) : null}
                             </button>

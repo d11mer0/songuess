@@ -322,7 +322,7 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                         ref={progressBarRef}
                         className={`${styles.progressBarTrack} ${isDragging ? styles.progressBarDragging : ''}`}
                         onPointerDown={handlePointerDown}
-                        title="Drag to seek"
+                        title={t('gameplay.musicDetailsDragToSeek')}
                     >
                         <div
                             className={styles.progressBarFill}
@@ -561,7 +561,7 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                             <FaBroadcastTower className={styles.metaIcon} style={{ color: '#00bbf9' }} />
                             <span className={styles.metaLabel}>{t('gameplay.musicDetailsRadioAvailable')}</span>
                         </div>
-                        <span className={styles.metaValueChip}>✓ Live</span>
+                        <span className={styles.metaValueChip}>✓ {t('gameplay.musicDetailsLiveBadge')}</span>
                     </div>
                 )}
                 <div className={styles.metaCard}>
@@ -569,9 +569,9 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                         <span className={styles.metaLabel}>{t('gameplay.musicDetailsExplicit')}</span>
                     </div>
                     {isExplicit ? (
-                        <span className={styles.explicitBadge}>EXPLICIT 18+</span>
+                        <span className={styles.explicitBadge}>{t('gameplay.musicDetailsExplicitBadge')}</span>
                     ) : (
-                        <span className={styles.cleanBadge}>CLEAN</span>
+                        <span className={styles.cleanBadge}>{t('gameplay.musicDetailsCleanBadge')}</span>
                     )}
                 </div>
             </div>
