@@ -12,6 +12,12 @@ export class SpotifyController {
         return this.spotifyService.searchArtist(query);
     }
 
+    @Public()
+    @Get('track')
+    async searchTrack(@Query('query') query: string) {
+        return this.spotifyService.searchTrack(query);
+    }
+
     @Get('top-tracks')
     async getTopTracks(@Query('artistId') artistId: string) {
         return await this.spotifyService.getTopTracks(artistId);

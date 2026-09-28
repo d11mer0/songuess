@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import { DeezerModule } from './deezer/deezer.module';
+import { SpotifyModule } from './spotify/spotify.module';
 import { GameModule } from './game/game.module';
 import { DailyModule } from './daily/daily.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
@@ -42,6 +43,7 @@ import { HealthController } from './health/health.controller';
         AuthModule,
         SongsModule,
         DeezerModule,
+        SpotifyModule,
         GameModule,
         DailyModule,
         LeaderboardModule,

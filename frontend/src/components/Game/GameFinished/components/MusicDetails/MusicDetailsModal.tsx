@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './MusicDetailsModal.module.css';
 import { RoundTrackWithoutPreview } from '../../../../../types/gameEndedTypes';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
@@ -73,7 +74,7 @@ const MusicDetailsModal: React.FC<MusicDetailsModalProps> = ({
     const artistName = selectedArtist?.name || track?.artistName || '';
     const artistId = selectedArtist?.id || track?.artistId;
 
-    return (
+    return createPortal(
         <div
             className={styles.modalOverlay}
             onClick={(e) => {
@@ -130,7 +131,8 @@ const MusicDetailsModal: React.FC<MusicDetailsModalProps> = ({
                     />
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

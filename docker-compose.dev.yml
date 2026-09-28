@@ -49,11 +49,15 @@ services:
       - "5555:5555"  # Prisma Studio
     volumes:
       - ./backend:/app
-      - /app/node_modules
+    env_file:
+      - ./backend/.env
     environment:
       DATABASE_URL: "postgresql://dimero:password@db:5432/songuess"
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
   frontend-dev:
     build:
       context: ./frontend

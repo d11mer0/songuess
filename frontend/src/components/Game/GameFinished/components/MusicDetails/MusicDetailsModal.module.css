@@ -2,17 +2,20 @@
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100vw;
     height: 100vh;
     background: rgba(8, 5, 16, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 999999;
     padding: 16px;
     box-sizing: border-box;
     animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    contain: layout paint;
 }
 
 @keyframes fadeIn {

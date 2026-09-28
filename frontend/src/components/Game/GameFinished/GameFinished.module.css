@@ -10,7 +10,6 @@
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(155, 93, 229, 0.15);
     font-family: var(--font-main);
     box-sizing: border-box;
-    contain: layout paint;
 }
 
 .gameFinishedTitle {

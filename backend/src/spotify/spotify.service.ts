@@ -64,7 +64,8 @@ export class SpotifyService {
             }
 
             return this.accessToken;
-        } catch (error) {
+        } catch (error: any) {
+            console.error('Spotify getAccessToken error:', error?.response?.data || error?.message || error);
             throw new BadRequestException(
                 'Error fetching Spotify access token.',
             );
@@ -82,13 +83,65 @@ export class SpotifyService {
                 },
             );
 
-            if (!response.data || !response.data.artists) {
-                throw new BadRequestException('No artist data found.');
+            const artist = response.data?.artists?.items?.[0] || null;
+            if (!artist) {
+                return null;
             }
 
-            return response.data;
-        } catch (error) {
-            throw new BadRequestException('Error fetching artist data.');
+            return {
+                id: artist.id,
+                name: artist.name,
+                genres: artist.genres || [],
+                popularity: artist.popularity,
+                followers: artist.followers?.total || 0,
+                images: artist.images || [],
+                external_urls: artist.external_urls,
+            };
+        } catch (error: any) {
+            console.error('Spotify searchArtist error:', error?.response?.data || error?.message || error);
+            return null;
+        }
+    }
+
+    async searchTrack(query: string) {
+        const token = await this.getAccessToken();
+        try {
+            const response = await this.httpService.axiosRef.get(
+                'https://api.spotify.com/v1/search',
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: { q: query, type: 'track', limit: 1 },
+                },
+            );
+
+            const track = response.data?.tracks?.items?.[0] || null;
+            if (!track) {
+                return null;
+            }
+
+            return {
+                id: track.id,
+                name: track.name,
+                popularity: track.popularity,
+                explicit: track.explicit,
+                duration_ms: track.duration_ms,
+                preview_url: track.preview_url,
+                external_urls: track.external_urls,
+                album: {
+                    id: track.album?.id,
+                    name: track.album?.name,
+                    images: track.album?.images,
+                    release_date: track.album?.release_date,
+                },
+                artists: track.artists?.map((a: any) => ({
+                    id: a.id,
+                    name: a.name,
+                    external_urls: a.external_urls,
+                })),
+            };
+        } catch (error: any) {
+            console.error('Spotify searchTrack error:', error?.response?.data || error?.message || error);
+            return null;
         }
     }
 
