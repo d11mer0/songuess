@@ -69,16 +69,131 @@
     box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
 }
 
-.unmuteBtn {
-    background: #ff0055;
-    border: none;
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 12px;
-    font-weight: 800;
+/* TV Autoplay Overlay (Full Screen, On Top of Everything) */
+.tvAutoplayOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(8, 6, 16, 0.88);
     cursor: pointer;
+    animation: tvOverlayFadeIn 0.25s ease-out;
+}
+
+@keyframes tvOverlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.tvAutoplayCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(160deg, rgba(28, 22, 44, 0.98) 0%, rgba(16, 12, 28, 0.99) 100%);
+    border: 2px solid rgba(0, 243, 255, 0.5);
+    border-radius: 28px;
+    padding: 44px 64px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.35), 0 20px 60px rgba(0, 0, 0, 0.85);
+    max-width: 580px;
+    box-sizing: border-box;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    animation: tvCardPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tvCardPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tvAutoplayCard:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 65px rgba(0, 243, 255, 0.5), 0 24px 70px rgba(0, 0, 0, 0.9);
+}
+
+.tvAutoplayIcon {
+    font-size: 64px;
+    line-height: 1;
+    animation: tvIconPulse 1.4s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 16px rgba(0, 243, 255, 0.7));
+}
+
+@keyframes tvIconPulse {
+    from {
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(0, 243, 255, 0.5));
+    }
+    to {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 24px rgba(0, 243, 255, 0.9));
+    }
+}
+
+.tvAutoplayTitle {
+    font-family: var(--font-title);
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 45%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.8px;
+}
+
+.tvAutoplaySubtitle {
+    font-family: var(--font-main);
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.tvAutoplayBtn {
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 34px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    color: #000000;
+    font-family: var(--font-title);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 22px rgba(0, 243, 255, 0.5);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tvAutoplayBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(0, 243, 255, 0.75);
+}
+
+.tvAutoplayHint {
+    font-family: var(--font-main);
     font-size: 14px;
-    animation: pulse 1.5s infinite;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.5px;
+    margin: 0;
 }
 
 .fullscreenBtn {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import styles from './RoomShareModal.module.css';
-import { FaCopy, FaCheck } from 'react-icons/fa';
+import { FaCopy, FaCheck, FaQrcode, FaTimes, FaCamera } from 'react-icons/fa';
 import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface RoomShareModalProps {
@@ -47,15 +47,18 @@ const RoomShareModal: React.FC<RoomShareModalProps> = ({ isOpen, onClose, roomId
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
-                    &times;
+                <button className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
+                    <FaTimes />
                 </button>
-                <h2 className={styles.title}>📱 {t('shareModal.title')}</h2>
+                <h2 className={styles.title}>
+                    <FaQrcode className={styles.titleIcon} />
+                    <span>{t('shareModal.title')}</span>
+                </h2>
                 <p className={styles.subtitle}>{t('shareModal.subtitle')}</p>
 
                 {/* 4-значний код */}
                 <div className={styles.codeSection}>
-                    <div className={styles.codeLabel}>{t('gameplay.roomCode')}:</div>
+                    <div className={styles.codeLabel}>{t('gameplay.roomCode')}</div>
                     <div className={styles.codeDisplay}>
                         {displayCode.split('').map((char, i) => (
                             <span key={i} className={styles.codeChar}>
@@ -64,16 +67,18 @@ const RoomShareModal: React.FC<RoomShareModalProps> = ({ isOpen, onClose, roomId
                         ))}
                     </div>
                     <button
-                        className={styles.copyBtn}
+                        className={`${styles.copyCodeBtn} ${copiedType === 'code' ? styles.copiedSuccess : ''}`}
                         onClick={() => copyToClipboard(displayCode, 'code')}
                     >
                         {copiedType === 'code' ? (
                             <>
-                                <FaCheck /> {t('shareModal.codeCopied')}
+                                <FaCheck className={styles.btnIcon} />
+                                <span>{t('shareModal.codeCopied')}</span>
                             </>
                         ) : (
                             <>
-                                <FaCopy /> {t('shareModal.copyCode')}
+                                <FaCopy className={styles.btnIcon} />
+                                <span>{t('shareModal.copyCode')}</span>
                             </>
                         )}
                     </button>
@@ -84,14 +89,17 @@ const RoomShareModal: React.FC<RoomShareModalProps> = ({ isOpen, onClose, roomId
                     <div className={styles.qrWrapper}>
                         <canvas ref={canvasRef} className={styles.qrCanvas} />
                     </div>
-                    <div className={styles.qrHint}>📷 {t('shareModal.scanQr')}</div>
+                    <div className={styles.qrHint}>
+                        <FaCamera className={styles.cameraIcon} />
+                        <span>{t('shareModal.scanQr')}</span>
+                    </div>
                 </div>
 
                 {/* Пряме посилання */}
                 <div className={styles.linkSection}>
                     <input className={styles.linkInput} readOnly value={shareUrl} />
                     <button
-                        className={styles.copyBtn}
+                        className={`${styles.copyLinkBtn} ${copiedType === 'link' ? styles.copiedSuccess : ''}`}
                         onClick={() => copyToClipboard(shareUrl, 'link')}
                         aria-label={t('shareModal.copyLink')}
                     >
@@ -99,7 +107,9 @@ const RoomShareModal: React.FC<RoomShareModalProps> = ({ isOpen, onClose, roomId
                     </button>
                 </div>
                 {copiedType === 'link' && (
-                    <div className={styles.copiedToast}>{t('shareModal.linkCopied')}</div>
+                    <div className={styles.copiedToast}>
+                        <FaCheck /> {t('shareModal.linkCopied')}
+                    </div>
                 )}
             </div>
         </div>

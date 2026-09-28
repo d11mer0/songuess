@@ -18,6 +18,7 @@ import {
     blockMediaSessionHardwareKeys,
     clearMediaSessionPlayback,
 } from '../../utils/audio/blockMediaSessionHardwareKeys';
+import { FaVolumeUp } from 'react-icons/fa';
 import styles from './PartyHostPage.module.css';
 
 interface RoundPayload {
@@ -491,6 +492,27 @@ const PartyHostPage: React.FC = () => {
         <div className={styles.container} onClick={isAudioBlocked ? unlockAudio : undefined}>
             <audio ref={audioRef} />
 
+            {/* Fullscreen TV Mode Autoplay Overlay — on top of everything */}
+            {isAudioBlocked && (
+                <div
+                    className={styles.tvAutoplayOverlay}
+                    onClick={unlockAudio}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={t('gameplay.tapToUnmuteTitle')}
+                >
+                    <div className={styles.tvAutoplayCard} onClick={unlockAudio}>
+                        <span className={styles.tvAutoplayIcon}>🔊</span>
+                        <h2 className={styles.tvAutoplayTitle}>{t('gameplay.tapToUnmuteTitle')}</h2>
+                        <p className={styles.tvAutoplaySubtitle}>{t('gameplay.tapToUnmuteSubtitle')}</p>
+                        <button className={styles.tvAutoplayBtn} onClick={unlockAudio}>
+                            <FaVolumeUp /> <span>{t('party.unmuteHint')}</span>
+                        </button>
+                    </div>
+                    <p className={styles.tvAutoplayHint}>{t('gameplay.tapToUnmuteHint')}</p>
+                </div>
+            )}
+
             {/* Top Bar on TV */}
             <div className={styles.header}>
                 <div className={styles.brand}>
@@ -505,12 +527,6 @@ const PartyHostPage: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {isAudioBlocked && (
-                        <button className={styles.unmuteBtn} onClick={unlockAudio}>
-                            {t('party.unmuteHint')}
-                        </button>
-                    )}
-
                     <LanguageSwitcher />
 
                     <button
@@ -524,11 +540,6 @@ const PartyHostPage: React.FC = () => {
                     <button className={styles.fullscreenBtn} onClick={toggleFullscreen}>
                         {isFullscreen ? t('party.exitFullscreen') : t('party.fullscreen')}
                     </button>
-
-                    <div className={styles.codeBanner}>
-                        <span className={styles.codeLabel}>{t('party.roomCode')}:</span>
-                        <span className={styles.codeValue}>{displayCode}</span>
-                    </div>
                 </div>
             </div>
 
