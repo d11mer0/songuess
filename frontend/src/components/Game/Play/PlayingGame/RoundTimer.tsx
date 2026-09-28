@@ -74,7 +74,7 @@ const RoundTimer: React.FC = () => {
             <div className={styles.timerBarWrapper}>
                 <div
                     className={`${styles.timerBar} ${isUrgent ? styles.danger : ''}`}
-                    style={{ width: `${percent}%` }}
+                    style={{ transform: `scaleX(${Math.max(0, Math.min(1, percent / 100))})` }}
                 />
             </div>
         </div>

@@ -19,6 +19,7 @@
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     gap: 4px;
+    transform: translateZ(0);
 }
 
 .triggerPill:hover,
@@ -26,7 +27,7 @@
     background: rgba(30, 24, 48, 0.95);
     border-color: rgba(0, 243, 255, 0.55);
     box-shadow: 0 4px 20px rgba(0, 243, 255, 0.2), 0 0 12px rgba(155, 93, 229, 0.3);
-    transform: translateY(-1px);
+    transform: translateY(-1px) translateZ(0);
 }
 
 .triggerOpen {
@@ -55,17 +56,17 @@
 
 .volumeIconMuted {
     color: var(--danger-color, #ff6f61);
-    filter: drop-shadow(0 0 5px rgba(255, 111, 97, 0.6));
+    text-shadow: 0 0 5px rgba(255, 111, 97, 0.6);
 }
 
 .volumeIconLow {
     color: #b075f7;
-    filter: drop-shadow(0 0 4px rgba(176, 117, 247, 0.5));
+    text-shadow: 0 0 4px rgba(176, 117, 247, 0.5);
 }
 
 .volumeIconHigh {
     color: #00f3ff;
-    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.6));
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.6);
 }
 
 /* ── Settings Toggle Button inside Pill ── */
@@ -100,6 +101,9 @@
     background: #00f3ff;
     border-radius: 1px;
     animation: eqPulse 0.9s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .bar:nth-child(1) {
@@ -596,11 +600,11 @@
 @keyframes iconPulse {
     0%,
     100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+        transform: scale(1) translateZ(0);
+        opacity: 0.9;
     }
     50% {
-        transform: scale(1.12);
-        filter: drop-shadow(0 0 18px rgba(0, 243, 255, 0.8));
+        transform: scale(1.1) translateZ(0);
+        opacity: 1;
     }
 }

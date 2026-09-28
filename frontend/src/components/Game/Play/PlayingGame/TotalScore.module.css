@@ -6,6 +6,7 @@
     padding: 22px 18px;
     box-sizing: border-box;
     width: 100%;
+    transform: translateZ(0);
 }
 
 .header {
@@ -35,16 +36,16 @@
 .trophyIcon {
     color: #ffd700;
     font-size: 20px;
-    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
     animation: trophyGlow 2.5s ease-in-out infinite alternate;
 }
 
 @keyframes trophyGlow {
     from {
-        filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
+        opacity: 0.85;
     }
     to {
-        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
+        opacity: 1;
     }
 }
 
@@ -83,14 +84,15 @@
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     box-sizing: border-box;
+    transform: translateZ(0);
 }
 
 .item:hover {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(155, 93, 229, 0.45);
-    transform: translateX(2px);
+    transform: translateX(2px) translateZ(0);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
@@ -197,6 +199,8 @@
     border-color: #ff5500;
     box-shadow: 0 0 12px #ff5500, 0 0 20px rgba(255, 136, 0, 0.8);
     animation: flamePulse 1.2s infinite alternate;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .flameIconMini {
@@ -204,7 +208,7 @@
     bottom: -2px;
     right: -2px;
     font-size: 13px;
-    filter: drop-shadow(0 0 4px #ff5500);
+    text-shadow: 0 0 4px #ff5500;
     line-height: 1;
 }
 
@@ -227,7 +231,7 @@
 .premiumStar {
     color: #ffd700;
     font-size: 13px;
-    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7));
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.7);
     flex-shrink: 0;
 }
 
@@ -305,10 +309,12 @@
 
 @keyframes flamePulse {
     from {
-        box-shadow: 0 0 8px #ff5500, 0 0 14px #ff9900;
+        transform: scale(1) translateZ(0);
+        opacity: 0.9;
     }
     to {
-        box-shadow: 0 0 16px #ff0055, 0 0 24px #ffaa00;
+        transform: scale(1.05) translateZ(0);
+        opacity: 1;
     }
 }
 

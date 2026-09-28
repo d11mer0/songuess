@@ -54,8 +54,7 @@
 }
 
 .logo:hover {
-    transform: scale(1.03);
-    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5));
+    transform: scale(1.03) translateZ(0);
 }
 
 .logoImg {
@@ -63,8 +62,9 @@
     height: 34px;
     border-radius: 10px;
     object-fit: cover;
-    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.65));
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.65);
     flex-shrink: 0;
+    transform: translateZ(0);
 }
 
 /* Nav Links */
@@ -128,25 +128,25 @@
 .linkIconCyan {
     color: #00f3ff;
     font-size: 14px;
-    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
 }
 
 .linkIconGold {
     color: #ffd700;
     font-size: 14px;
-    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 
 .linkIconPurple {
     color: #b075f7;
     font-size: 14px;
-    filter: drop-shadow(0 0 5px rgba(176, 117, 247, 0.5));
+    text-shadow: 0 0 5px rgba(176, 117, 247, 0.5);
 }
 
 .linkIconPink {
     color: #f15bb5;
     font-size: 14px;
-    filter: drop-shadow(0 0 5px rgba(241, 91, 181, 0.5));
+    text-shadow: 0 0 5px rgba(241, 91, 181, 0.5);
 }
 
 .activeNavLink {

@@ -60,7 +60,7 @@
 .sectionTitleIcon {
     color: #00f3ff;
     font-size: 22px;
-    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.5));
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
 }
 
 .modeSelectContainer {
@@ -446,7 +446,7 @@
 .duelIcon {
     font-size: 16px;
     color: #ff007f;
-    filter: drop-shadow(0 0 8px rgba(255, 0, 127, 0.6));
+    text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
 }
 
 .duelDesc {
@@ -548,7 +548,7 @@
 .codeJoinIcon {
     font-size: 16px;
     color: #00f3ff;
-    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
 }
 
 .codeJoinRow {

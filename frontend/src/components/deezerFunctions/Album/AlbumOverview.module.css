@@ -18,6 +18,7 @@
     border-radius: 18px;
     padding: 1.25rem 1.5rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transform: translateZ(0);
 }
 
 .albumCover {
@@ -28,6 +29,7 @@
     border: 2px solid rgba(0, 243, 255, 0.4);
     box-shadow: 0 0 16px rgba(0, 243, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.5);
     flex-shrink: 0;
+    transform: translateZ(0);
 }
 
 .albumDetails {

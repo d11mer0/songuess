@@ -1,4 +1,4 @@
-﻿import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import styles from './NeonVisualizer.module.css';
 
 interface NeonVisualizerProps {
@@ -23,35 +23,22 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
         let width = (canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1));
         let height = (canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1));
 
-        const handleResize = () => {
-            if (!canvas) return;
-            width = canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
-            height = canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
-        };
-
-        const resizeObserver = new ResizeObserver(handleResize);
-        resizeObserver.observe(canvas);
-
-        let phase = 0;
-
-        const render = () => {
-            phase += 0.08;
+        const drawFrame = (active: boolean, phase: number) => {
             ctx.clearRect(0, 0, width, height);
 
             const gap = 3 * (window.devicePixelRatio || 1);
             const totalGaps = gap * (BAR_COUNT - 1);
             const barWidth = Math.max(2, (width - totalGaps) / BAR_COUNT);
 
-            // Створюємо неоновий градієнт
+            // Створюємо яскравий неоновий градієнт (GPU-friendly, без shadowBlur)
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#f15bb5'); // Neon Magenta
-            gradient.addColorStop(0.5, '#7928ca'); // Purple
-            gradient.addColorStop(1, '#00f3ff'); // Neon Cyan
+            gradient.addColorStop(0, '#f15bb5');
+            gradient.addColorStop(0.5, '#7928ca');
+            gradient.addColorStop(1, '#00f3ff');
 
             for (let i = 0; i < BAR_COUNT; i++) {
                 let targetHeight = 4;
-                if (isPlaying) {
-                    // Симулюємо динамічний музичний спектр
+                if (active) {
                     const s1 = Math.sin(phase + i * 0.4) * 0.5 + 0.5;
                     const s2 = Math.cos(phase * 1.3 - i * 0.25) * 0.5 + 0.5;
                     const s3 = Math.sin(phase * 0.7 + i * 0.8) * 0.5 + 0.5;
@@ -60,15 +47,12 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
 
                     targetHeight = Math.max(6, energy * envelope * (height * 0.88));
                 } else {
-                    // Спокійний стан (idle)
-                    targetHeight = Math.max(3, 4 + Math.sin(phase * 0.4 + i * 0.3) * 3);
+                    targetHeight = 4;
                 }
 
-                // Плавна інтерполяція висоти
                 heightsRef.current[i] += (targetHeight - heightsRef.current[i]) * 0.3;
                 const curH = heightsRef.current[i];
 
-                // Обчислення піків (падаючі крапки)
                 if (curH >= peaksRef.current[i]) {
                     peaksRef.current[i] = curH;
                 } else {
@@ -79,12 +63,7 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
                 const y = height - curH;
 
                 // Малювання стовпчика еквалайзера
-                ctx.save();
                 ctx.fillStyle = gradient;
-                ctx.shadowColor = isPlaying ? '#00f3ff' : 'transparent';
-                ctx.shadowBlur = isPlaying ? 8 : 0;
-
-                // Заокруглений прямокутник
                 const radius = Math.min(barWidth / 2, 3);
                 ctx.beginPath();
                 ctx.moveTo(x + radius, y);
@@ -97,27 +76,22 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
                 ctx.closePath();
                 ctx.fill();
 
-                // Малювання неонової шапки піку
-                if (isPlaying) {
+                // Неонова шапка піку
+                if (active) {
                     const peakY = height - peaksRef.current[i] - 2;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = '#f15bb5';
-                    ctx.shadowBlur = 10;
+                    ctx.fillStyle = '#f15bb5';
                     ctx.fillRect(x, peakY, barWidth, 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x + 1, peakY, Math.max(1, barWidth - 2), 1);
                 }
-
-                ctx.restore();
             }
 
-            // Малювання плавної хвилі поверх стовпчиків
-            if (isPlaying) {
-                ctx.save();
+            // Малювання неонової хвилі (двошаровий векторний шлейф замість CPU-blur)
+            if (active) {
+                // Зовнішнє напівпрозоре сяйво хвилі
                 ctx.beginPath();
-                ctx.strokeStyle = 'rgba(0, 243, 255, 0.45)';
-                ctx.lineWidth = 2 * (window.devicePixelRatio || 1);
-                ctx.shadowColor = '#00f3ff';
-                ctx.shadowBlur = 12;
-
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+                ctx.lineWidth = 5 * (window.devicePixelRatio || 1);
                 for (let i = 0; i < BAR_COUNT; i++) {
                     const x = i * (barWidth + gap) + barWidth / 2;
                     const y = height - heightsRef.current[i];
@@ -125,9 +99,44 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
                     else ctx.lineTo(x, y);
                 }
                 ctx.stroke();
-                ctx.restore();
-            }
 
+                // Внутрішній лазерний промінь хвилі
+                ctx.beginPath();
+                ctx.strokeStyle = '#00f3ff';
+                ctx.lineWidth = 2 * (window.devicePixelRatio || 1);
+                for (let i = 0; i < BAR_COUNT; i++) {
+                    const x = i * (barWidth + gap) + barWidth / 2;
+                    const y = height - heightsRef.current[i];
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        };
+
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
+            height = canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
+            if (!isPlaying) {
+                drawFrame(false, 0);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(handleResize);
+        resizeObserver.observe(canvas);
+
+        if (!isPlaying) {
+            drawFrame(false, 0);
+            return () => {
+                resizeObserver.disconnect();
+            };
+        }
+
+        let phase = 0;
+        const render = () => {
+            phase += 0.08;
+            drawFrame(true, phase);
             animFrameRef.current = requestAnimationFrame(render);
         };
 

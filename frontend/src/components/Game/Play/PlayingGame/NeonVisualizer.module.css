@@ -1,4 +1,4 @@
-﻿.visualizerContainer {
+.visualizerContainer {
     width: 100%;
     max-width: 640px;
     margin: 12px auto 20px;
@@ -12,6 +12,7 @@
     align-items: center;
     position: relative;
     overflow: hidden;
+    transform: translateZ(0);
 }
 
 .visualizerHeader {
@@ -42,6 +43,8 @@
     background-color: #00f3ff;
     box-shadow: 0 0 8px #00f3ff;
     animation: pulse 1.5s infinite;
+    transform: translateZ(0);
+    will-change: transform, opacity;
 }
 
 .statusDot.idle {
@@ -55,6 +58,7 @@
     height: 64px;
     display: block;
     border-radius: 6px;
+    transform: translateZ(0);
 }
 
 @keyframes pulse {
