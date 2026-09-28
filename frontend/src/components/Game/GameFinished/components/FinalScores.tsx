@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { FaTrophy } from 'react-icons/fa';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from '../GameFinished.module.css';
@@ -20,12 +21,14 @@ interface FinalScoresProps {
 
 const FinalScores = ({ players, userId }: FinalScoresProps) => {
     const { t } = useTranslation();
-    const sortedPlayers = [...players].sort(
-        (a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)
+
+    const sortedPlayers = useMemo(
+        () => [...players].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)),
+        [players]
     );
 
-    const podiumPlayers = sortedPlayers.slice(0, 3);
-    const otherPlayers = sortedPlayers.slice(3);
+    const podiumPlayers = useMemo(() => sortedPlayers.slice(0, 3), [sortedPlayers]);
+    const otherPlayers = useMemo(() => sortedPlayers.slice(3), [sortedPlayers]);
 
     return (
         <section className={styles.gameFinishedSection}>

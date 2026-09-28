@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
@@ -18,7 +19,7 @@ interface PlayerCardProps {
     isYou: boolean;
 }
 
-const PlayerCard = ({ player, rank, isYou }: PlayerCardProps) => {
+const PlayerCard = memo(({ player, rank, isYou }: PlayerCardProps) => {
     const { t } = useTranslation();
     const roundedScore = Math.round(player.totalScore ?? 0);
 
@@ -50,6 +51,8 @@ const PlayerCard = ({ player, rank, isYou }: PlayerCardProps) => {
             </div>
         </div>
     );
-};
+});
+
+PlayerCard.displayName = 'PlayerCard';
 
 export default PlayerCard;

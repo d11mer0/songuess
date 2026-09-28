@@ -3,52 +3,14 @@
     margin-left: auto;
     margin-right: auto;
     padding: 28px 24px;
-    background: linear-gradient(160deg, rgba(24, 20, 38, 0.95) 0%, rgba(14, 10, 24, 0.98) 100%);
+    background: linear-gradient(160deg, rgba(24, 20, 38, 0.96) 0%, rgba(14, 10, 24, 0.98) 100%);
     color: var(--text-main);
     border-radius: 18px;
     border: 1px solid rgba(155, 93, 229, 0.35);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 28px rgba(155, 93, 229, 0.15);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(155, 93, 229, 0.15);
     font-family: var(--font-main);
     box-sizing: border-box;
-}
-
-/* ── Animations confetti ── */
-.confettiWrapper {
-    position: relative;
-    height: 60px;    
-    overflow: visible;
-}
-
-.confetti {
-    position: absolute;
-    top: -10px;
-    width: 8px;
-    height: 14px;
-    opacity: 0.85;
-    background: var(--primary-color);
-    animation: fall 3s linear infinite;
-    border-radius: 2px;
-}
-
-.confetti:nth-child(5n) { background: var(--secondary-color); }
-.confetti:nth-child(3n) { background: var(--success-color); }
-.confetti:nth-child(2n) { background: #ffd700; }
-.confetti:nth-child(odd) { transform: rotate(20deg); }
-
-@keyframes fall {
-    0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100px) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-.confetti {
-    left: calc(var(--i, 0) * 3%);
-    animation-delay: calc(var(--i, 0) * -0.1s);
+    contain: layout paint;
 }
 
 .gameFinishedTitle {
@@ -61,7 +23,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: none;
-    filter: drop-shadow(0 0 16px rgba(155, 93, 229, 0.4));
+    filter: drop-shadow(0 0 12px rgba(155, 93, 229, 0.35));
 }
 
 .gameFinishedSection {
@@ -84,7 +46,6 @@
 .sectionIcon {
     font-size: 1.6rem;
     color: #ffd700;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
 }
 
 /* ── Podium Layout (Top 1-3) ── */
@@ -120,24 +81,24 @@
     border-radius: 18px;
     position: relative;
     box-sizing: border-box;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    transform: translateZ(0);
+    will-change: transform;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
-    animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: popIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .podiumCard:hover {
-    transform: translateY(-4px);
+    transform: translate3d(0, -4px, 0);
 }
 
 @keyframes popIn {
     from {
         opacity: 0;
-        transform: scale(0.88) translateY(16px);
+        transform: scale3d(0.9, 0.9, 1) translateY(14px);
     }
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: scale3d(1, 1, 1) translateY(0);
     }
 }
 
@@ -145,73 +106,73 @@
 .podium1 {
     height: 310px;
     order: 2;
-    background: linear-gradient(165deg, rgba(42, 32, 12, 0.94) 0%, rgba(18, 14, 8, 0.98) 100%);
+    background: linear-gradient(165deg, rgba(42, 32, 12, 0.96) 0%, rgba(18, 14, 8, 0.98) 100%);
     border: 2px solid rgba(255, 215, 0, 0.75);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(255, 215, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.2);
     z-index: 2;
 }
 
 .podium1:hover {
     border-color: #ffd700;
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.7), 0 0 34px rgba(255, 215, 0, 0.38);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), 0 0 26px rgba(255, 215, 0, 0.32);
 }
 
 .podium1 .podiumAvatar {
     width: 104px;
     height: 104px;
     border: 3.5px solid #ffd700;
-    box-shadow: 0 0 18px rgba(255, 215, 0, 0.45);
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
 }
 
 /* 2nd Place (Silver) */
 .podium2 {
     height: 275px;
     order: 1;
-    background: linear-gradient(165deg, rgba(28, 32, 40, 0.94) 0%, rgba(14, 16, 22, 0.98) 100%);
+    background: linear-gradient(165deg, rgba(28, 32, 40, 0.96) 0%, rgba(14, 16, 22, 0.98) 100%);
     border: 2px solid rgba(210, 220, 235, 0.65);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(200, 215, 235, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(200, 215, 235, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.15);
     z-index: 1;
 }
 
 .podium2:hover {
     border-color: #e2e8f0;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 26px rgba(226, 232, 240, 0.28);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 20px rgba(226, 232, 240, 0.24);
 }
 
 .podium2 .podiumAvatar {
     width: 90px;
     height: 90px;
     border: 3px solid #e2e8f0;
-    box-shadow: 0 0 14px rgba(226, 232, 240, 0.35);
+    box-shadow: 0 0 12px rgba(226, 232, 240, 0.3);
 }
 
 /* 3rd Place (Bronze) */
 .podium3 {
     height: 245px;
     order: 3;
-    background: linear-gradient(165deg, rgba(36, 22, 14, 0.94) 0%, rgba(18, 10, 8, 0.98) 100%);
+    background: linear-gradient(165deg, rgba(36, 22, 14, 0.96) 0%, rgba(18, 10, 8, 0.98) 100%);
     border: 2px solid rgba(220, 130, 60, 0.65);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(220, 130, 60, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.48), 0 0 14px rgba(220, 130, 60, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.12);
     z-index: 1;
 }
 
 .podium3:hover {
     border-color: #ed8936;
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.6), 0 0 22px rgba(237, 137, 54, 0.3);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.55), 0 0 18px rgba(237, 137, 54, 0.26);
 }
 
 .podium3 .podiumAvatar {
     width: 82px;
     height: 82px;
     border: 3px solid #ed8936;
-    box-shadow: 0 0 12px rgba(237, 137, 54, 0.35);
+    box-shadow: 0 0 10px rgba(237, 137, 54, 0.3);
 }
 
 /* ── YOU Highlight ── */
 .youHighlight {
-    outline: 2.5px solid #00f3ff !important;
+    outline: 2px solid #00f3ff !important;
     outline-offset: 3px;
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.7), 0 0 32px rgba(0, 243, 255, 0.4) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 22px rgba(0, 243, 255, 0.35) !important;
 }
 
 .youIndicator {
