@@ -27,8 +27,9 @@ const AppRoutes: React.FC = () => {
     return (
         <>
             {!isPartyOrGamepad && <Navigation />}
-            <Suspense fallback={<Loader />}>
-                <Routes>
+            <main className="main-content">
+                <Suspense fallback={<Loader />}>
+                    <Routes>
                     <Route path="/error" element={<ErrorPage />} />
                     <Route path="/auth/*" element={<AuthRoutes />} />
                     <Route path="/songs/*" element={<SongsRoutes />} />
@@ -44,7 +45,8 @@ const AppRoutes: React.FC = () => {
                     <Route path="/" element={<MainPage />} />
                     <Route path="*" element={<Navigate to="/error" replace />} />
                 </Routes>
-            </Suspense>
+                </Suspense>
+            </main>
             {!isPartyOrGamepad && <Footer />}
         </>
     );

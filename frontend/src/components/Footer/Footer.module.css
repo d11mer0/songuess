@@ -1,4 +1,6 @@
 .footer {
+    position: relative;
+    z-index: 1;
     background: linear-gradient(180deg, rgba(16, 12, 26, 0.98) 0%, rgba(9, 6, 16, 1) 100%);
     border-top: 1px solid rgba(155, 93, 229, 0.28);
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5), 0 -1px 20px rgba(155, 93, 229, 0.08);

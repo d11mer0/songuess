@@ -65,7 +65,7 @@ const SearchDropdown = <T extends { id: number }>({
     };
 
     return (
-        <div className={styles.searchContainer}>
+        <div className={`${styles.searchContainer} ${isDropdownOpen && options.length > 0 ? styles.isOpen : ""}`}>
             <div className={styles.inputWrapper}>
                 <span className={styles.searchIcon}>
                     <BsSearch />

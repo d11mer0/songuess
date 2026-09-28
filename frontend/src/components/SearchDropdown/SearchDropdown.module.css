@@ -4,6 +4,11 @@
     max-width: 480px;
     margin: 0 auto;
     font-family: var(--font-main);
+    z-index: 10;
+}
+
+.searchContainer.isOpen {
+    z-index: 60;
 }
 
 .inputWrapper {
@@ -92,19 +97,18 @@
     top: calc(100% + 8px);
     left: 0;
     width: 100%;
-    background: linear-gradient(180deg, rgba(32, 24, 48, 0.98) 0%, rgba(18, 14, 28, 0.98) 100%);
-    border: 1px solid rgba(155, 93, 229, 0.4);
+    background: linear-gradient(180deg, #241a38 0%, #150f24 100%);
+    border: 1px solid rgba(155, 93, 229, 0.45);
     border-radius: 16px;
     list-style: none;
     padding: 8px;
     margin: 0;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(155, 93, 229, 0.2);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(155, 93, 229, 0.25);
     max-height: 260px;
     overflow-y: auto;
     z-index: 100;
     box-sizing: border-box;
     animation: fadeIn 0.15s ease-out;
-    transform: translateZ(0);
     contain: content;
 
     /* Cross-browser scrollbar */

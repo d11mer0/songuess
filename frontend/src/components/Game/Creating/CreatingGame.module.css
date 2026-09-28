@@ -12,7 +12,8 @@
     gap: 2rem;
     align-items: center;
     box-sizing: border-box;
-    transform: translateZ(0);
+    position: relative;
+    z-index: 10;
 }
 
 @media (max-width: 850px) {

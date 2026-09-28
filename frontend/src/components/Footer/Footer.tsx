@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { 
     FaGithub, 
@@ -277,7 +278,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Interactive Info Modal */}
-            {activeModalTab && (
+            {activeModalTab && createPortal(
                 <div className={styles.modalOverlay} onClick={() => setActiveModalTab(null)}>
                     <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
@@ -294,7 +295,8 @@ const Footer: React.FC = () => {
                             {modalContent[activeModalTab].body}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </footer>
     );
