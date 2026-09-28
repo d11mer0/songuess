@@ -39,8 +39,12 @@ export function buildGameRound(
         id: correctTrack.id,
         title: correctTrack.title,
         preview: correctTrack.preview,
+        artistId: correctTrack.artist?.id,
         artistName: correctTrack.artist?.name,
+        artistPicture: correctTrack.artist?.picture_big || correctTrack.artist?.picture,
+        albumId: correctTrack.album?.id,
         albumName: correctTrack.album?.title,
+        albumCover: correctTrack.album?.cover_big || correctTrack.album?.picture,
     };
 
     return {

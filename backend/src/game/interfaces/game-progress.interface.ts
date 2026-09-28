@@ -17,8 +17,12 @@ export interface RoundTrack {
     id: string;
     title: string;
     preview: string;
+    artistId?: number;
     artistName?: string;
+    artistPicture?: string;
+    albumId?: string | number;
     albumName?: string;
+    albumCover?: string;
 }
 
 export interface PlayerRoundResult {
