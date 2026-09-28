@@ -36,36 +36,48 @@ const UserInfoPage: React.FC = () => {
 
             <AchievementsShowcase />
 
-            <EditUserProfile
-                show={showEditProfile}
-                onClose={setShowEditProfile}
-            />
-            <EditAvatar
-                user={user!}
-                show={showEditAvatar}
-                onClose={setShowEditAvatar}
-            />
-            <PresetAvatarModal
-                show={showPresetAvatar}
-                onClose={() => setShowPresetAvatar(false)}
-                currentAvatar={user?.avatar}
-            />
-            <DonationModal
-                show={showDonation}
-                onClose={() => setShowDonation(false)}
-                onSuccess={() => refetch()}
-            />
-            <CosmeticsModal
-                show={showCosmetics}
-                onClose={() => setShowCosmetics(false)}
-                currentNameColor={user?.nameColor}
-                currentTitle={user?.customTitle}
-                login={user?.login}
-            />
-            <DeleteUser
-                show={showDeleteConfirm}
-                onClose={() => setShowDeleteConfirm(false)}
-            />
+            {showEditProfile && (
+                <EditUserProfile
+                    show={showEditProfile}
+                    onClose={setShowEditProfile}
+                />
+            )}
+            {showEditAvatar && user && (
+                <EditAvatar
+                    user={user}
+                    show={showEditAvatar}
+                    onClose={setShowEditAvatar}
+                />
+            )}
+            {showPresetAvatar && (
+                <PresetAvatarModal
+                    show={showPresetAvatar}
+                    onClose={() => setShowPresetAvatar(false)}
+                    currentAvatar={user?.avatar}
+                />
+            )}
+            {showDonation && (
+                <DonationModal
+                    show={showDonation}
+                    onClose={() => setShowDonation(false)}
+                    onSuccess={() => refetch()}
+                />
+            )}
+            {showCosmetics && (
+                <CosmeticsModal
+                    show={showCosmetics}
+                    onClose={() => setShowCosmetics(false)}
+                    currentNameColor={user?.nameColor}
+                    currentTitle={user?.customTitle}
+                    login={user?.login}
+                />
+            )}
+            {showDeleteConfirm && (
+                <DeleteUser
+                    show={showDeleteConfirm}
+                    onClose={() => setShowDeleteConfirm(false)}
+                />
+            )}
         </Container>
     );
 };

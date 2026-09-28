@@ -31,24 +31,27 @@
     border: 1.5px solid rgba(155, 93, 229, 0.28);
     border-radius: 18px;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
     text-align: center;
     user-select: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    transform: translateZ(0);
+    will-change: transform;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .avatarCard:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     border-color: rgba(0, 243, 255, 0.55);
-    box-shadow: 0 8px 24px rgba(0, 243, 255, 0.22), 0 0 16px rgba(155, 93, 229, 0.2);
     background: rgba(30, 22, 50, 0.9);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .avatarCard.selected {
     border: 2px solid #00f3ff;
     background: linear-gradient(145deg, rgba(0, 243, 255, 0.16) 0%, rgba(155, 93, 229, 0.26) 100%);
-    box-shadow: 0 0 24px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.15);
-    transform: translateY(-3px);
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.35);
+    transform: translateY(-2px);
 }
 
 .avatarImgWrapper {
@@ -66,12 +69,6 @@
     height: 72px;
     border-radius: 50%;
     object-fit: contain;
-    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.45));
-    transition: transform 0.25s ease;
-}
-
-.avatarCard:hover .avatarImg {
-    transform: scale(1.08);
 }
 
 .checkBadge {
@@ -88,19 +85,7 @@
     justify-content: center;
     font-size: 11px;
     font-weight: 900;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
-    animation: badgePop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes badgePop {
-    from {
-        transform: scale(0.6);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
 }
 
 .avatarTitle {
@@ -109,14 +94,14 @@
     font-family: var(--font-title);
     letter-spacing: 0.4px;
     color: rgba(255, 255, 255, 0.8);
-    transition: color 0.2s ease;
+    transition: color 0.15s ease;
     margin: 0;
     line-height: 1.2;
 }
 
 .avatarCard.selected .avatarTitle {
     color: #00f3ff;
-    text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+    text-shadow: 0 0 6px rgba(0, 243, 255, 0.4);
 }
 
 .modalFooter {
@@ -131,13 +116,13 @@
     background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%) !important;
     border: none !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35) !important;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.3) !important;
     font-weight: 800 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
 
 .applyBtn:hover:not(:disabled) {
-    box-shadow: 0 6px 24px rgba(155, 93, 229, 0.6) !important;
-    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(155, 93, 229, 0.5) !important;
+    transform: translateY(-2px) !important;
 }

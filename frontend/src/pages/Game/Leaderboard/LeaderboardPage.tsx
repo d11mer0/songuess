@@ -5,7 +5,7 @@ import styles from './LeaderboardPage.module.css';
 import { useTranslation } from '../../../i18n/LanguageContext';
 
 const LeaderboardPage: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { user } = useAppSelector((state) => state.user);
     const [period, setPeriod] = useState<'all_time' | 'weekly' | 'monthly'>('all_time');
     const [genre, setGenre] = useState<string>('all');
@@ -157,12 +157,17 @@ const LeaderboardPage: React.FC = () => {
                         <div className={styles.myRankCard}>
                             <div className={styles.myRankInfo}>
                                 <span className={styles.myRankBadge}>#{data.currentUserRank.rank}</span>
-                                <div>
-                                    <strong style={{ color: data.currentUserRank.nameColor || (data.currentUserRank.isPremium ? '#ffd700' : '#ffffff') }}>
+                                <div className={styles.myRankDetails}>
+                                    <div
+                                        className={styles.myRankLogin}
+                                        style={{ color: data.currentUserRank.nameColor || (data.currentUserRank.isPremium ? '#ffd700' : '#ffffff') }}
+                                    >
                                         {data.currentUserRank.isPremium && '⭐ '}
                                         {data.currentUserRank.login} ({t('leaderboard.myRank')})
-                                    </strong>
-                                    <div>{data.currentUserRank.gamesPlayed} ігор</div>
+                                    </div>
+                                    <div className={styles.myRankGames}>
+                                        {data.currentUserRank.gamesPlayed} {language === 'uk' ? 'ігор' : 'games'}
+                                    </div>
                                 </div>
                             </div>
                             <div className={styles.podiumScore}>
@@ -212,12 +217,12 @@ const LeaderboardPage: React.FC = () => {
                                                         }}
                                                     >
                                                         {entry.isPremium && '⭐ '}
-                                                        {entry.login} {isMe ? '(Ви)' : ''}
+                                                        {entry.login} {isMe ? (language === 'uk' ? '(Ви)' : '(You)') : ''}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className={styles.scoreCell}>{entry.totalScore}</td>
-                                            <td>{entry.highScore}</td>
+                                            <td className={styles.highScoreCell}>{entry.highScore}</td>
                                             <td className={styles.streakCell}>
                                                 {entry.dailyStreak > 0 ? `🔥 x${entry.dailyStreak}` : '—'}
                                             </td>

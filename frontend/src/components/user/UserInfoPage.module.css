@@ -12,8 +12,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     width: 100%;
+    transform: translateZ(0);
 }
 
 .avatarPreviewContainer {
@@ -27,16 +28,10 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #00f3ff;
-    box-shadow: 0 0 25px rgba(0, 243, 255, 0.45), inset 0 0 15px rgba(0, 243, 255, 0.2);
+    border: 2.5px solid #00f3ff;
+    box-shadow: 0 0 18px rgba(0, 243, 255, 0.35);
     background: #140f22;
-    padding: 3px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.avatarPreviewContainer:hover .avatarPreviewImg {
-    transform: scale(1.04);
-    box-shadow: 0 0 32px rgba(0, 243, 255, 0.65);
+    padding: 2px;
 }
 
 .avatarBadge {
@@ -52,7 +47,7 @@
     justify-content: center;
     color: #ffffff;
     font-size: 13px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 243, 255, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     border: 2px solid #140f22;
 }
 
@@ -64,7 +59,7 @@
     gap: 10px;
     width: 100%;
     padding: 13px 20px;
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 700;
     font-family: var(--font-title, sans-serif);
     text-transform: uppercase;
@@ -74,8 +69,8 @@
     background: linear-gradient(135deg, rgba(0, 243, 255, 0.12) 0%, rgba(155, 93, 229, 0.18) 100%);
     border: 1.5px solid rgba(0, 243, 255, 0.45);
     color: #00f3ff;
-    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.12);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     box-sizing: border-box;
     text-align: center;
 }
@@ -84,7 +79,6 @@
     background: linear-gradient(135deg, rgba(0, 243, 255, 0.22) 0%, rgba(155, 93, 229, 0.3) 100%);
     border-color: #00f3ff;
     color: #ffffff;
-    box-shadow: 0 6px 24px rgba(0, 243, 255, 0.35);
     transform: translateY(-2px);
 }
 
@@ -92,12 +86,11 @@
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.25) 100%);
     border-color: #10b981;
     color: #34d399;
-    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
 .fileButtonIcon {
-    font-size: 16px;
-    filter: drop-shadow(0 0 6px currentColor);
+    font-size: 15px;
 }
 
 .hiddenInput {
@@ -109,7 +102,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 24px 20px;
-    border: 2px dashed rgba(155, 93, 229, 0.45);
+    border: 2px dashed rgba(155, 93, 229, 0.4);
     border-radius: 16px;
     background: rgba(0, 0, 0, 0.25);
     text-align: center;
@@ -120,7 +113,7 @@
     justify-content: center;
     gap: 8px;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .dropZone:hover {
@@ -133,26 +126,21 @@
     border-color: #00f3ff;
     background: rgba(0, 243, 255, 0.12);
     color: #00f3ff;
-    box-shadow: 0 0 25px rgba(0, 243, 255, 0.35);
-    transform: scale(1.02);
 }
 
 .dropZoneIcon {
     font-size: 28px;
     color: #9b5de5;
-    transition: color 0.25s ease, transform 0.25s ease;
-    filter: drop-shadow(0 0 8px rgba(155, 93, 229, 0.5));
+    transition: color 0.2s ease;
 }
 
 .dropZone:hover .dropZoneIcon,
 .dropZone.dragging .dropZoneIcon {
     color: #00f3ff;
-    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.6));
-    transform: translateY(-2px);
 }
 
 .dropZoneMainText {
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -174,13 +162,13 @@
     background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%) !important;
     border: none !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35) !important;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.3) !important;
     font-weight: 800 !important;
 }
 
 .uploadSubmitBtn:hover:not(:disabled) {
-    box-shadow: 0 6px 24px rgba(155, 93, 229, 0.6) !important;
-    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(155, 93, 229, 0.5) !important;
+    transform: translateY(-2px) !important;
 }
 
 .buttonContainer {

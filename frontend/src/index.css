@@ -147,13 +147,19 @@ input:focus {
 
 /* МОДАЛЬНЕ:*/
 
+.modal-dialog {
+    transform: translateZ(0);
+}
+
 .modal-content {
     background: linear-gradient(145deg, rgba(28, 22, 44, 0.98), rgba(18, 14, 31, 0.98)) !important;
     border: 1px solid rgba(155, 93, 229, 0.35) !important;
     color: var(--text-main);
     border-radius: 22px !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(155, 93, 229, 0.18) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(155, 93, 229, 0.15) !important;
     overflow: hidden;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .modal-header {
@@ -184,14 +190,13 @@ input:focus {
     right: 18px;
     top: 50%;
     transform: translateY(-50%);
-    opacity: 0.75;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    filter: invert(1) drop-shadow(0 0 4px rgba(0, 243, 255, 0.5));
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    filter: invert(1);
 }
 
 .modal-header .btn-close:hover {
     opacity: 1;
-    transform: translateY(-50%) scale(1.1);
 }
 
 .modal-body {

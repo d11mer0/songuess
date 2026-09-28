@@ -1,58 +1,78 @@
 .container {
-    max-width: 840px;
-    margin: 30px auto;
-    padding: 28px 24px;
-    background: var(--background-secondary, #1a1528);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    max-width: 960px;
+    margin: 32px auto 48px auto;
+    padding: 36px 32px;
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.12);
     color: var(--text-main, #ffffff);
     text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    transform: translateZ(0);
 }
 
 .title {
-    font-size: 38px;
-    font-weight: 800;
-    color: var(--primary-color, #f15bb5);
-    margin-bottom: 6px;
-    letter-spacing: 1.5px;
+    font-size: 40px;
+    font-weight: 900;
+    font-family: var(--font-title);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 40%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 .subtitle {
     font-size: 15px;
-    color: #a0a0b0;
-    margin-bottom: 24px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 26px;
+    font-family: var(--font-main);
 }
 
 /* Period Tabs */
 .periodTabs {
-    display: flex;
+    display: inline-flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 5px;
+    gap: 6px;
+    margin: 0 auto 20px auto;
 }
 
 .tabBtn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ccc;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 9px 22px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: var(--font-title, sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.tabBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+.tabBtn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
 }
 
 .tabBtn.active {
-    background: linear-gradient(135deg, var(--primary-color, #f15bb5), #7928ca);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 0 12px rgba(241, 91, 181, 0.4);
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.45) 0%, rgba(155, 93, 229, 0.25) 100%);
+    border-color: #9b5de5;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(155, 93, 229, 0.4);
+    transform: translateY(-1px);
 }
 
 /* Genre Pills */
@@ -61,30 +81,35 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 }
 
 .genrePill {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 243, 255, 0.3);
-    color: #00f3ff;
-    padding: 6px 14px;
-    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(155, 93, 229, 0.3);
+    color: rgba(255, 255, 255, 0.75);
+    padding: 7px 16px;
+    border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.genrePill:hover {
-    background: rgba(0, 243, 255, 0.15);
+.genrePill:hover:not(.active) {
+    background: rgba(0, 243, 255, 0.08);
+    border-color: rgba(0, 243, 255, 0.45);
+    color: #00f3ff;
+    transform: translateY(-1px);
 }
 
 .genrePill.active {
-    background: #00f3ff;
-    color: #000;
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.22) 0%, rgba(0, 119, 255, 0.25) 100%);
+    border-color: #00f3ff;
+    color: #00f3ff;
     font-weight: 700;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.35);
+    transform: translateY(-1px);
 }
 
 /* Podium */
@@ -92,21 +117,24 @@
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 16px;
+    gap: 18px;
     margin-bottom: 36px;
     padding: 0 10px;
 }
 
 .podiumCard {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 14px;
-    padding: 16px 12px;
+    border-radius: 20px;
+    padding: 22px 14px 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 140px;
-    border: 2px solid;
-    transition: transform 0.2s;
+    justify-content: space-between;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+    transform: translateZ(0);
+    will-change: transform;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .podiumCard:hover {
@@ -115,96 +143,146 @@
 
 .podium1 {
     order: 2;
-    height: 240px;
-    border-color: gold;
-    background: linear-gradient(180deg, rgba(255, 215, 0, 0.15), rgba(0, 0, 0, 0.4));
-    box-shadow: 0 0 24px rgba(255, 215, 0, 0.25);
+    width: 175px;
+    height: 260px;
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.16) 0%, rgba(26, 18, 40, 0.95) 100%);
+    border: 2px solid #ffd700;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 28px rgba(255, 215, 0, 0.25);
 }
 
 .podium2 {
     order: 1;
-    height: 200px;
-    border-color: silver;
-    background: linear-gradient(180deg, rgba(192, 192, 192, 0.15), rgba(0, 0, 0, 0.4));
+    width: 155px;
+    height: 220px;
+    background: linear-gradient(180deg, rgba(200, 215, 240, 0.12) 0%, rgba(22, 16, 36, 0.95) 100%);
+    border: 1.5px solid rgba(200, 215, 240, 0.55);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(200, 215, 240, 0.15);
 }
 
 .podium3 {
     order: 3;
-    height: 180px;
-    border-color: #cd7f32;
-    background: linear-gradient(180deg, rgba(205, 127, 50, 0.15), rgba(0, 0, 0, 0.4));
+    width: 155px;
+    height: 200px;
+    background: linear-gradient(180deg, rgba(230, 140, 70, 0.12) 0%, rgba(22, 16, 36, 0.95) 100%);
+    border: 1.5px solid rgba(230, 140, 70, 0.55);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(230, 140, 70, 0.15);
 }
 
 .podiumTrophy {
-    font-size: 28px;
-    margin-bottom: 6px;
+    font-size: 34px;
+    line-height: 1;
+    margin-bottom: 8px;
 }
 
 .podiumAvatar {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 8px;
-    border: 2px solid #fff;
+    border: 2.5px solid rgba(255, 255, 255, 0.4);
+    background: #140f22;
 }
 
 .podium1 .podiumAvatar {
-    width: 72px;
-    height: 72px;
-    border-color: gold;
-    box-shadow: 0 0 12px gold;
+    width: 76px;
+    height: 76px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
 }
 
 .podiumName {
     font-weight: 700;
-    font-size: 15px;
-    color: #fff;
+    font-size: 14.5px;
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    margin-bottom: 4px;
+    font-family: var(--font-title, sans-serif);
+    letter-spacing: 0.3px;
 }
 
 .podiumScore {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
-    color: var(--secondary-color, #00f3ff);
+    color: #00f3ff;
+    font-family: var(--font-mono, monospace);
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    padding: 3px 10px;
+    border-radius: 10px;
     margin-top: 4px;
+}
+
+.podium1 .podiumScore {
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.podium3 .podiumScore {
+    color: #f15bb5;
+    background: rgba(241, 91, 181, 0.12);
+    border-color: rgba(241, 91, 181, 0.35);
 }
 
 /* User Rank Card */
 .myRankCard {
-    background: linear-gradient(135deg, rgba(241, 91, 181, 0.15), rgba(121, 40, 202, 0.2));
-    border: 2px solid var(--primary-color, #f15bb5);
-    border-radius: 12px;
-    padding: 14px 20px;
-    margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.15) 0%, rgba(0, 243, 255, 0.1) 100%);
+    border: 1.5px solid rgba(0, 243, 255, 0.45);
+    border-radius: 16px;
+    padding: 16px 22px;
+    margin-bottom: 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 243, 255, 0.15);
 }
 
 .myRankInfo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    text-align: left;
 }
 
 .myRankBadge {
-    background: var(--primary-color, #f15bb5);
-    color: #fff;
-    font-weight: 800;
-    padding: 6px 12px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #00f3ff, #0077ff);
+    color: #040d1a;
+    font-weight: 900;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-family: var(--font-mono, monospace);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+}
+
+.myRankDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.myRankLogin {
     font-size: 16px;
+    font-weight: 700;
+    font-family: var(--font-title, sans-serif);
+}
+
+.myRankGames {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.55);
 }
 
 /* Table */
 .tableContainer {
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 12px;
+    background: rgba(14, 10, 24, 0.7);
+    border: 1px solid rgba(155, 93, 229, 0.28);
+    border-radius: 18px;
     overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 .table {
@@ -214,50 +292,73 @@
 }
 
 .table th {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 12px 16px;
-    font-size: 13px;
+    background: rgba(28, 22, 44, 0.9);
+    padding: 14px 18px;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
-    color: #aaa;
-    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid rgba(155, 93, 229, 0.25);
+    font-family: var(--font-title, sans-serif);
 }
 
 .table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    font-size: 15px;
+    padding: 13px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14.5px;
+    vertical-align: middle;
+}
+
+.table tr {
+    transition: background-color 0.15s ease;
+}
+
+.table tr:hover:not(.highlightUser) {
+    background: rgba(155, 93, 229, 0.08);
 }
 
 .table tr.highlightUser {
-    background: rgba(241, 91, 181, 0.15);
+    background: rgba(0, 243, 255, 0.12) !important;
+    border-left: 3px solid #00f3ff;
 }
 
 .rankNumber {
     font-weight: 800;
-    font-size: 16px;
-    color: #888;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: var(--font-mono, monospace);
 }
 
 .rankTop {
-    color: gold;
+    font-size: 18px;
 }
 
 .userCell {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .tableAvatar {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     object-fit: cover;
+    border: 1.5px solid rgba(155, 93, 229, 0.35);
+    background: #140f22;
 }
 
 .scoreCell {
-    font-weight: 700;
+    font-weight: 800;
     color: #00f3ff;
+    font-family: var(--font-mono, monospace);
+    font-size: 15px;
+}
+
+.highScoreCell {
+    font-weight: 600;
+    color: #cbd5e1;
     font-family: var(--font-mono, monospace);
 }
 
@@ -267,20 +368,41 @@
     color: #ff8800;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 680px) {
     .container {
-        margin: 10px auto;
-        padding: 16px 12px;
+        margin: 16px auto;
+        padding: 20px 14px;
+        border-radius: 18px;
     }
     .title {
-        font-size: 26px;
+        font-size: 28px;
+    }
+    .periodTabs {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+    }
+    .tabBtn {
+        padding: 8px 14px;
+        font-size: 12px;
+        flex: 1;
+        white-space: nowrap;
     }
     .podiumContainer {
         gap: 8px;
     }
     .podiumCard {
-        width: 100px;
-        padding: 10px 6px;
+        width: 105px;
+        padding: 12px 6px;
+    }
+    .podium1 {
+        height: 220px;
+    }
+    .podium2 {
+        height: 190px;
+    }
+    .podium3 {
+        height: 175px;
     }
     .podiumAvatar {
         width: 46px;
@@ -291,7 +413,7 @@
         height: 54px;
     }
     .table th, .table td {
-        padding: 8px 10px;
-        font-size: 13px;
+        padding: 10px 8px;
+        font-size: 12.5px;
     }
 }
