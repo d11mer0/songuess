@@ -1,16 +1,17 @@
 .layout {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 290px 1fr;
   gap: 16px;
   align-items: start;
 }
 
 .leftCol {
-  min-width: 260px;
+  width: 290px;
 }
 
 .centerCol {
   flex: 1;
+  min-width: 0;
 }
 
 .playingWrapper {
