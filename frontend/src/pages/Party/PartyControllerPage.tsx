@@ -152,8 +152,16 @@ const PartyControllerPage: React.FC = () => {
     }, [currentRoom?.id, currentRoom?.leaderId, user?.id, navigate]);
 
     // Safe leave handler when party mode ends or user leaves
-    const handleLeaveParty = useCallback((message?: string) => {
+    const handleLeaveParty = useCallback((messageOrEvent?: string | any) => {
+        const message = typeof messageOrEvent === 'string' ? messageOrEvent : undefined;
         setPartyModeDisabledData(null);
+        setIsGameFinished(false);
+        setCurrentRound(null);
+        setRoundResult(null);
+        setIsAnswerSubmitted(false);
+        setSelectedOptionIndex(null);
+        sessionStorage.removeItem('pendingJoinCode');
+
         const targetId = currentRoom?.id || roomCode;
         if (targetId) {
             socketEmitter.emit('leaveRoom', { id: targetId });
@@ -169,12 +177,12 @@ const PartyControllerPage: React.FC = () => {
             if (message) {
                 showToast(message, 'neutral');
             }
-            navigate('/');
+            navigate('/', { replace: true });
         } else {
             if (message) {
                 showToast(message, 'neutral');
             }
-            navigate('/game');
+            navigate('/game', { replace: true });
         }
     }, [currentRoom?.id, dispatch, navigate, roomCode, showToast, user?.email]);
 
@@ -593,7 +601,7 @@ const PartyControllerPage: React.FC = () => {
                         <button
                             type="button"
                             className={`${styles.submitBtn} ${styles.leaveBtn}`}
-                            onClick={handleLeaveParty}
+                            onClick={() => handleLeaveParty()}
                         >
                             {t('party.leavePartyGame')}
                         </button>
@@ -744,7 +752,7 @@ const PartyControllerPage: React.FC = () => {
                     <button
                         type="button"
                         className={`${styles.submitBtn} ${styles.leaveBtn}`}
-                        onClick={handleLeaveParty}
+                        onClick={() => handleLeaveParty()}
                         style={{ marginTop: '20px' }}
                     >
                         {t('party.leavePartyGame')}
@@ -789,13 +797,76 @@ const PartyControllerPage: React.FC = () => {
 
     // View 4: Active Round (The 4-Button Gamepad)
     if (currentRound) {
+        const myPlayer = currentRoom?.players?.find((p) => String(p.id) === String(user?.id));
+        const selectedTheme = selectedOptionIndex !== null ? BUTTON_THEMES[selectedOptionIndex] : null;
+
         return (
             <div className={styles.container}>
                 <div className={styles.gamepadContainer}>
-                    <div className={styles.gamepadHeader}>
-                        <span>{user?.login}</span>
-                        <span>
-                            {t('gameplay.round')} #{currentRound.roundNumber + 1}
+                    <header className={styles.gamepadHeader}>
+                        {/* Player Pill */}
+                        <div className={styles.playerInfoPill}>
+                            <div className={styles.playerAvatarBadge}>
+                                {user?.avatar ? (
+                                    <img src={user.avatar} alt={user.login} className={styles.playerAvatarImg} />
+                                ) : (
+                                    <span className={styles.playerInitial}>
+                                        {user?.login ? user.login[0].toUpperCase() : '👤'}
+                                    </span>
+                                )}
+                            </div>
+                            <div className={styles.playerTextMeta}>
+                                <div className={styles.playerLoginRow}>
+                                    <span className={styles.playerLogin}>{user?.login || 'Player'}</span>
+                                    {isAnswerSubmitted && (
+                                        <span className={styles.answeredCheckBadge} title={t('party.hostAnswered')}>
+                                            ✓
+                                        </span>
+                                    )}
+                                </div>
+                                {myPlayer && typeof myPlayer.totalScore === 'number' && (
+                                    <span className={styles.playerScore}>
+                                        <span className={styles.scoreStar}>⭐</span>
+                                        {myPlayer.totalScore} {t('gameplay.points')}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Center Branding & Controller Status */}
+                        <div className={styles.controllerCenterBranding}>
+                            <div className={styles.brandTitleRow}>
+                                <span className={styles.brandLogoIcon}>🎵</span>
+                                <span className={styles.brandName}>SonGuess</span>
+                                <span className={styles.livePill}>
+                                    <span className={styles.pulseDot} />
+                                    LIVE
+                                </span>
+                            </div>
+                            <div className={styles.brandSubText}>
+                                {t('party.controllerSub')}
+                            </div>
+                        </div>
+
+                        {/* Right: Round & Code Badge */}
+                        <div className={styles.gamepadRightMeta}>
+                            <div className={styles.roundBadgePill}>
+                                <span className={styles.roundPillLabel}>{t('gameplay.round')}</span>
+                                <span className={styles.roundPillNumber}>#{currentRound.roundNumber + 1}</span>
+                            </div>
+                            {(roomCode || currentRoom?.shortCode) && (
+                                <div className={styles.roomCodePill}>
+                                    #{(roomCode || currentRoom?.shortCode || '').toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                    </header>
+
+                    {/* Instruction sub-banner */}
+                    <div className={styles.gamepadInstructionBanner}>
+                        <span className={styles.instructionIcon}>📺</span>
+                        <span className={styles.instructionText}>
+                            {t('party.gamepadInstruction')}
                         </span>
                     </div>
 
@@ -823,9 +894,24 @@ const PartyControllerPage: React.FC = () => {
 
                     {isAnswerSubmitted && (
                         <div className={styles.submittedBanner}>
-                            <div className={styles.submittedIcon}>✨</div>
+                            <div className={styles.submittedIconWrapper}>
+                                {selectedTheme ? (
+                                    <div
+                                        className={styles.submittedChoiceBadge}
+                                        style={{ background: selectedTheme.color }}
+                                    >
+                                        <span className={styles.choiceShape}>{selectedTheme.shape}</span>
+                                        <span className={styles.choiceLabel}>{selectedTheme.label}</span>
+                                    </div>
+                                ) : (
+                                    <span className={styles.submittedIcon}>✨</span>
+                                )}
+                            </div>
                             <div className={styles.submittedText}>
                                 {t('party.answerSubmitted')}
+                            </div>
+                            <div className={styles.submittedSubText}>
+                                {t('party.watchTvForPodium')}
                             </div>
                         </div>
                     )}

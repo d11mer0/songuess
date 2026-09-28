@@ -194,27 +194,242 @@
 }
 
 /* Gamepad Grid (During Round) */
+/* Gamepad Grid (During Round) */
 .gamepadContainer {
     width: 100%;
+    max-width: 960px;
     height: 100vh;
     height: 100dvh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 12px;
+    padding: 10px 12px;
     box-sizing: border-box;
     position: relative;
+    margin: 0 auto;
 }
 
 .gamepadHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.06);
+    padding: 8px 14px;
+    background: linear-gradient(135deg, rgba(26, 17, 48, 0.95), rgba(15, 11, 28, 0.98));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    gap: 10px;
+}
+
+/* Player Profile Pill */
+.playerInfoPill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(155, 93, 229, 0.25);
     border-radius: 12px;
+    padding: 4px 10px;
+}
+
+.playerAvatarBadge {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #00f3ff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #9b5de5, #00f3ff);
+    flex-shrink: 0;
+}
+
+.playerAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.playerInitial {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.playerTextMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.playerLoginRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.playerLogin {
     font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.answeredCheckBadge {
+    background: #00f3ff;
+    color: #0f0b1c;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 900;
+    width: 15px;
+    height: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playerScore {
+    font-size: 11px;
     font-weight: 700;
+    color: #ffd166;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.scoreStar {
+    font-size: 11px;
+}
+
+/* Center Branding */
+.controllerCenterBranding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.brandTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.brandLogoIcon {
+    font-size: 14px;
+}
+
+.brandName {
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #00f3ff, #9b5de5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.livePill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 243, 255, 0.12);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 8px;
+    padding: 1px 5px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #00f3ff;
+    letter-spacing: 0.8px;
+}
+
+.pulseDot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #00f3ff;
+    box-shadow: 0 0 6px #00f3ff;
+    animation: pulse 1.5s infinite;
+}
+
+.brandSubText {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Right Meta */
+.gamepadRightMeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.roundBadgePill {
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.3), rgba(241, 91, 181, 0.3));
+    border: 1px solid rgba(155, 93, 229, 0.5);
+    border-radius: 12px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 12px rgba(155, 93, 229, 0.25);
+}
+
+.roundPillLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.roundPillNumber {
+    font-size: 15px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(241, 91, 181, 0.6);
+}
+
+.roomCodePill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 800;
+    color: #00f3ff;
+    letter-spacing: 0.5px;
+}
+
+/* Instruction banner */
+.gamepadInstructionBanner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 12px;
+    margin: 8px 0 4px;
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px dashed rgba(0, 243, 255, 0.22);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.instructionIcon {
+    font-size: 14px;
+}
+
+.instructionText {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c4d7ff;
+    letter-spacing: 0.2px;
 }
 
 .gamepadGrid {
@@ -223,62 +438,69 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 12px;
-    margin: 12px 0;
+    margin: 8px 0;
 }
 
 .gamepadBtn {
     border: none;
-    border-radius: 18px;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
     cursor: pointer;
-    transition: transform 0.1s, filter 0.15s;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
     touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
 }
 
-.gamepadBtn:active {
-    transform: scale(0.95);
+.gamepadBtn:active:not(:disabled) {
+    transform: scale(0.96);
 }
 
 .btnRed {
     background: linear-gradient(145deg, #e63946, #c1121f);
+    border: 2px solid rgba(230, 57, 70, 0.5);
 }
 .btnBlue {
     background: linear-gradient(145deg, #0077b6, #023e8a);
+    border: 2px solid rgba(0, 119, 182, 0.5);
 }
 .btnYellow {
     background: linear-gradient(145deg, #e09f3e, #d97706);
+    border: 2px solid rgba(224, 159, 62, 0.5);
 }
 .btnGreen {
     background: linear-gradient(145deg, #2a9d8f, #1b4332);
+    border: 2px solid rgba(42, 157, 143, 0.5);
 }
 
 .btnShape {
     font-size: 48px;
     color: #fff;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
 }
 
 .btnLabel {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 20px;
+    font-weight: 900;
     color: #fff;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
 }
 
 .btnSelected {
-    box-shadow: 0 0 24px #fff, 0 0 40px #00f3ff;
-    filter: brightness(1.25);
+    box-shadow: 0 0 28px #fff, 0 0 45px #00f3ff;
+    border-color: #00f3ff;
+    filter: brightness(1.2);
     transform: scale(0.98);
 }
 
 .btnDimmed {
-    opacity: 0.35;
-    filter: grayscale(0.5);
+    opacity: 0.3;
+    filter: grayscale(0.55);
 }
 
 /* Submitted state banner */
@@ -287,25 +509,59 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(18, 14, 31, 0.94);
+    background: rgba(18, 14, 31, 0.96);
     border: 2px solid #00f3ff;
-    box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+    box-shadow: 0 0 35px rgba(0, 243, 255, 0.45);
     border-radius: 20px;
     padding: 24px 32px;
     text-align: center;
     z-index: 10;
     animation: scaleIn 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 260px;
+}
+
+.submittedIconWrapper {
+    margin-bottom: 4px;
+}
+
+.submittedChoiceBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.choiceShape {
+    font-size: 22px;
+    color: #fff;
+}
+
+.choiceLabel {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
 }
 
 .submittedIcon {
-    font-size: 42px;
-    margin-bottom: 8px;
+    font-size: 40px;
 }
 
 .submittedText {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 800;
     color: #00f3ff;
+}
+
+.submittedSubText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
 }
 
 /* Round Result Screen */
@@ -496,5 +752,84 @@
     margin-top: 4px;
     text-align: center;
 }
+
+@media (max-width: 600px) {
+    .gamepadContainer {
+        padding: 6px 8px;
+    }
+
+    .gamepadHeader {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+
+    .playerInfoPill {
+        padding: 3px 6px;
+        gap: 6px;
+    }
+
+    .playerAvatarBadge {
+        width: 28px;
+        height: 28px;
+    }
+
+    .playerLogin {
+        max-width: 75px;
+        font-size: 12px;
+    }
+
+    .playerScore {
+        font-size: 10px;
+    }
+
+    .controllerCenterBranding {
+        display: none;
+    }
+
+    .roundBadgePill {
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .roundPillLabel {
+        font-size: 9px;
+    }
+
+    .roundPillNumber {
+        font-size: 13px;
+    }
+
+    .roomCodePill {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+
+    .gamepadInstructionBanner {
+        padding: 4px 8px;
+        margin: 4px 0 2px;
+    }
+
+    .instructionText {
+        font-size: 11px;
+    }
+
+    .gamepadGrid {
+        gap: 8px;
+        margin: 6px 0;
+    }
+
+    .gamepadBtn {
+        border-radius: 16px;
+    }
+
+    .btnShape {
+        font-size: 40px;
+    }
+
+    .btnLabel {
+        font-size: 16px;
+    }
+}
+
 
 

@@ -363,6 +363,9 @@ export interface TranslationDictionary {
         partyBadge: string;
         partyTag: string;
         controllerTitle: string;
+        controllerSub: string;
+        gamepadInstruction: string;
+        watchTvForAnswers: string;
         enterNickname: string;
         nicknamePlaceholder: string;
         roomCodePlaceholder: string;

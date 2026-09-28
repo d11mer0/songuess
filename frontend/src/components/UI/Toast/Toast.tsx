@@ -20,10 +20,11 @@ const iconMap: Record<ToastType, JSX.Element> = {
 };
 
 const Toast = ({ message, type = 'primary', onClose }: ToastProps) => {
+    const text = typeof message === 'string' ? message : '';
     return (
         <div className={`${styles.toast} ${styles[type]}`}>
             <span className={styles.icon}>{iconMap[type]}</span>
-            <span className={styles.message}>{message}</span>
+            <span className={styles.message}>{text}</span>
             {onClose && (
                 <button className={styles.closeButton} onClick={onClose}>
                     <BsXLg />

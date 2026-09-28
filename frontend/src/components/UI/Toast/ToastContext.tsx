@@ -28,7 +28,8 @@ let toastId = 0;
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [toasts, setToasts] = useState<ToastData[]>([]);
 
-    const showToast = useCallback((message: string, type: ToastType = 'primary') => {
+    const showToast = useCallback((message: any, type: ToastType = 'primary') => {
+        if (!message || typeof message !== 'string') return;
         const id = toastId++;
 
         setToasts(prev => {

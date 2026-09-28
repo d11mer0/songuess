@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 
 import { useGameplay } from '../../hooks/Gameplay/useGameplay';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
@@ -21,7 +22,9 @@ const Gameplay = () => {
     const [showPlayers, setShowPlayers] = useState(false); // 🔹
     const [showFinishModal, setShowFinishModal] = useState(false);
 
-    if (!currentRoom) return <></>
+    if (!currentRoom) {
+        return <Navigate to="/game" replace />;
+    }
 
     return (
         <>
