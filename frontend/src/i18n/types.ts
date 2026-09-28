@@ -213,6 +213,7 @@ export interface TranslationDictionary {
         incorrect: string;
         noAnswer: string;
         answeredIn: string;
+        fastest: string;
         qrAndCode: string;
         hidePlayers: string;
         showPlayers: string;

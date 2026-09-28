@@ -213,6 +213,7 @@ export const uk: TranslationDictionary = {
         incorrect: 'Неправильно',
         noAnswer: 'Час вичерпано',
         answeredIn: 'Відповідь за',
+        fastest: '⚡ Найшвидший',
         qrAndCode: 'QR & Код',
         hidePlayers: 'Приховати гравців',
         showPlayers: 'Показати гравців',

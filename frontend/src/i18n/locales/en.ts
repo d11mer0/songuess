@@ -213,6 +213,7 @@ export const en: TranslationDictionary = {
         incorrect: 'Incorrect',
         noAnswer: 'No answer',
         answeredIn: 'Answered in',
+        fastest: '⚡ Fastest',
         qrAndCode: 'QR & Code',
         hidePlayers: 'Hide Players',
         showPlayers: 'Show Players',

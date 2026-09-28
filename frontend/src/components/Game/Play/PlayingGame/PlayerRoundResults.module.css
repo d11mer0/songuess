@@ -1,136 +1,376 @@
-﻿.playersResultsWrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+/* ── Container ── */
+.playersResultsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
     gap: 16px;
-    margin-top: 20px;
+    margin-top: 18px;
+    width: 100%;
 }
 
+/* ── Base Card ── */
 .playerCard {
-    background-color: var(--background-tertiary);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px var(--primary-box-shadow-color);
-    padding: 16px;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 220px;
+    max-width: 100%;
+    min-height: 270px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    min-height: 320px;
+    justify-content: space-between;
+    padding: 16px 14px 14px 14px;
+    border-radius: 16px;
     position: relative;
+    box-sizing: border-box;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+    animation: cardPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.playerCard:hover {
+    transform: translateY(-2px);
+}
+
+@keyframes cardPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Card Themes ── */
+
+/* 1. Fastest Player (Gold Neon) */
+.fastestCard {
+    background: linear-gradient(165deg, rgba(38, 30, 14, 0.92) 0%, rgba(18, 14, 10, 0.96) 100%);
+    border: 1.5px solid rgba(255, 215, 0, 0.55);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.fastestCard:hover {
+    border-color: #ffd700;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(255, 215, 0, 0.35);
+}
+
+.fastestCard .playerAvatar {
+    border-color: #ffd700;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+}
+
+/* 2. Current Player (Cyan Glow) */
+.currentCard {
+    background: linear-gradient(165deg, rgba(14, 26, 42, 0.92) 0%, rgba(10, 16, 26, 0.96) 100%);
+    border: 1.5px solid rgba(0, 243, 255, 0.55);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.2);
+}
+
+.currentCard:hover {
+    border-color: #00f3ff;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(0, 243, 255, 0.35);
+}
+
+.currentCard .playerAvatar {
+    border-color: #00f3ff;
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.4);
+}
+
+/* 3. Other Correct Player (Emerald) */
+.correctCard {
+    background: linear-gradient(165deg, rgba(14, 28, 22, 0.92) 0%, rgba(10, 18, 16, 0.96) 100%);
+    border: 1.5px solid rgba(16, 185, 129, 0.45);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), 0 0 16px rgba(16, 185, 129, 0.15);
+}
+
+.correctCard:hover {
+    border-color: #10b981;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 22px rgba(16, 185, 129, 0.25);
+}
+
+.correctCard .playerAvatar {
+    border-color: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+/* 4. Incorrect or Late Player (Subdued Crimson) */
+.incorrectCard {
+    background: linear-gradient(165deg, rgba(30, 14, 18, 0.88) 0%, rgba(18, 10, 14, 0.96) 100%);
+    border: 1.5px solid rgba(255, 71, 87, 0.35);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+.incorrectCard:hover {
+    border-color: rgba(255, 71, 87, 0.6);
+}
+
+.incorrectCard .playerAvatar {
+    border-color: rgba(255, 71, 87, 0.5);
+    filter: grayscale(0.2);
+}
+
+/* ── Top Status Badges ── */
+.badgeRow {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    min-height: 24px;
+    margin-bottom: 8px;
+}
+
+.topBadgeFastest {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #ffd700 0%, #ff9900 100%);
+    color: #1a1200;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.boltIcon {
+    font-size: 11px;
+}
+
+.topBadgeYou {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 243, 255, 0.12);
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    color: #00f3ff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+}
+
+.topBadgeCorrect {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.topBadgeIncorrect {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.35);
+    color: #ff4757;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+/* ── Avatar ── */
 .avatarContainer {
     position: relative;
-    display: inline-block;
-    border-radius: 50%;
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
 }
 
-.flameAura {
-    box-shadow: 0 0 15px #ff5500, 0 0 25px #ff9900;
+.playerAvatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    display: block;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.flameAura .playerAvatar {
+    border-color: #ff5500 !important;
+    box-shadow: 0 0 16px #ff5500, 0 0 28px rgba(255, 136, 0, 0.7) !important;
     animation: flamePulse 1.2s infinite alternate;
 }
 
 .flameIcon {
     position: absolute;
-    bottom: 6px;
-    right: 6px;
-    font-size: 24px;
+    bottom: 2px;
+    right: 2px;
+    font-size: 20px;
     filter: drop-shadow(0 0 6px #ff5500);
     animation: flameBounce 0.8s infinite alternate ease-in-out;
 }
 
-.playerAvatar {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
+/* ── Player Name ── */
+.playerNameRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
     margin-bottom: 6px;
-    display: block;
+    min-height: 26px;
+}
+
+.premiumStar {
+    color: #ffd700;
+    font-size: 14px;
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+    flex-shrink: 0;
 }
 
 .playerName {
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: var(--text-main);
-    margin-bottom: 4px;
-    white-space: nowrap; 
-    overflow: hidden;  
-    text-overflow: ellipsis; 
-    max-width: 100%;          
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-main, #ffffff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
 }
 
+.currentName {
+    color: #00f3ff;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+    letter-spacing: 1px;
+}
+
+/* ── Streak Badge ── */
 .streakBadge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     background: linear-gradient(135deg, #ff5500, #ff8800);
     color: #fff;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 12px;
-    box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
-    margin-bottom: 4px;
-    animation: flamePulse 1.2s infinite alternate;
+    box-shadow: 0 0 8px rgba(255, 85, 0, 0.5);
+    margin-bottom: 8px;
+    line-height: 1.3;
 }
 
 .superStreak {
     background: linear-gradient(135deg, #ff0055, #ff5500, #ffcc00);
-    box-shadow: 0 0 14px rgba(255, 0, 85, 0.7);
-    font-size: 0.95rem;
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.7);
 }
 
-.playerScore {
-    color: var(--secondary-color);
-    font-size: 1.7rem;
-    margin-bottom: 4px;
+/* ── Score Row ── */
+.scoreRow {
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
-.playerTime {
-    color: var(--text-main);
-    font-size: 0.92rem;
-    font-style: italic;
+.scoreChip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-family: var(--font-mono, monospace);
+    line-height: 1;
 }
 
-.incorrectText {
-    color: var(--danger-color);
-    font-style: italic;
-    font-size: 1.2rem;
-    font-family: var(--font-mono);
+.scoreChipFastest {
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
 }
 
-.correctAnswer {
-    border: 2px solid var(--success-color);
-    background: linear-gradient(145deg, rgba(31,156,80,0.15), rgba(31,156,80,0.05));
+.scoreChipCorrect {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #00ff88;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
 }
 
-.incorrectAnswer,
-.noAnswer {
-    border: 2px solid var(--danger-color);
-    background: linear-gradient(145deg, rgba(255,111,97,0.15), rgba(255,111,97,0.05));
+.scoreChipZero {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    font-family: var(--font-mono, monospace);
+    line-height: 1;
 }
 
-.fastestPlayer {
-    border: 2px solid #FFC857;
-    background: linear-gradient(145deg, rgba(255,200,87,0.25), rgba(255,200,87,0.1));
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+.scorePlus {
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
-.onStreakCard {
-    border-color: #ff5500;
+.scoreValue {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
-.currentPlayer .playerName {
-    color: var(--primary-color);
-    font-family: var(--font-title);
-    font-size: 2.2rem;
+.scoreUnit {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-left: 2px;
 }
 
-.currentPlayer .playerAvatar {
-    border: 3px solid var(--primary-color);
-    box-shadow: 0 0 10px rgba(241, 91, 181, 0.5);
-    padding: 2px;
+/* ── Time Row ── */
+.timeRow {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.timeBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0.3px;
+}
+
+.timeBadgeLate {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 71, 87, 0.08);
+    border: 1px solid rgba(255, 71, 87, 0.2);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    color: #ff6f61;
+}
+
+.timeIcon {
+    font-size: 11px;
+    opacity: 0.7;
 }
 
 @keyframes flamePulse {
@@ -145,27 +385,43 @@
 }
 
 @keyframes flameBounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-4px); }
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-4px);
+    }
 }
 
 @media (max-width: 600px) {
     .playersResultsWrapper {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: center;
         gap: 12px;
     }
+
     .playerCard {
+        width: 100%;
+        max-width: 280px;
         min-height: auto;
-        padding: 12px;
+        padding: 14px;
     }
+
     .playerAvatar {
-        width: 90px;
-        height: 90px;
+        width: 76px;
+        height: 76px;
     }
+
+    .avatarContainer {
+        width: 76px;
+        height: 76px;
+    }
+
     .playerName {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
     }
-    .playerScore {
-        font-size: 1.4rem;
+
+    .scoreValue {
+        font-size: 1.3rem;
     }
 }
