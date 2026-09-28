@@ -107,3 +107,28 @@ export function getAlbumStreamingLinks(
         apple: `https://music.apple.com/search?term=${encoded}`,
     };
 }
+
+export interface DiscographyLinks {
+    spotify: string;
+    deezer: string;
+}
+
+export function getArtistDiscographyLinks(
+    artistName: string,
+    deezerArtistId?: number | string,
+    directDeezerLink?: string
+): DiscographyLinks {
+    const encoded = encodeURIComponent(artistName.trim());
+    const deezerUrl = deezerArtistId
+        ? `https://www.deezer.com/artist/${deezerArtistId}/albums`
+        : directDeezerLink
+        ? `${directDeezerLink.replace(/\/+$/, '')}/albums`
+        : `https://www.deezer.com/search/${encodeURIComponent(artistName.trim() + ' albums')}`;
+
+    const spotifyUrl = `https://open.spotify.com/search/${encoded}/albums`;
+
+    return {
+        spotify: spotifyUrl,
+        deezer: deezerUrl,
+    };
+}

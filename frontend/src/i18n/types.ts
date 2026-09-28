@@ -318,6 +318,16 @@ export interface TranslationDictionary {
         musicDetailsUnmute: string;
         musicDetailsSpeed: string;
         musicDetailsNormalSpeed: string;
+        musicDetailsDiscographyPartial: string;
+        musicDetailsAlbumsCountBadge: string;
+        musicDetailsAlbumsSelectedBadge: string;
+        musicDetailsAlbumsNotice: string;
+        musicDetailsViewAllAlbums: string;
+        musicDetailsViewAllAlbumsDesc: string;
+        musicDetailsViewAllSpotify: string;
+        musicDetailsViewAllSpotifySub: string;
+        musicDetailsViewAllDeezer: string;
+        musicDetailsViewAllDeezerSub: string;
     };
     shareModal: {
         title: string;

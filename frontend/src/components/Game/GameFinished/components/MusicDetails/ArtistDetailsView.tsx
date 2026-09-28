@@ -9,7 +9,11 @@ import {
 } from '../../../../../store/api/deezerApi';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
 import { fetchArtistBio, ArtistBioResult } from '../../../../../utils/music/artistBio';
-import { getArtistStreamingLinks, getAlbumStreamingLinks } from '../../../../../utils/music/streamingLinks';
+import { 
+    getArtistStreamingLinks, 
+    getAlbumStreamingLinks,
+    getArtistDiscographyLinks 
+} from '../../../../../utils/music/streamingLinks';
 import StreamingLinksGrid from './StreamingLinksGrid';
 import { 
     FaUser, 
@@ -22,7 +26,8 @@ import {
     FaExternalLinkAlt,
     FaBroadcastTower,
     FaClock,
-    FaRecordVinyl
+    FaRecordVinyl,
+    FaInfoCircle
 } from 'react-icons/fa';
 import { SiSpotify } from 'react-icons/si';
 import { FaDeezer } from 'react-icons/fa6';
@@ -182,6 +187,13 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
     const displayAlbums = (studioAlbums.length >= 3 ? studioAlbums : rawAlbums)
         .slice(0, 6);
 
+    const discographyLinks = getArtistDiscographyLinks(
+        displayName,
+        effectiveId,
+        deezerArtist?.link
+    );
+    const totalAlbumsCount = deezerArtist?.nb_album || albumsData?.total || rawAlbums.length;
+
     // Parse related artists: top 6
     const relatedArtists: any[] = Array.isArray(relatedData)
         ? relatedData.slice(0, 6)
@@ -335,10 +347,28 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
             {/* Discography & Key Albums */}
             {displayAlbums.length > 0 && (
                 <div className={styles.albumsSection}>
-                    <div className={styles.sectionHeader}>
-                        <FaRecordVinyl style={{ color: '#9b5de5' }} />
-                        <span>{t('gameplay.musicDetailsDiscography')}</span>
+                    <div className={styles.sectionHeaderRow}>
+                        <div className={styles.sectionHeader}>
+                            <FaRecordVinyl style={{ color: '#9b5de5' }} />
+                            <span>{t('gameplay.musicDetailsDiscographyPartial')}</span>
+                        </div>
+                        <span className={styles.albumsCountBadge}>
+                            {totalAlbumsCount > displayAlbums.length
+                                ? t('gameplay.musicDetailsAlbumsCountBadge', {
+                                      count: displayAlbums.length,
+                                      total: totalAlbumsCount,
+                                  })
+                                : t('gameplay.musicDetailsAlbumsSelectedBadge', {
+                                      count: displayAlbums.length,
+                                  })}
+                        </span>
                     </div>
+
+                    <div className={styles.albumsNoticeBar}>
+                        <FaInfoCircle className={styles.albumsNoticeIcon} />
+                        <span>{t('gameplay.musicDetailsAlbumsNotice')}</span>
+                    </div>
+
                     <div className={styles.albumsGrid}>
                         {displayAlbums.map((album: any) => {
                             const albumLinks = getAlbumStreamingLinks(album.title, displayName, album.link);
@@ -392,6 +422,61 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* View all albums / Full discography callout */}
+                    <div className={styles.viewAllAlbumsSection}>
+                        <div className={styles.viewAllAlbumsHeader}>
+                            <div className={styles.viewAllAlbumsTitleGroup}>
+                                <FaCompactDisc className={styles.viewAllTitleIcon} />
+                                <span className={styles.viewAllAlbumsHeading}>
+                                    {t('gameplay.musicDetailsViewAllAlbums')}
+                                </span>
+                            </div>
+                            <span className={styles.viewAllAlbumsSubheading}>
+                                {t('gameplay.musicDetailsViewAllAlbumsDesc', { artist: displayName })}
+                            </span>
+                        </div>
+
+                        <div className={styles.viewAllAlbumsButtons}>
+                            <a
+                                href={discographyLinks.spotify}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.viewAllBtnSpotify}
+                                title={t('gameplay.musicDetailsViewAllSpotify')}
+                            >
+                                <SiSpotify className={styles.viewAllPlatformIcon} />
+                                <div className={styles.viewAllBtnText}>
+                                    <span className={styles.viewAllBtnMain}>
+                                        {t('gameplay.musicDetailsViewAllSpotify')}
+                                    </span>
+                                    <span className={styles.viewAllBtnSub}>
+                                        {t('gameplay.musicDetailsViewAllSpotifySub')}
+                                    </span>
+                                </div>
+                                <FaExternalLinkAlt className={styles.viewAllExtIcon} />
+                            </a>
+
+                            <a
+                                href={discographyLinks.deezer}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.viewAllBtnDeezer}
+                                title={t('gameplay.musicDetailsViewAllDeezer')}
+                            >
+                                <FaDeezer className={styles.viewAllPlatformIcon} />
+                                <div className={styles.viewAllBtnText}>
+                                    <span className={styles.viewAllBtnMain}>
+                                        {t('gameplay.musicDetailsViewAllDeezer')}
+                                    </span>
+                                    <span className={styles.viewAllBtnSub}>
+                                        {t('gameplay.musicDetailsViewAllDeezerSub')}
+                                    </span>
+                                </div>
+                                <FaExternalLinkAlt className={styles.viewAllExtIcon} />
+                            </a>
+                        </div>
                     </div>
                 </div>
             )}
