@@ -316,6 +316,8 @@ export const uk: TranslationDictionary = {
         musicDetailsLoop: 'Зациклити фрагмент',
         musicDetailsMute: 'Вимкнути звук',
         musicDetailsUnmute: 'Увімкнути звук',
+        musicDetailsSpeed: 'Швидкість відтворення',
+        musicDetailsNormalSpeed: 'Звичайна',
     },
     shareModal: {
         title: 'Запросити у кімнату',

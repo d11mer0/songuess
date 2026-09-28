@@ -386,6 +386,11 @@
     background: rgba(255, 255, 255, 0.18);
 }
 
+.progressBarDragging {
+    height: 10px;
+    cursor: grabbing !important;
+}
+
 .progressBarFill {
     height: 100%;
     width: 100%;
@@ -407,7 +412,13 @@
     transform: translate(-50%, -50%);
     box-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
     pointer-events: none;
-    transition: opacity 0.15s ease;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.progressBarThumbDragging {
+    transform: translate(-50%, -50%) scale(1.35);
+    background: #00f3ff;
+    box-shadow: 0 0 16px #00f3ff;
 }
 
 /* ── Controls Row ── */
@@ -510,6 +521,111 @@
     background: rgba(239, 68, 68, 0.2);
     border-color: #ef4444;
     color: #ff6b6b;
+}
+
+/* ── Playback Speed Controller ── */
+.speedControlWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.speedBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+}
+
+.speedBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.speedBtnActive {
+    background: rgba(0, 243, 255, 0.18);
+    border-color: #00f3ff;
+    color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.speedDropdown {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: linear-gradient(165deg, rgba(26, 20, 42, 0.98) 0%, rgba(13, 9, 22, 0.99) 100%);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 243, 255, 0.15);
+    padding: 6px;
+    min-width: 145px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: modalPop 0.15s ease;
+}
+
+.speedDropdownHeader {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 4px 8px 6px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+}
+
+.speedOptionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.speedOptionItem {
+    background: none;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.12s ease;
+    text-align: left;
+}
+
+.speedOptionItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.speedOptionActive {
+    background: rgba(0, 243, 255, 0.16);
+    color: #00f3ff;
+    font-weight: 800;
+}
+
+.speedCheck {
+    font-size: 11px;
+    color: #00f3ff;
+    font-weight: 800;
 }
 
 /* ── Dedicated Full Album Card ── */

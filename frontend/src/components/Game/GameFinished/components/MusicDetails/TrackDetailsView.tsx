@@ -42,6 +42,8 @@ const formatSeconds = (sec: number) => {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
 };
 
+const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
 const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArtist }) => {
     const { t, language } = useTranslation();
     const isNumericId = !isNaN(Number(track.id)) && Number(track.id) > 0;
@@ -70,11 +72,16 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
     // Audio preview state
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const progressBarRef = useRef<HTMLDivElement | null>(null);
+    const speedMenuRef = useRef<HTMLDivElement | null>(null);
+    const isDraggingRef = useRef(false);
+    const [isDragging, setIsDragging] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(30);
     const [isLooping, setIsLooping] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
+    const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+    const [showSpeedMenu, setShowSpeedMenu] = useState(false);
 
     const title = deezerTrack?.title || track.title;
     const artistName = deezerTrack?.artist?.name || track.artistName || t('gameplay.singer');
@@ -106,7 +113,11 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         const audio = audioRef.current;
         if (!audio) return;
 
-        const updateTime = () => setCurrentTime(audio.currentTime);
+        const updateTime = () => {
+            if (!isDraggingRef.current) {
+                setCurrentTime(audio.currentTime);
+            }
+        };
         const onLoaded = () => setDuration(audio.duration || 30);
         const onEnded = () => {
             if (!isLooping) {
@@ -127,6 +138,21 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         };
     }, [previewUrl, isLooping]);
 
+    // Close speed dropdown on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (speedMenuRef.current && !speedMenuRef.current.contains(e.target as Node)) {
+                setShowSpeedMenu(false);
+            }
+        };
+        if (showSpeedMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showSpeedMenu]);
+
     const togglePlay = () => {
         if (!audioRef.current || !previewUrl) return;
 
@@ -143,16 +169,39 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         }
     };
 
-    const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const updateSeekFromClientX = (clientX: number) => {
         const bar = progressBarRef.current;
         const audio = audioRef.current;
         if (!bar || !audio || duration <= 0) return;
         const rect = bar.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const newRatio = Math.max(0, Math.min(1, clickX / rect.width));
-        const newTime = newRatio * duration;
+        const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const newTime = ratio * duration;
         audio.currentTime = newTime;
         setCurrentTime(newTime);
+    };
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return;
+        isDraggingRef.current = true;
+        setIsDragging(true);
+        updateSeekFromClientX(e.clientX);
+
+        const onPointerMove = (moveEvent: PointerEvent) => {
+            if (!isDraggingRef.current) return;
+            updateSeekFromClientX(moveEvent.clientX);
+        };
+
+        const onPointerUp = () => {
+            isDraggingRef.current = false;
+            setIsDragging(false);
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            window.removeEventListener('pointercancel', onPointerUp);
+        };
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
     };
 
     const handleRewind5s = () => {
@@ -181,6 +230,14 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         const next = !isMuted;
         setIsMuted(next);
         audioRef.current.muted = next;
+    };
+
+    const handleSelectSpeed = (speed: number) => {
+        setPlaybackSpeed(speed);
+        if (audioRef.current) {
+            audioRef.current.playbackRate = speed;
+        }
+        setShowSpeedMenu(false);
     };
 
     // Calculate scale factor for GPU-accelerated progress animation (avoids layout reflow in Firefox)
@@ -260,19 +317,19 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                         </div>
                     </div>
 
-                    {/* Seekable Progress Bar Scrubber */}
+                    {/* Seekable Progress Bar Scrubber with Smooth Live Dragging */}
                     <div
                         ref={progressBarRef}
-                        className={styles.progressBarTrack}
-                        onClick={handleSeek}
-                        title="Click to seek"
+                        className={`${styles.progressBarTrack} ${isDragging ? styles.progressBarDragging : ''}`}
+                        onPointerDown={handlePointerDown}
+                        title="Drag to seek"
                     >
                         <div
                             className={styles.progressBarFill}
                             style={{ transform: `scaleX(${progressScale})` }}
                         />
                         <div
-                            className={styles.progressBarThumb}
+                            className={`${styles.progressBarThumb} ${isDragging ? styles.progressBarThumbDragging : ''}`}
                             style={{ left: `${progressScale * 100}%` }}
                         />
                     </div>
@@ -311,6 +368,39 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                         </div>
 
                         <div className={styles.audioExtraControls}>
+                            {/* Playback Speed Controller */}
+                            <div className={styles.speedControlWrapper} ref={speedMenuRef}>
+                                <button
+                                    type="button"
+                                    className={`${styles.speedBtn} ${playbackSpeed !== 1 ? styles.speedBtnActive : ''}`}
+                                    onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                                    title={t('gameplay.musicDetailsSpeed')}
+                                >
+                                    <span>{playbackSpeed}x</span>
+                                </button>
+
+                                {showSpeedMenu && (
+                                    <div className={styles.speedDropdown}>
+                                        <div className={styles.speedDropdownHeader}>
+                                            {t('gameplay.musicDetailsSpeed')}
+                                        </div>
+                                        <div className={styles.speedOptionsList}>
+                                            {SPEED_OPTIONS.map((speed) => (
+                                                <button
+                                                    key={speed}
+                                                    type="button"
+                                                    className={`${styles.speedOptionItem} ${playbackSpeed === speed ? styles.speedOptionActive : ''}`}
+                                                    onClick={() => handleSelectSpeed(speed)}
+                                                >
+                                                    <span>{speed === 1 ? `${speed}x (${t('gameplay.musicDetailsNormalSpeed')})` : `${speed}x`}</span>
+                                                    {playbackSpeed === speed && <span className={styles.speedCheck}>✓</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <button
                                 type="button"
                                 className={`${styles.extraControlBtn} ${isLooping ? styles.extraControlActive : ''}`}

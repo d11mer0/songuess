@@ -316,6 +316,8 @@ export interface TranslationDictionary {
         musicDetailsLoop: string;
         musicDetailsMute: string;
         musicDetailsUnmute: string;
+        musicDetailsSpeed: string;
+        musicDetailsNormalSpeed: string;
     };
     shareModal: {
         title: string;

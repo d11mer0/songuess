@@ -316,6 +316,8 @@ export const en: TranslationDictionary = {
         musicDetailsLoop: 'Loop preview',
         musicDetailsMute: 'Mute',
         musicDetailsUnmute: 'Unmute',
+        musicDetailsSpeed: 'Playback Speed',
+        musicDetailsNormalSpeed: 'Normal',
     },
     shareModal: {
         title: 'Invite to Room',
