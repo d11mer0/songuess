@@ -17,8 +17,8 @@ const TrackPreviewSummary: React.FC<TrackPreviewSummaryProps> = ({ tracks }) => 
     return (
         <div className={styles.summaryWrapper}>
             <h3 className={styles.heading}>
-                <BsMusicNoteBeamed style={{ marginRight: '6px' }} />
-                {t('gameplay.selectedCollectionIncludes', { count: tracks.length })}
+                <BsMusicNoteBeamed className={styles.icon} />
+                <span>{t('gameplay.selectedCollectionIncludes', { count: tracks.length })}</span>
             </h3>
 
             <p className={styles.preview}>

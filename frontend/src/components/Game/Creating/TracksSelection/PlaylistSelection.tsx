@@ -9,6 +9,7 @@ import ClearSelectionButton from './components/ClearSelectionButton';
 import StartGameButtonBlock from './components/StartGameButtonBlock';
 import OverviewLoadingPlaceholder from '../../../UI/Loader/OverviewLoading/OverviewLoadingPlaceholder';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import styles from './TrackSelection.module.css';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
@@ -43,7 +44,7 @@ const PlaylistSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props)
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchPlaylistTitle')}</h2>
+            <h2 className={styles.sectionTitle}>{t('gameCreation.searchPlaylistTitle')}</h2>
 
             <PlaylistSearch
                 searchTerm={searchTerm}

@@ -6,6 +6,7 @@ import ClearSelectionButton from './components/ClearSelectionButton';
 import TrackTypeSelector from './ArtistSelection/TrackTypeSelector';
 import SelectedArtistPanel from './ArtistSelection/SelectedArtistPanel';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import styles from './TrackSelection.module.css';
 
 type TracksFormat = 'ALL' | 'PLAYLIST' | 'ALBUM';
 
@@ -46,7 +47,7 @@ const ArtistSelection: FC<Props> = ({ handleStart, autoFocus = false }) => {
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchArtist')}</h2>
+            <h2 className={styles.sectionTitle}>{t('gameCreation.searchArtist')}</h2>
 
             <ArtistSearch
                 searchQuery={searchQuery}

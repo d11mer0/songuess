@@ -5,6 +5,7 @@ import AlbumOverview from '../../../deezerFunctions/Album/AlbumOverview';
 import { SelectedTracks } from '../../../../types/gameTypes';
 import ClearSelectionButton from './components/ClearSelectionButton';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import styles from './TrackSelection.module.css';
 
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
@@ -23,7 +24,7 @@ const AlbumSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props) =>
 
     return (
         <div>
-            <h2 style={{textAlign: 'center'}}>{t('gameCreation.searchAlbumTitle')}</h2>
+            <h2 className={styles.sectionTitle}>{t('gameCreation.searchAlbumTitle')}</h2>
 
             <AlbumSearch
                 albumName={albumName}

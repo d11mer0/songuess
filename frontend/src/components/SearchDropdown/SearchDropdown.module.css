@@ -1,91 +1,117 @@
 .searchContainer {
     position: relative;
     width: 100%;
-    max-width: 400px;
-    margin: 0 auto; /* Центрує блок по горизонталі */
+    max-width: 480px;
+    margin: 0 auto;
     font-family: var(--font-main);
 }
 
 .inputWrapper {
     position: relative;
+    width: 100%;
 }
 
 .searchIcon {
     position: absolute;
     top: 50%;
-    left: 12px;
+    left: 16px;
     transform: translateY(-50%);
-    color: var(--primary-color);
-    font-size: 22px;
+    color: #00f3ff;
+    font-size: 20px;
     pointer-events: none;
     display: flex;
     align-items: center;
+    filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.45));
+    transition: all 0.25s ease;
+}
+
+.inputWrapper:focus-within .searchIcon {
+    color: #00f3ff;
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.8));
+    transform: translateY(-50%) scale(1.08);
 }
 
 .searchInput {
     width: 100%;
-    padding: 10px 14px;
-    padding-left: 40px; /* було 14px */
-    font-size: 16px;
-    border: 1px solid var(--background-highlight);
-    border-radius: 6px;
-    background-color: var(--background-secondary);
-    color: var(--text-main);
+    padding: 13px 44px 13px 48px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1.5px solid rgba(155, 93, 229, 0.35);
+    border-radius: 16px;
+    background: rgba(14, 10, 24, 0.85);
+    color: #ffffff;
     outline: none;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 14px;
+}
+
+.searchInput:hover {
+    border-color: rgba(155, 93, 229, 0.65);
+    background: rgba(20, 15, 34, 0.92);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(155, 93, 229, 0.2);
 }
 
 .searchInput:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(155, 93, 229, 0.3);
+    border-color: #00f3ff;
+    background: rgba(22, 16, 38, 0.95);
+    box-shadow: 0 0 18px rgba(0, 243, 255, 0.3), inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .clearButton {
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: 14px;
     transform: translateY(-50%);
     background: none;
     border: none;
-    padding: 0;
+    padding: 4px;
     margin: 0;
     cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 20px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
 }
 
 .clearButton:hover {
-    color: var(--primary-color);
+    color: #f15bb5;
+    background: rgba(241, 91, 181, 0.15);
+    transform: translateY(-50%) scale(1.1);
 }
-
-
 
 .dropdownList {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     left: 0;
     width: 100%;
-    background: linear-gradient(180deg, #2a2238 0%, #1e1829 100%);
+    background: linear-gradient(180deg, rgba(32, 24, 48, 0.98) 0%, rgba(18, 14, 28, 0.98) 100%);
     border: 1px solid rgba(155, 93, 229, 0.4);
-    border-radius: 12px;
+    border-radius: 16px;
     list-style: none;
-    padding: 6px 0;
+    padding: 8px;
     margin: 0;
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(155, 93, 229, 0.15);
-    max-height: 240px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(155, 93, 229, 0.2);
+    max-height: 260px;
     overflow-y: auto;
     z-index: 100;
+    box-sizing: border-box;
     animation: fadeIn 0.15s ease-out;
 
-    /* Cross-browser scrollbar (Firefox, modern Chrome, Edge, Safari) */
+    /* Cross-browser scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(155, 93, 229, 0.55) rgba(0, 0, 0, 0.25);
 }
 
-/* WebKit / Blink scrollbar (Chrome, Edge, Safari, Opera, Brave) */
+/* WebKit / Blink scrollbar */
 .dropdownList::-webkit-scrollbar {
     width: 6px;
 }
@@ -119,39 +145,40 @@
 
 .highlightedMatch {
     font-weight: 700;
-    color: var(--primary-hover, #b075f7);
-    text-shadow: 0 0 8px rgba(176, 117, 247, 0.4);
+    color: #00f3ff;
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
 }
 
 .dropdownItem {
-    margin: 2px 6px;
+    margin: 3px 0;
     padding: 10px 14px;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    transition: all 0.15s ease;
     color: var(--text-main);
     font-size: 15px;
     flex-direction: row;
-    flex-wrap: wrap; /* для перестроювання */
+    flex-wrap: wrap;
 }
 
 .dropdownItem:hover {
-    background-color: rgba(155, 93, 229, 0.2);
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.3), rgba(0, 243, 255, 0.15));
     color: #ffffff;
+    transform: translateX(4px);
 }
 
 .mainText {
-    font-weight: 500;
+    font-weight: 600;
     flex: 1 1 auto;
     min-width: 0;
 }
 
 .subText {
-    color: var(--text-secondary);
-    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
     margin-left: 10px;
     white-space: nowrap;
 }
@@ -169,7 +196,7 @@
     .subText {
         margin-left: 0;
         align-self: flex-end;
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-secondary);
     }
 }

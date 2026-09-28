@@ -1,8 +1,13 @@
 .heading {
-    font-size: 2rem;
-    margin: 20px 0 10px 0;
-    color: var(--text-main);
+    font-family: var(--font-title);
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #ffffff 40%, #00f3ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-align: center;
+    margin: 20px 0 16px 0;
 }
 
 .albumLayout {
@@ -20,9 +25,24 @@
     max-width: 400px;
     max-height: 600px;
     overflow-y: auto;
-    overflow-y: auto;
-    border-right: 1px solid var(--border-color, #444);
-    padding-right: 12px;
+    border-right: 1px solid rgba(155, 93, 229, 0.25);
+    padding-right: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 93, 229, 0.45) rgba(0, 0, 0, 0.2);
+}
+
+.leftColumn::-webkit-scrollbar {
+    width: 6px;
+}
+
+.leftColumn::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+}
+
+.leftColumn::-webkit-scrollbar-thumb {
+    background: rgba(155, 93, 229, 0.45);
+    border-radius: 6px;
 }
 
 /* права колонка – overview вибраного альбому */
@@ -36,8 +56,8 @@
 }
 
 .selectAlbumText {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.5);
     font-style: italic;
     text-align: center;
     margin-top: 60px;

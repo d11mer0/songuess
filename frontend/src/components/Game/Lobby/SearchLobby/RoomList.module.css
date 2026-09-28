@@ -9,7 +9,6 @@
     width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
-    backdrop-filter: blur(16px);
 }
 
 .emptyState {
@@ -115,7 +114,6 @@
     box-sizing: border-box;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    backdrop-filter: blur(10px);
 }
 
 .roomItem:hover {
