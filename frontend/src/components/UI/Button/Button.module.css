@@ -1,16 +1,19 @@
 .button {
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: 600;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 700;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     font-family: var(--font-title);
-    letter-spacing: 0.05em; /* ⬅️ додає характеру */
-    text-transform: uppercase; /* ⬅️ опціонально, але виглядає круто */
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition:
-        background-color 0.2s,
-        transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
 }
 
 .responsive {}
@@ -18,85 +21,107 @@
 @media (max-width: 520px) and (min-width: 321px) {
     .responsive {
         width: auto !important;
-        margin: 0; /* прибираємо auto-margin, щоб не центровано */
+        margin: 0;
     }
 }
 
-/* МЕНШЕ або рівно 320px: width: 95%, по центру */
 @media (max-width: 320px) {
     .responsive {
         width: 95% !important;
-        margin: 0 auto; /* центровано */
+        margin: 0 auto;
     }
 }
 
-
 .button:disabled {
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transform: none !important;
+    box-shadow: none !important;
 }
 
+/* 🔹 Primary Variant (Neon Purple Gradient) */
 .button.primary {
-    background-color: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, #9b5de5, #7a3eb5);
+    color: #ffffff;
+    border: 1px solid rgba(155, 93, 229, 0.4);
+    box-shadow: 0 4px 14px rgba(155, 93, 229, 0.35);
 }
 
-.button.primary:hover {
-    background-color: var(--primary-hover);
-    transform: scale(1.05);
+.button.primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #af6ef8, #8c4ad0);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(155, 93, 229, 0.5);
+    border-color: rgba(175, 110, 248, 0.6);
 }
 
-.button.primary:active {
-    background-color: var(--primary-active);
-    transform: scale(1.05);
+.button.primary:active:not(:disabled) {
+    background: linear-gradient(135deg, #8848d0, #692fa3);
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(155, 93, 229, 0.4);
 }
 
+/* 🔹 Secondary Variant (Neon Pink Gradient) */
 .button.secondary {
-    background-color: var(--secondary-color);
-    color: white;
-    
+    background: linear-gradient(135deg, #f15bb5, #c1448e);
+    color: #ffffff;
+    border: 1px solid rgba(241, 91, 181, 0.4);
+    box-shadow: 0 4px 14px rgba(241, 91, 181, 0.35);
 }
 
-.button.secondary:hover {
-    background-color: var(--secondary-hover);
-    transform: scale(1.05);
+.button.secondary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f773c3, #cf4ea0);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(241, 91, 181, 0.5);
+    border-color: rgba(247, 115, 195, 0.6);
 }
 
-.button.secondary:active {
-    background-color: var(--secondary-active);
-    transform: scale(1.05);
+.button.secondary:active:not(:disabled) {
+    background: linear-gradient(135deg, #de4b9f, #aa397a);
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(241, 91, 181, 0.4);
 }
 
+/* 🔹 Danger Variant (Cyber Red Gradient) */
 .button.danger {
-    background-color: var(--danger-color);
-    color: white;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #ffffff;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
 }
 
-.button.danger:hover {
-    background-color: var(--danger-hover);
-    transform: scale(1.05);
+.button.danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    border-color: rgba(248, 113, 113, 0.6);
 }
 
-.button.danger:active {
-    background-color: var(--danger-active);
-    transform: scale(1.05);
+.button.danger:active:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 }
 
+/* 🔹 Neutral Variant (Frosted Glass / Slate) */
 .button.neutral {
-    background-color: #4a4a4a;
-    color: #cccccc;
-    transition:
-        background-color 0.2s,
-        box-shadow 0.2s;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e0e0e0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
-.button.neutral:hover {
-    background-color: #5c5c5c;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05),
-                0 0 4px rgba(0, 0, 0, 0.4);
+.button.neutral:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-.button.neutral:active {
-    background-color: #3c3c3c;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
+.button.neutral:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }

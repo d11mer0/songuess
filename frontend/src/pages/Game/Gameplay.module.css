@@ -26,12 +26,15 @@
 .playersSection {
     margin: 0 auto;
     width: 500px;
-    background-color: var(--background-secondary);
-    padding: 25px 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px var(--primary-box-shadow-color);
+    max-width: 100%;
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
     margin-bottom: 30px;
-    transition: all 0.3s ease-in-out; /* плавне згортання / поява */
+    transition: all 0.3s ease-in-out;
+    backdrop-filter: blur(16px);
 }
 
 .gameContent {

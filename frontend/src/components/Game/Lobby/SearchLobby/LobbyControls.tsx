@@ -6,6 +6,16 @@ import MaxPlayersInput from './LobbyControls/MaxPlayersInput';
 import ActionButtons from './LobbyControls/ActionButtons';
 import { socketEmitter, socketHandlers } from '../../../../services/socket';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import { 
+    FaMusic, 
+    FaHourglassHalf, 
+    FaListOl, 
+    FaKeyboard, 
+    FaTv, 
+    FaBolt, 
+    FaKey, 
+    FaPlusCircle 
+} from 'react-icons/fa';
 
 interface Props {
     createRoom: (options: LobbyOptions) => void;
@@ -84,26 +94,32 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
             <div className={styles.quickPlayColumn}>
                 {/* ⚡ Блок швидкого підбору 1v1 */}
                 <div className={styles.duelSection}>
-                    <div className={styles.duelTitle}>{t('lobby.duelTitle')}</div>
+                    <div className={styles.duelTitle}>
+                        <FaBolt className={styles.duelIcon} />
+                        <span>{t('lobby.duelTitle')}</span>
+                    </div>
                     <div className={styles.duelDesc}>{t('lobby.duelDesc')}</div>
 
                     {!isSearchingDuel ? (
-                        <button className={styles.duelButton} onClick={handleStartDuelSearch}>
-                            {t('lobby.duelFindBtn')}
+                        <button type="button" className={styles.duelButton} onClick={handleStartDuelSearch}>
+                            <span>{t('lobby.duelFindBtn')}</span>
                         </button>
                     ) : (
                         <div className={styles.duelWaitingBox}>
-                            <span>{t('lobby.duelSearching')}</span>
-                            <button className={styles.duelCancelButton} onClick={handleCancelDuelSearch}>
+                            <span className={styles.duelSearchingText}>{t('lobby.duelSearching')}</span>
+                            <button type="button" className={styles.duelCancelButton} onClick={handleCancelDuelSearch}>
                                 {t('lobby.duelCancelBtn')}
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* 🔑 Швидкий вхід за 4-значним кодом */}
+                {/* 🔑 Швидкий вхід за кодом */}
                 <div className={styles.codeJoinSection}>
-                    <div className={styles.codeJoinTitle}>{t('lobby.codeJoinTitle')}</div>
+                    <div className={styles.codeJoinTitle}>
+                        <FaKey className={styles.codeJoinIcon} />
+                        <span>{t('lobby.codeJoinTitle')}</span>
+                    </div>
                     <div className={styles.codeJoinRow}>
                         <input
                             type="text"
@@ -133,7 +149,10 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
             {/* Права колонка: Створення власної кімнати */}
             <div className={styles.createRoomColumn}>
                 <div className={styles.controlsContainer}>
-                    <h3 className={styles.sectionTitle}>{t('lobby.createRoomTitle')}</h3>
+                    <h3 className={styles.sectionTitle}>
+                        <FaPlusCircle className={styles.sectionTitleIcon} />
+                        <span>{t('lobby.createRoomTitle')}</span>
+                    </h3>
 
                     {/* Вибір режиму гри */}
                     <div className={styles.modeSelectContainer}>
@@ -144,14 +163,16 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
                                 className={`${styles.modeBtn} ${lobbyOptions.gameMode === 'CLASSIC' ? styles.active : ''}`}
                                 onClick={() => setGameMode('CLASSIC')}
                             >
-                                {t('lobby.modeClassic')}
+                                <FaMusic className={styles.modeBtnIcon} />
+                                <span>{t('lobby.modeClassic')}</span>
                             </button>
                             <button
                                 type="button"
                                 className={`${styles.modeBtn} ${lobbyOptions.gameMode === 'HEARDLE' ? styles.active : ''}`}
                                 onClick={() => setGameMode('HEARDLE')}
                             >
-                                {t('lobby.modeHeardle')}
+                                <FaHourglassHalf className={styles.modeBtnIcon} />
+                                <span>{t('lobby.modeHeardle')}</span>
                             </button>
                         </div>
                     </div>
@@ -165,14 +186,16 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
                                 className={`${styles.modeBtn} ${lobbyOptions.answerMode === 'MULTIPLE_CHOICE' ? styles.active : ''}`}
                                 onClick={() => setAnswerMode('MULTIPLE_CHOICE')}
                             >
-                                {t('lobby.modeOptions')}
+                                <FaListOl className={styles.modeBtnIcon} />
+                                <span>{t('lobby.modeOptions')}</span>
                             </button>
                             <button
                                 type="button"
                                 className={`${styles.modeBtn} ${lobbyOptions.answerMode === 'TYPE_IN' ? styles.active : ''}`}
                                 onClick={() => setAnswerMode('TYPE_IN')}
                             >
-                                {t('lobby.modeHardcore')}
+                                <FaKeyboard className={styles.modeBtnIcon} />
+                                <span>{t('lobby.modeHardcore')}</span>
                             </button>
                         </div>
                     </div>
@@ -196,33 +219,20 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
 
                     <Checkboxes options={lobbyOptions} onToggle={handleChange} />
                     <MaxPlayersInput maxPlayers={lobbyOptions.maxPlayers} onChange={setMaxPlayers} />
+
                     <button
                         type="button"
+                        className={styles.partyModeBtn}
                         onClick={() => createRoom({
                             ...lobbyOptions,
                             maxPlayers: 12,
                             isPartyMode: true,
                         })}
-                        style={{
-                            width: '100%',
-                            padding: '12px 18px',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(0, 243, 255, 0.5)',
-                            background: 'linear-gradient(135deg, rgba(0, 243, 255, 0.15), rgba(155, 93, 229, 0.25))',
-                            color: '#00f3ff',
-                            fontSize: '15px',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            marginBottom: '16px',
-                            boxShadow: '0 4px 16px rgba(0, 243, 255, 0.15)',
-                        }}
                     >
-                        {t('party.partyModeBtn')}
+                        <FaTv className={styles.partyBtnIcon} />
+                        <span>{t('party.partyModeBtn')}</span>
                     </button>
+
                     <ActionButtons
                         onAutoJoin={autoJoinRoom}
                         onCreateRoom={createRoom}

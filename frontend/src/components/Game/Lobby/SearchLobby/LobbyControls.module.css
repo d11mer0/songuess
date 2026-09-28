@@ -8,7 +8,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    max-width: 880px;
+    max-width: 900px;
     margin: 0 auto 36px auto;
     align-items: start;
 }
@@ -25,218 +25,102 @@
 }
 
 .controlsContainer {
-    background-color: var(--background-secondary);
-    padding: 24px;
-    border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 24px;
+    padding: 26px 28px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.12);
     width: 100%;
     margin: 0;
+    position: relative;
+    box-sizing: border-box;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.controlsContainer:hover {
+    border-color: rgba(155, 93, 229, 0.5);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), 0 0 36px rgba(155, 93, 229, 0.18);
 }
 
 .sectionTitle {
-    font-size: 26px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: var(--text-main, #ffffff);
-}
-
-.checkboxGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.checkboxLabel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    color: var(--text-main);
-    cursor: pointer;
-    text-align: left;
-    user-select: none;
-}
-
-.playerCountContainer {
-    margin-bottom: 24px;
-    text-align: left;
-}
-
-.counterWrapper {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 22px;
+    color: #ffffff;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-family: var(--font-title, sans-serif);
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.counterButton {
-    width: 28px;
-    height: 30px;
-    background-color: var(--primary-color);
-    color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.counterButton:hover {
-    background-color: var(--primary-hover);
-}
-
-.counterButton:first-child {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-}
-
-.counterButton:last-child {
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-
-.counterInput {
-    width: 38px;
-    height: 30px;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    border: 1px solid var(--primary-color);
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-    background-color: var(--background-tertiary);
-    color: var(--text-main);
-    outline: none;
-    appearance: textfield;
-    caret-color: var(--primary-color);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.counterInput:focus {
-    border-top: 1px solid var(--primary-hover);
-    border-bottom: 1px solid var(--primary-hover);
-    box-shadow: inset 0 1px 3px rgba(155, 93, 229, 0.6), 0 0 2px var(--primary-hover);
-}
-
-.inputLabel {
-    font-size: 15px;
-    color: var(--text-secondary);
-    display: block;
-    margin-bottom: 6px;
-}
-
-.buttonGroup {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    gap: 12px;
-}
-
-/* ⚡ Duel & Mode selectors */
-.duelSection {
-    background: linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(121, 40, 202, 0.15));
-    border: 2px solid rgba(255, 0, 127, 0.4);
-    border-radius: 14px;
-    padding: 22px 20px;
-    width: 100%;
-    margin: 0;
-    text-align: center;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
-}
-
-.duelTitle {
-    font-size: 18px;
-    font-weight: 800;
-    color: #ff007f;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-}
-
-.duelDesc {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 14px;
-    line-height: 1.4;
-}
-
-.duelButton {
-    width: 100%;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #ff007f, #7928ca);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.duelButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 0, 127, 0.4);
-}
-
-.duelWaitingBox {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    padding: 12px;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 10px;
 }
 
-.duelCancelButton {
-    padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
+.sectionTitleIcon {
+    color: #00f3ff;
+    font-size: 22px;
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.5));
 }
 
 .modeSelectContainer {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     text-align: left;
 }
 
 .modeLabel {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
     display: block;
 }
 
 .modeButtonGroup {
     display: flex;
     gap: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 5px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .modeBtn {
     flex: 1;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: #fff;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.65);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+}
+
+.modeBtn:hover:not(.active) {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .modeBtn.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: #fff;
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.35) 0%, rgba(155, 93, 229, 0.18) 100%);
+    border: 1px solid #9b5de5;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(155, 93, 229, 0.4);
+    transform: translateY(-1px);
+}
+
+.modeBtnIcon {
+    font-size: 14px;
+    color: #00f3ff;
 }
 
 .durationButtonGroup {
@@ -252,61 +136,429 @@
 }
 
 .durationBtn {
-    padding: 8px 4px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: #fff;
+    padding: 10px 4px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     text-align: center;
+    font-family: inherit;
 }
 
-.durationBtn:hover {
-    border-color: rgba(0, 243, 255, 0.5);
-    background: rgba(0, 243, 255, 0.1);
+.durationBtn:hover:not(.active) {
+    border-color: rgba(0, 243, 255, 0.4);
+    background: rgba(0, 243, 255, 0.08);
+    color: #00f3ff;
+    transform: translateY(-1px);
 }
 
 .durationBtn.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.4) 0%, rgba(0, 243, 255, 0.2) 100%);
+    border: 1px solid #00f3ff;
+    color: #00f3ff;
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* 🔹 Checkbox Card Group */
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.checkboxCard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.checkboxCard:hover {
+    border-color: rgba(155, 93, 229, 0.35);
+    background: rgba(155, 93, 229, 0.05);
+}
+
+.checkboxCardActive {
+    border-color: rgba(155, 93, 229, 0.55);
+    background: rgba(155, 93, 229, 0.12);
+    box-shadow: 0 0 16px rgba(155, 93, 229, 0.15);
+}
+
+.checkboxBox {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.checkboxCardActive .checkboxBox {
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    border-color: transparent;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+
+.checkIcon {
+    font-size: 11px;
+    color: #ffffff;
+}
+
+.checkboxLabelText {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 1.3;
+}
+
+/* 🔹 Player Count Stepper */
+.playerCountContainer {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.inputLabel {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.stepperContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 6px 12px;
+}
+
+.stepperBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(155, 93, 229, 0.18);
+    border: 1px solid rgba(155, 93, 229, 0.4);
+    color: #c084fc;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.stepperBtn:hover:not(:disabled) {
+    background: rgba(155, 93, 229, 0.35);
+    border-color: #9b5de5;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(155, 93, 229, 0.5);
+    transform: scale(1.05);
+}
+
+.stepperBtn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.stepperDisplay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.stepperIcon {
+    color: #00f3ff;
+    font-size: 16px;
+    opacity: 0.85;
+}
+
+.counterInput {
+    width: 44px;
+    height: 36px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    font-family: var(--font-mono, monospace);
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    outline: none;
+}
+
+/* 🔹 Party Mode Button */
+.partyModeBtn {
+    width: 100%;
+    padding: 13px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 243, 255, 0.45);
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.12) 0%, rgba(155, 93, 229, 0.2) 100%);
+    color: #00f3ff;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.15);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+}
+
+.partyModeBtn:hover {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.22) 0%, rgba(155, 93, 229, 0.32) 100%);
+    border-color: #00f3ff;
+    box-shadow: 0 6px 24px rgba(0, 243, 255, 0.35);
+    transform: translateY(-2px);
+    color: #ffffff;
+}
+
+.partyBtnIcon {
+    font-size: 16px;
+    color: #00f3ff;
+}
+
+/* 🔹 Action Buttons Group */
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 12px;
+}
+
+.autoJoinBtn {
+    width: 100%;
+    padding: 13px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #cbd5e1;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.autoJoinBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.createRoomMainBtn {
+    width: 100%;
+    padding: 14px 22px;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    border: none;
+    color: #ffffff;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 14.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(0, 243, 255, 0.35);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.createRoomMainBtn:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 28px rgba(155, 93, 229, 0.6);
+}
+
+.actionBtnIcon {
+    font-size: 15px;
+}
+
+/* ⚡ Duel & Code Join Sections */
+.duelSection {
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(255, 0, 127, 0.35);
+    border-radius: 24px;
+    padding: 26px 24px;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 0, 127, 0.12);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.duelSection:hover {
+    border-color: rgba(255, 0, 127, 0.55);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), 0 0 32px rgba(255, 0, 127, 0.2);
+}
+
+.duelTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ff007f;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-title, sans-serif);
+}
+
+.duelIcon {
+    font-size: 16px;
+    color: #ff007f;
+    filter: drop-shadow(0 0 8px rgba(255, 0, 127, 0.6));
+}
+
+.duelDesc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 16px;
+    line-height: 1.45;
+}
+
+.duelButton {
+    width: 100%;
+    padding: 13px 20px;
+    background: linear-gradient(135deg, #ff007f, #7928ca);
     color: #fff;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+    border: none;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 18px rgba(255, 0, 127, 0.35);
+    font-family: inherit;
+}
+
+.duelButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(255, 0, 127, 0.55);
+}
+
+.duelWaitingBox {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 0, 127, 0.3);
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.duelSearchingText {
+    font-size: 13px;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.duelCancelButton {
+    padding: 7px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.duelCancelButton:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
 }
 
 /* 🔑 Швидкий вхід за кодом */
 .codeJoinSection {
-    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(121, 40, 202, 0.15));
-    border: 2px solid rgba(0, 243, 255, 0.4);
-    border-radius: 14px;
-    padding: 20px;
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(0, 243, 255, 0.35);
+    border-radius: 24px;
+    padding: 26px 24px;
     width: 100%;
     margin: 0;
     text-align: center;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 243, 255, 0.12);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.codeJoinSection:hover {
+    border-color: rgba(0, 243, 255, 0.55);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), 0 0 32px rgba(0, 243, 255, 0.2);
 }
 
 .codeJoinTitle {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 800;
     color: #00f3ff;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-title, sans-serif);
+}
+
+.codeJoinIcon {
+    font-size: 16px;
+    color: #00f3ff;
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
 }
 
 .codeJoinRow {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .codeInput {
     flex: 1;
     background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(0, 243, 255, 0.5);
-    border-radius: 8px;
-    padding: 10px 14px;
+    border: 1.5px solid rgba(0, 243, 255, 0.4);
+    border-radius: 14px;
+    padding: 11px 14px;
     font-size: 18px;
     font-weight: 800;
     font-family: var(--font-mono, monospace);
@@ -315,12 +567,12 @@
     letter-spacing: 4px;
     text-transform: uppercase;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .codeInput:focus {
     border-color: #00f3ff;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.5);
 }
 
 .codeInput::placeholder {
@@ -330,26 +582,31 @@
 }
 
 .joinCodeBtn {
-    padding: 10px 18px;
+    padding: 11px 20px;
     background: linear-gradient(135deg, #00f3ff, #0077ff);
-    color: #000;
+    color: #040d1a;
     border: none;
-    border-radius: 8px;
+    border-radius: 14px;
     font-weight: 800;
     font-size: 14px;
     cursor: pointer;
-    transition: transform 0.15s, opacity 0.15s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: inherit;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.35);
 }
 
 .joinCodeBtn:hover:enabled {
-    transform: scale(1.03);
-    box-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 243, 255, 0.55);
 }
 
 .joinCodeBtn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 @media (max-width: 820px) {
@@ -358,3 +615,4 @@
         max-width: 440px;
     }
 }
+

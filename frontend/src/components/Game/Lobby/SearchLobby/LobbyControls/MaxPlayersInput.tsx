@@ -1,5 +1,6 @@
 import styles from '../LobbyControls.module.css';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
+import { FaUsers, FaMinus, FaPlus } from 'react-icons/fa';
 
 interface Props {
     maxPlayers: number;
@@ -22,28 +23,35 @@ const MaxPlayersInput = ({ maxPlayers, onChange }: Props) => {
             <label htmlFor="maxPlayers" className={styles.inputLabel}>
                 {t('lobby.maxPlayers')}
             </label>
-            <div className={styles.counterWrapper}>
+            <div className={styles.stepperContainer}>
                 <button
                     type="button"
-                    className={styles.counterButton}
+                    className={styles.stepperBtn}
                     onClick={() => onChange(Math.max(3, maxPlayers - 1))}
+                    disabled={maxPlayers <= 3}
+                    title="Зменшити"
                 >
-                    –
+                    <FaMinus />
                 </button>
-                <input
-                    id="maxPlayers"
-                    type="text"
-                    inputMode="numeric"
-                    value={maxPlayers}
-                    onChange={handleInput}
-                    className={styles.counterInput}
-                />
+                <div className={styles.stepperDisplay}>
+                    <FaUsers className={styles.stepperIcon} />
+                    <input
+                        id="maxPlayers"
+                        type="text"
+                        inputMode="numeric"
+                        value={maxPlayers}
+                        onChange={handleInput}
+                        className={styles.counterInput}
+                    />
+                </div>
                 <button
                     type="button"
-                    className={styles.counterButton}
+                    className={styles.stepperBtn}
                     onClick={() => onChange(Math.min(9, maxPlayers + 1))}
+                    disabled={maxPlayers >= 9}
+                    title="Збільшити"
                 >
-                    +
+                    <FaPlus />
                 </button>
             </div>
         </div>

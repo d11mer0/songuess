@@ -17,20 +17,24 @@
 .playingWrapper {
     max-width: 900px;
     margin: 0 auto;
-    padding: 24px;
-    background-color: var(--background-secondary);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px var(--primary-box-shadow-color);
+    padding: 28px 24px;
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
     color: var(--text-main);
     font-family: var(--font-main);
     text-align: center;
+    backdrop-filter: blur(16px);
 }
 
 .roundTitle {
     font-family: var(--font-title);
     font-size: 38px;
-    color: var(--primary-color);
-    text-shadow: 1px 1px var(--text-shadow-color);
+    font-weight: 800;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 60%, #f15bb5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 12px;
     letter-spacing: 2px;
 }
@@ -87,22 +91,19 @@
 }
 
 .answerButton {
-    background-color: var(--background-tertiary);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-hover);
-    border: 2px solid var(--primary-color);
+    border: 1.5px solid rgba(155, 93, 229, 0.4);
     padding: 12px 18px;
     font-size: 16px;
-    border-radius: 10px;
+    font-weight: 600;
+    border-radius: 14px;
     width: 100%;
     min-height: 52px;
     cursor: pointer;
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.15s ease,
-        box-shadow 0.2s ease;
-    box-shadow: 0 4px 12px var(--primary-box-shadow-color);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 
     display: flex;
     align-items: center;
@@ -114,7 +115,9 @@
 }
 
 .answerButton:hover:enabled {
-    background-color: var(--primary-hover);
+    background: linear-gradient(135deg, rgba(155, 93, 229, 0.3), rgba(241, 91, 181, 0.2));
+    border-color: #00f3ff;
+    box-shadow: 0 6px 20px rgba(0, 243, 255, 0.25);
     transform: translateY(-2px);
 }
 

@@ -1,7 +1,7 @@
-import Button from '../../../../UI/Button/Button';
 import styles from '../LobbyControls.module.css';
 import { LobbyOptions } from '../../../../../types/roomTypes';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
+import { FaDoorOpen, FaPlusCircle } from 'react-icons/fa';
 
 interface Props {
     onAutoJoin: () => void;
@@ -14,12 +14,22 @@ const ActionButtons = ({ onAutoJoin, onCreateRoom, options }: Props) => {
 
     return (
         <div className={styles.buttonGroup}>
-            <Button variant="neutral" width="100%" onClick={onAutoJoin}>
-                {t('lobby.autoJoinBtn')}
-            </Button>
-            <Button variant="primary" width="100%" onClick={() => onCreateRoom(options)}>
-                {t('lobby.createRoomBtn')}
-            </Button>
+            <button
+                type="button"
+                className={styles.autoJoinBtn}
+                onClick={onAutoJoin}
+            >
+                <FaDoorOpen className={styles.actionBtnIcon} />
+                <span>{t('lobby.autoJoinBtn')}</span>
+            </button>
+            <button
+                type="button"
+                className={styles.createRoomMainBtn}
+                onClick={() => onCreateRoom(options)}
+            >
+                <FaPlusCircle className={styles.actionBtnIcon} />
+                <span>{t('lobby.createRoomBtn')}</span>
+            </button>
         </div>
     );
 };

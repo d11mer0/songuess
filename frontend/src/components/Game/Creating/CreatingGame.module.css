@@ -1,14 +1,18 @@
 .container {  
     width: 820px;
+    max-width: 100%;
     margin: 0 auto;
-    background-color: var(--background-secondary);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px var(--primary-box-shadow-color);
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
     display: flex;
     flex-direction: column;
     gap: 2rem;
     align-items: center;
+    box-sizing: border-box;
+    backdrop-filter: blur(16px);
 }
 
 @media (max-width: 850px) {
@@ -101,9 +105,15 @@
 }
 
 .heading {
-    font-size: 2.2rem; /* було 1.5rem */
-    margin-bottom: 2rem; /* було 1rem */
-    color: var(--primary-color);
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-title);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 50%, #f15bb5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
 }
 
 .gameTypeButtons {
@@ -115,31 +125,35 @@
 }
 
 .typeButton {
-    padding: 0.65rem 1.4rem;
-    background-color: var(--background-highlight);
-    border: none;
-    border-radius: 8px;
-    color: var(--text-main);
-    font-weight: 600;
+    padding: 10px 22px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    color: var(--text-secondary);
+    font-weight: 700;
     font-size: 1rem;
+    font-family: var(--font-title);
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     white-space: nowrap;
 }
 
 .typeButton:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    background-color: var(--primary-hover);
-    transform: scale(1.03);
+    background: rgba(155, 93, 229, 0.2);
+    color: #ffffff;
+    border-color: rgba(155, 93, 229, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(155, 93, 229, 0.3);
 }
 
 .active {
-    background-color: var(--primary-color);
-    color: #fff;
-    transform: scale(1.05);
-
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #9b5de5, #7a3eb5) !important;
+    color: #ffffff !important;
+    border-color: rgba(155, 93, 229, 0.7) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(155, 93, 229, 0.45) !important;
 }
 
 .selectionSection {
