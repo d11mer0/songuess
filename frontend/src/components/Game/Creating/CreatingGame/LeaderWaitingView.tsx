@@ -8,14 +8,14 @@ const LeaderWaitingView: FC = () => {
 
     return (
         <>
-            <h3 className={styles.sectionTitle}>
+            <div className={styles.waitingHeader}>
                 <div className={styles.emptyText}>
                     <span className={styles.emoji}>🕹️</span> {t('gameCreation.hostPreparingTitle')}
                 </div>
                 <div className={styles.emptySubtext}>
                     {t('gameCreation.hostPreparingSubtext')} <span className={styles.emoji}>⏳</span>
                 </div>
-            </h3>
+            </div>
             <WaitingLoader />
         </>
     );

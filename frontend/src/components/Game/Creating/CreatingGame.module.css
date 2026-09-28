@@ -34,8 +34,13 @@
     text-align: center;
 }
 
+.waitingHeader {
+    width: 100%;
+    text-align: center;
+}
+
 .emptyText {
-    font-size: 34px;
+    font-size: 30px;
     font-family: var(--font-title);
     line-height: 1.3;
     background: linear-gradient(90deg, #00c9ff, #92fe9d); /* змінено на холодніший градієнт */
@@ -44,7 +49,7 @@
     -webkit-text-fill-color: transparent;
     display: block;
     margin-bottom: 8px;
-    animation: floatIn 1s ease forwards, pulse 2s infinite ease-in-out;
+    animation: textShimmer 3s ease-in-out infinite;
 }
 
 .emptySubtext {
@@ -77,12 +82,14 @@
     }
 }
 
-@keyframes pulse {
+@keyframes textShimmer {
     0%, 100% {
-        transform: scale(1);
+        opacity: 0.95;
+        filter: drop-shadow(0 0 6px rgba(0, 201, 255, 0.25));
     }
     50% {
-        transform: scale(1.04);
+        opacity: 1;
+        filter: drop-shadow(0 0 16px rgba(146, 254, 157, 0.5));
     }
 }
 

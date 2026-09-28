@@ -5,11 +5,11 @@ const EmptyRoomListState = () => {
     const { t } = useTranslation();
 
     return (
-        <h3 className={styles.sectionTitle}>
+        <div className={styles.emptyContainer}>
             <div className={styles.emptyText}>
-                <span className={styles.emoji}>😢</span> {t('lobby.noRooms')}
+                <span className={styles.emoji}>🥺</span> {t('lobby.noRooms')}
             </div>
-        </h3>
+        </div>
     );
 };
 
