@@ -243,20 +243,211 @@
     word-break: break-word;
 }
 
-/* ── Audio Preview Player (GPU-accelerated) ── */
+/* ── Upgraded Audio Preview Player ── */
 .audioPreviewCard {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 12px 16px;
+    background: linear-gradient(145deg, rgba(22, 17, 36, 0.88) 0%, rgba(13, 9, 23, 0.96) 100%);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 16px;
+    padding: 14px 18px 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audioPreviewPlaying {
+    border-color: rgba(0, 243, 255, 0.45);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.15);
+}
+
+.audioCardHeader {
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: space-between;
+}
+
+.audioBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.liveDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transition: all 0.2s ease;
+}
+
+.liveDotActive {
+    background: #00f3ff;
+    box-shadow: 0 0 8px #00f3ff;
+    animation: livePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(1.3);
+    }
+}
+
+.audioTimeStatus {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.timeCurrent {
+    color: #00f3ff;
+}
+
+.timeDivider {
+    opacity: 0.35;
+    color: #ffffff;
+}
+
+.timeDuration {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Sound Waveform Visualizer ── */
+.visualizerContainer {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+}
+
+.visualizerWave {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    gap: 3px;
+}
+
+.visualizerBar {
+    flex: 1;
+    background: linear-gradient(180deg, #00f3ff 0%, #9b5de5 100%);
+    border-radius: 2px;
+    min-height: 4px;
+    max-height: 100%;
+    opacity: 0.45;
+    transition: height 0.2s ease, opacity 0.2s ease;
+}
+
+.visualizerWavePlaying .visualizerBar {
+    opacity: 0.95;
+    animation: waveBounce 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes waveBounce {
+    0% {
+        height: 15%;
+    }
+    50% {
+        height: 90%;
+    }
+    100% {
+        height: 35%;
+    }
+}
+
+/* ── Seekable Scrubber Track ── */
+.progressBarTrack {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    overflow: visible;
+    transition: background 0.15s ease;
+}
+
+.progressBarTrack:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.progressBarFill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00f3ff 0%, #f15bb5 100%);
+    border-radius: 4px;
+    transform-origin: left center;
+    will-change: transform;
+    transition: transform 0.08s linear;
+}
+
+.progressBarThumb {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border: 2px solid #00f3ff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+/* ── Controls Row ── */
+.audioControlsRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+.audioMainControls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.seekStepBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.seekStepBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .playBtn {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, #00f3ff, #0099ff);
     border: none;
@@ -264,7 +455,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
     box-shadow: 0 0 16px rgba(0, 243, 255, 0.4);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -272,43 +463,53 @@
 }
 
 .playBtn:hover {
-    transform: scale(1.06);
-    box-shadow: 0 0 22px rgba(0, 243, 255, 0.6);
+    transform: scale(1.08);
+    box-shadow: 0 0 24px rgba(0, 243, 255, 0.65);
 }
 
-.audioTrackInfo {
-    flex: 1;
+.playBtnActive {
+    background: linear-gradient(135deg, #f15bb5, #9b5de5);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(241, 91, 181, 0.5);
+}
+
+.audioExtraControls {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
 }
 
-.audioLabelRow {
+.extraControlBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
     display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.75);
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.progressBarTrack {
-    width: 100%;
-    height: 6px;
+.extraControlBtn:hover {
     background: rgba(255, 255, 255, 0.12);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
+    color: #ffffff;
 }
 
-/* Transform-based fill avoids reflow in Firefox */
-.progressBarFill {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, #00f3ff, #9b5de5);
-    border-radius: 3px;
-    transform-origin: left center;
-    will-change: transform;
-    transition: transform 0.08s linear;
+.extraControlActive {
+    background: rgba(0, 243, 255, 0.2);
+    border-color: #00f3ff;
+    color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.extraControlMuted {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #ff6b6b;
 }
 
 /* ── Dedicated Full Album Card ── */

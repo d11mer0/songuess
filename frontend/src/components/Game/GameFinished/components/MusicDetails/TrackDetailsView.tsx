@@ -17,7 +17,13 @@ import {
     FaFire, 
     FaBroadcastTower, 
     FaExternalLinkAlt, 
-    FaLayerGroup 
+    FaLayerGroup,
+    FaHeadphones,
+    FaBackward,
+    FaForward,
+    FaRedo,
+    FaVolumeUp,
+    FaVolumeMute
 } from 'react-icons/fa';
 import { SiSpotify, SiApplemusic } from 'react-icons/si';
 import { FaDeezer } from 'react-icons/fa6';
@@ -63,9 +69,12 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
 
     // Audio preview state
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const progressBarRef = useRef<HTMLDivElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(30);
+    const [isLooping, setIsLooping] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
 
     const title = deezerTrack?.title || track.title;
     const artistName = deezerTrack?.artist?.name || track.artistName || t('gameplay.singer');
@@ -100,8 +109,10 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         const updateTime = () => setCurrentTime(audio.currentTime);
         const onLoaded = () => setDuration(audio.duration || 30);
         const onEnded = () => {
-            setIsPlaying(false);
-            setCurrentTime(0);
+            if (!isLooping) {
+                setIsPlaying(false);
+                setCurrentTime(0);
+            }
         };
 
         audio.addEventListener('timeupdate', updateTime);
@@ -114,7 +125,7 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
             audio.removeEventListener('ended', onEnded);
             audio.pause();
         };
-    }, [previewUrl]);
+    }, [previewUrl, isLooping]);
 
     const togglePlay = () => {
         if (!audioRef.current || !previewUrl) return;
@@ -130,6 +141,46 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                 setIsPlaying(false);
             });
         }
+    };
+
+    const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+        const bar = progressBarRef.current;
+        const audio = audioRef.current;
+        if (!bar || !audio || duration <= 0) return;
+        const rect = bar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const newRatio = Math.max(0, Math.min(1, clickX / rect.width));
+        const newTime = newRatio * duration;
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+    };
+
+    const handleRewind5s = () => {
+        if (!audioRef.current) return;
+        const newTime = Math.max(0, audioRef.current.currentTime - 5);
+        audioRef.current.currentTime = newTime;
+        setCurrentTime(newTime);
+    };
+
+    const handleForward5s = () => {
+        if (!audioRef.current) return;
+        const newTime = Math.min(duration, audioRef.current.currentTime + 5);
+        audioRef.current.currentTime = newTime;
+        setCurrentTime(newTime);
+    };
+
+    const toggleLoop = () => {
+        if (!audioRef.current) return;
+        const next = !isLooping;
+        setIsLooping(next);
+        audioRef.current.loop = next;
+    };
+
+    const toggleMute = () => {
+        if (!audioRef.current) return;
+        const next = !isMuted;
+        setIsMuted(next);
+        audioRef.current.muted = next;
     };
 
     // Calculate scale factor for GPU-accelerated progress animation (avoids layout reflow in Firefox)
@@ -169,28 +220,114 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                 </div>
             </div>
 
-            {/* Audio Preview Card (GPU-accelerated progress bar) */}
+            {/* Upgraded Cyber Audio Preview Card */}
             {previewUrl && (
-                <div className={styles.audioPreviewCard}>
-                    <audio ref={audioRef} src={previewUrl} preload="none" />
-                    <button
-                        type="button"
-                        className={styles.playBtn}
-                        onClick={togglePlay}
-                        title={isPlaying ? t('gameplay.musicDetailsPausePreview') : t('gameplay.musicDetailsPlayPreview')}
-                    >
-                        {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: 2 }} />}
-                    </button>
-                    <div className={styles.audioTrackInfo}>
-                        <div className={styles.audioLabelRow}>
-                            <span>{t('gameplay.musicDetailsPlayPreview')} (30s)</span>
-                            <span>{formatSeconds(currentTime)} / {formatSeconds(duration)}</span>
+                <div className={`${styles.audioPreviewCard} ${isPlaying ? styles.audioPreviewPlaying : ''}`}>
+                    <audio 
+                        ref={audioRef} 
+                        src={previewUrl} 
+                        preload="none" 
+                        loop={isLooping} 
+                    />
+
+                    {/* Top Row: Title Badge, Pulsing Dot & Time */}
+                    <div className={styles.audioCardHeader}>
+                        <div className={styles.audioBadge}>
+                            <FaHeadphones style={{ color: '#00f3ff' }} />
+                            <span>{t('gameplay.musicDetailsAudioPreviewTitle')}</span>
+                            <span className={`${styles.liveDot} ${isPlaying ? styles.liveDotActive : ''}`} />
                         </div>
-                        <div className={styles.progressBarTrack}>
-                            <div
-                                className={styles.progressBarFill}
-                                style={{ transform: `scaleX(${progressScale})` }}
-                            />
+                        <div className={styles.audioTimeStatus}>
+                            <span className={styles.timeCurrent}>{formatSeconds(currentTime)}</span>
+                            <span className={styles.timeDivider}>/</span>
+                            <span className={styles.timeDuration}>{formatSeconds(duration)}</span>
+                        </div>
+                    </div>
+
+                    {/* Animated Sound Waveform Visualizer */}
+                    <div className={styles.visualizerContainer}>
+                        <div className={`${styles.visualizerWave} ${isPlaying ? styles.visualizerWavePlaying : ''}`}>
+                            {Array.from({ length: 24 }).map((_, i) => (
+                                <span
+                                    key={i}
+                                    className={styles.visualizerBar}
+                                    style={{
+                                        animationDelay: `${(i * 0.05) % 0.8}s`,
+                                        height: isPlaying ? undefined : `${15 + (i % 6) * 10}%`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Seekable Progress Bar Scrubber */}
+                    <div
+                        ref={progressBarRef}
+                        className={styles.progressBarTrack}
+                        onClick={handleSeek}
+                        title="Click to seek"
+                    >
+                        <div
+                            className={styles.progressBarFill}
+                            style={{ transform: `scaleX(${progressScale})` }}
+                        />
+                        <div
+                            className={styles.progressBarThumb}
+                            style={{ left: `${progressScale * 100}%` }}
+                        />
+                    </div>
+
+                    {/* Controls Row */}
+                    <div className={styles.audioControlsRow}>
+                        <div className={styles.audioMainControls}>
+                            <button
+                                type="button"
+                                className={styles.seekStepBtn}
+                                onClick={handleRewind5s}
+                                title={t('gameplay.musicDetailsRewind5s')}
+                            >
+                                <FaBackward style={{ fontSize: 10 }} />
+                                <span>-5s</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className={`${styles.playBtn} ${isPlaying ? styles.playBtnActive : ''}`}
+                                onClick={togglePlay}
+                                title={isPlaying ? t('gameplay.musicDetailsPausePreview') : t('gameplay.musicDetailsPlayPreview')}
+                            >
+                                {isPlaying ? <FaPause /> : <FaPlay style={{ marginLeft: 2 }} />}
+                            </button>
+
+                            <button
+                                type="button"
+                                className={styles.seekStepBtn}
+                                onClick={handleForward5s}
+                                title={t('gameplay.musicDetailsForward5s')}
+                            >
+                                <span>+5s</span>
+                                <FaForward style={{ fontSize: 10 }} />
+                            </button>
+                        </div>
+
+                        <div className={styles.audioExtraControls}>
+                            <button
+                                type="button"
+                                className={`${styles.extraControlBtn} ${isLooping ? styles.extraControlActive : ''}`}
+                                onClick={toggleLoop}
+                                title={t('gameplay.musicDetailsLoop')}
+                            >
+                                <FaRedo style={{ fontSize: 11 }} />
+                            </button>
+
+                            <button
+                                type="button"
+                                className={`${styles.extraControlBtn} ${isMuted ? styles.extraControlMuted : ''}`}
+                                onClick={toggleMute}
+                                title={isMuted ? t('gameplay.musicDetailsUnmute') : t('gameplay.musicDetailsMute')}
+                            >
+                                {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                            </button>
                         </div>
                     </div>
                 </div>

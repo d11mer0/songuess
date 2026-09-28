@@ -310,6 +310,12 @@ export const uk: TranslationDictionary = {
         musicDetailsCleanLyrics: 'Без ненормативної лексики',
         musicDetailsRelatedArtists: 'Схожі виконавці',
         musicDetailsDiscography: 'Дискографія та альбоми',
+        musicDetailsAudioPreviewTitle: 'Аудіофрагмент (30 сек)',
+        musicDetailsRewind5s: 'Назад на 5 секунд',
+        musicDetailsForward5s: 'Вперед на 5 секунд',
+        musicDetailsLoop: 'Зациклити фрагмент',
+        musicDetailsMute: 'Вимкнути звук',
+        musicDetailsUnmute: 'Увімкнути звук',
     },
     shareModal: {
         title: 'Запросити у кімнату',

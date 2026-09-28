@@ -310,6 +310,12 @@ export const en: TranslationDictionary = {
         musicDetailsCleanLyrics: 'Clean Lyrics',
         musicDetailsRelatedArtists: 'Similar Artists',
         musicDetailsDiscography: 'Discography & Albums',
+        musicDetailsAudioPreviewTitle: 'Audio Preview (30s)',
+        musicDetailsRewind5s: 'Rewind 5s',
+        musicDetailsForward5s: 'Forward 5s',
+        musicDetailsLoop: 'Loop preview',
+        musicDetailsMute: 'Mute',
+        musicDetailsUnmute: 'Unmute',
     },
     shareModal: {
         title: 'Invite to Room',

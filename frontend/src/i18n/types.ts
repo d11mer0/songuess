@@ -310,6 +310,12 @@ export interface TranslationDictionary {
         musicDetailsCleanLyrics: string;
         musicDetailsRelatedArtists: string;
         musicDetailsDiscography: string;
+        musicDetailsAudioPreviewTitle: string;
+        musicDetailsRewind5s: string;
+        musicDetailsForward5s: string;
+        musicDetailsLoop: string;
+        musicDetailsMute: string;
+        musicDetailsUnmute: string;
     };
     shareModal: {
         title: string;
