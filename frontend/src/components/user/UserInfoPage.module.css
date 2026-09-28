@@ -7,72 +7,193 @@
     gap: 8px;
 }
 
+/* 🔹 Avatar Modal Styles */
+.avatarModalContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+}
+
+.avatarPreviewContainer {
+    position: relative;
+    display: inline-flex;
+    margin: 0 auto 6px auto;
+}
+
+.avatarPreviewImg {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #00f3ff;
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.45), inset 0 0 15px rgba(0, 243, 255, 0.2);
+    background: #140f22;
+    padding: 3px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.avatarPreviewContainer:hover .avatarPreviewImg {
+    transform: scale(1.04);
+    box-shadow: 0 0 32px rgba(0, 243, 255, 0.65);
+}
+
+.avatarBadge {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 243, 255, 0.5);
+    border: 2px solid #140f22;
+}
+
+/* 🔹 File Upload Button */
 .fileButton {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    font-size: 16px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 14.5px;
+    font-weight: 700;
+    font-family: var(--font-title, sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 14px;
     cursor: pointer;
-    background-color: var(--secondary-color);
-    color: var(--text-main);
-    border: none;
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.12) 0%, rgba(155, 93, 229, 0.18) 100%);
+    border: 1.5px solid rgba(0, 243, 255, 0.45);
+    color: #00f3ff;
+    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.12);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .fileButton:hover {
-    background-color: var(--secondary-hover);
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.22) 0%, rgba(155, 93, 229, 0.3) 100%);
+    border-color: #00f3ff;
+    color: #ffffff;
+    box-shadow: 0 6px 24px rgba(0, 243, 255, 0.35);
+    transform: translateY(-2px);
 }
 
 .fileButton.selected {
-    background-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.25) 100%);
+    border-color: #10b981;
+    color: #34d399;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
 }
 
-.icon {
-    font-size: 20px;
+.fileButtonIcon {
+    font-size: 16px;
+    filter: drop-shadow(0 0 6px currentColor);
 }
 
 .hiddenInput {
     display: none;
 }
 
-/* Drag & Drop – залишив фон таким, як був */
+/* 🔹 Drag & Drop Zone */
 .dropZone {
-    margin-top: 15px;
-    padding: 20px;
-    border: 2px dashed #757575; /* Колір залишив */
-    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px 20px;
+    border: 2px dashed rgba(155, 93, 229, 0.45);
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.25);
     text-align: center;
-    font-size: 16px;
-    color: #a0a0a0; /* Колір залишив */
-    transition:
-        border-color 0.2s ease,
-        background-color 0.2s ease;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropZone:hover {
+    border-color: rgba(155, 93, 229, 0.7);
+    background: rgba(155, 93, 229, 0.06);
+    color: #ffffff;
 }
 
 .dropZone.dragging {
-    border-color: var(--primary-color);
-    background-color: rgba(30, 136, 229, 0.1);
-    color: var(--primary-color);
+    border-color: #00f3ff;
+    background: rgba(0, 243, 255, 0.12);
+    color: #00f3ff;
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.35);
+    transform: scale(1.02);
 }
 
-.uploadButtonContainer {
-    margin-top: 20px;
-    text-align: center;
+.dropZoneIcon {
+    font-size: 28px;
+    color: #9b5de5;
+    transition: color 0.25s ease, transform 0.25s ease;
+    filter: drop-shadow(0 0 8px rgba(155, 93, 229, 0.5));
+}
+
+.dropZone:hover .dropZoneIcon,
+.dropZone.dragging .dropZoneIcon {
+    color: #00f3ff;
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.6));
+    transform: translateY(-2px);
+}
+
+.dropZoneMainText {
+    font-size: 14.5px;
+    font-weight: 600;
+}
+
+.dropZoneSubText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.uploadSubmitBtn {
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35) !important;
+    font-weight: 800 !important;
+}
+
+.uploadSubmitBtn:hover:not(:disabled) {
+    box-shadow: 0 6px 24px rgba(155, 93, 229, 0.6) !important;
+    transform: translateY(-2px) scale(1.02) !important;
 }
 
 .buttonContainer {
     display: flex;
-    gap: 12px; /* Відстань між кнопками */
-    flex-wrap: wrap; /* Щоб кнопки переносились на новий рядок, якщо не влазять */
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 500px) {
     .buttonContainer {
-        flex-direction: column; /* На вузьких екранах кнопки стають у стовпчик */
+        flex-direction: column;
         align-items: center;
-        gap: 8px; /* Менший відступ для компактності */
+        gap: 8px;
     }
     .buttonContainer button {
         width: 90%;

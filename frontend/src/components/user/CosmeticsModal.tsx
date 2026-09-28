@@ -48,8 +48,8 @@ export const CosmeticsModal: React.FC<CosmeticsModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onClose} centered contentClassName="bg-dark text-white border-warning">
-            <Modal.Header closeButton closeVariant="white">
+        <Modal show={show} onHide={onClose} centered>
+            <Modal.Header closeButton>
                 <Modal.Title style={{ color: '#ffd700', fontWeight: 800 }}>
                     {t('profile.cosmeticsTitle')}
                 </Modal.Title>
@@ -137,7 +137,7 @@ export const CosmeticsModal: React.FC<CosmeticsModalProps> = ({
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose}>
+                <Button variant="neutral" onClick={onClose}>
                     {t('common.cancel')}
                 </Button>
                 <Button variant="primary" onClick={handleSave} disabled={isLoading}>

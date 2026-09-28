@@ -10,6 +10,8 @@ import FileUploadButton from './EditAvatar/FileUploadButton';
 import DragAndDropZone from './EditAvatar/DragAndDropZone';
 import AvatarPreview from './EditAvatar/AvatarPreview';
 import styles from './UserInfoPage.module.css';
+import { useTranslation } from '../../i18n/LanguageContext';
+import { FaCloudArrowUp } from 'react-icons/fa6';
 
 interface EditAvatarProps {
     user: {
@@ -19,7 +21,9 @@ interface EditAvatarProps {
     show: boolean;
     onClose: (show: boolean) => void;
 }
+
 const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
+    const { t, language } = useTranslation();
     const dispatch = useDispatch();
     const [updateAvatar, { error, isLoading, reset }] =
         useUpdateAvatarMutation();
@@ -35,7 +39,11 @@ const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
 
     const handleUpdate = async () => {
         if (!newAvatar) {
-            setErrorMessage('SELECT FILE!');
+            setErrorMessage(
+                language === 'uk'
+                    ? 'Будь ласка, спочатку оберіть файл зображення!'
+                    : 'Please select an image file first!'
+            );
             return;
         }
         try {
@@ -43,7 +51,7 @@ const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
             formData.append('avatar', newAvatar);
             const response = await updateAvatar(formData).unwrap();
             dispatch(updateUser({ avatar: response.avatar }));
-            onClose(false);
+            handleClose();
         } catch (error) {
             console.error('Failed to update avatar:', error);
         }
@@ -57,44 +65,64 @@ const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
         reset();
     };
 
+    const modalTitle = t('profile.editAvatar');
+
     if (isLoading) {
         return (
             <CustomModal
                 isOpen={show}
-                title="Edit Avatar"
+                title={modalTitle}
                 onClose={handleClose}
             >
-                <Loader />
+                <div style={{ padding: '40px 0', display: 'flex', justifyContent: 'center' }}>
+                    <Loader />
+                </div>
             </CustomModal>
         );
     }
 
     return (
-        <CustomModal isOpen={show} onClose={handleClose} title="Edit Avatar">
-            <AvatarPreview previewAvatar={previewAvatar} user={user} />
-            <FileUploadButton
-                onFileSelect={handleAvatarChange}
-                newAvatar={newAvatar}
-                setErrorMessage={setErrorMessage}
-            />
-            <DragAndDropZone
-                onFileDrop={handleAvatarChange}
-                setErrorMessage={setErrorMessage}
-            />
-            {(error as any)?.data?.message || errorMessage ? (
-                <AuthFormError
-                    error={(error as any)?.data?.message || errorMessage}
+        <CustomModal isOpen={show} onClose={handleClose} title={modalTitle}>
+            <div className={styles.avatarModalContent}>
+                <AvatarPreview previewAvatar={previewAvatar} user={user} />
+                
+                <FileUploadButton
+                    onFileSelect={handleAvatarChange}
+                    newAvatar={newAvatar}
+                    setErrorMessage={setErrorMessage}
                 />
-            ) : null}
-            <div className={styles.uploadButtonContainer}>
-                <Button
-                    variant="primary"
-                    onClick={handleUpdate}
-                    disabled={isLoading}
-                    width={'40%'}
-                >
-                    {isLoading ? 'Uploading...' : 'Upload'}
-                </Button>
+                
+                <DragAndDropZone
+                    onFileDrop={handleAvatarChange}
+                    setErrorMessage={setErrorMessage}
+                />
+
+                {(error as any)?.data?.message || errorMessage ? (
+                    <AuthFormError
+                        error={(error as any)?.data?.message || errorMessage}
+                    />
+                ) : null}
+
+                <div className={styles.modalActions}>
+                    <Button
+                        variant="neutral"
+                        onClick={handleClose}
+                        disabled={isLoading}
+                    >
+                        {t('common.cancel')}
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleUpdate}
+                        disabled={isLoading}
+                        className={styles.uploadSubmitBtn}
+                    >
+                        <FaCloudArrowUp />
+                        {isLoading
+                            ? t('common.loading')
+                            : (language === 'uk' ? 'Завантажити аватар' : 'Upload Avatar')}
+                    </Button>
+                </div>
             </div>
         </CustomModal>
     );

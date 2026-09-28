@@ -148,43 +148,61 @@ input:focus {
 /* МОДАЛЬНЕ:*/
 
 .modal-content {
-    background: linear-gradient(145deg, rgba(28, 22, 44, 0.98), rgba(18, 14, 31, 0.98));
-    border: 1px solid rgba(155, 93, 229, 0.35);
+    background: linear-gradient(145deg, rgba(28, 22, 44, 0.98), rgba(18, 14, 31, 0.98)) !important;
+    border: 1px solid rgba(155, 93, 229, 0.35) !important;
     color: var(--text-main);
-    border-radius: 20px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(155, 93, 229, 0.15);
+    border-radius: 22px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(155, 93, 229, 0.18) !important;
+    overflow: hidden;
 }
 
 .modal-header {
     display: flex;
-    justify-content: center; /* Центрує вміст */
+    justify-content: center;
+    align-items: center;
     position: relative;
+    border-bottom: 1px solid rgba(155, 93, 229, 0.22) !important;
+    padding: 18px 24px !important;
+    background: transparent !important;
 }
 
 .modal-title {
     font-family: var(--font-title);
-    flex-grow: 1; /* Дозволяє заголовку займати весь простір */
+    flex-grow: 1;
     text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 45%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
 }
 
 .modal-header .btn-close {
     position: absolute;
-    right: 15px;
+    right: 18px;
     top: 50%;
     transform: translateY(-50%);
+    opacity: 0.75;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    filter: invert(1) drop-shadow(0 0 4px rgba(0, 243, 255, 0.5));
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
 }
 
 .modal-body {
-    background-color: var(--background-secondary);
+    background-color: transparent !important;
+    padding: 24px !important;
 }
 
 .modal-footer {
-    background-color: var(--background-tertiary);
-    border-top: 1px solid var(--border-color);
-}
-
-.btn-close {
-    filter: invert(1); /* Робить іконку закриття білою */
+    background-color: transparent !important;
+    border-top: 1px solid rgba(155, 93, 229, 0.22) !important;
+    padding: 16px 24px !important;
 }
 
 .checkbox {

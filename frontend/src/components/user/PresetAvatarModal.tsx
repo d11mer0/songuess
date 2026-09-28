@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { PRESET_AVATARS, PresetAvatar } from '../../assets/avatars/presetAvatars';
 import { useUpdatePresetAvatarMutation } from '../../store/api/userApi';
 import { useTranslation } from '../../i18n/LanguageContext';
 import Button from '../UI/Button/Button';
+import styles from './PresetAvatarModal.module.css';
+import { FaCheck } from 'react-icons/fa6';
 
 interface PresetAvatarModalProps {
     show: boolean;
@@ -20,6 +22,17 @@ export const PresetAvatarModal: React.FC<PresetAvatarModalProps> = ({
     const [selectedPreset, setSelectedPreset] = useState<string>(PRESET_AVATARS[0].id);
     const [updatePreset, { isLoading }] = useUpdatePresetAvatarMutation();
 
+    useEffect(() => {
+        if (show && currentAvatar) {
+            const matched = PRESET_AVATARS.find(
+                (p) => p.id === currentAvatar || p.svgDataUri === currentAvatar
+            );
+            if (matched) {
+                setSelectedPreset(matched.id);
+            }
+        }
+    }, [show, currentAvatar]);
+
     const handleApply = async () => {
         try {
             await updatePreset({ presetId: selectedPreset }).unwrap();
@@ -30,21 +43,14 @@ export const PresetAvatarModal: React.FC<PresetAvatarModalProps> = ({
     };
 
     return (
-        <Modal show={show} onHide={onClose} centered contentClassName="bg-dark text-white border-primary">
-            <Modal.Header closeButton closeVariant="white">
+        <Modal show={show} onHide={onClose} centered dialogClassName={styles.modalDialog}>
+            <Modal.Header closeButton>
                 <Modal.Title>{t('avatarModal.title')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p className="text-secondary small mb-3">{t('avatarModal.subtitle')}</p>
+                <p className={styles.subtitle}>{t('avatarModal.subtitle')}</p>
 
-                <div
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '14px',
-                        justifyItems: 'center',
-                    }}
-                >
+                <div className={styles.avatarGrid}>
                     {PRESET_AVATARS.map((avatar: PresetAvatar) => {
                         const isSelected = selectedPreset === avatar.id;
                         const title = language === 'uk' ? avatar.titleUk : avatar.titleEn;
@@ -53,42 +59,21 @@ export const PresetAvatarModal: React.FC<PresetAvatarModalProps> = ({
                             <div
                                 key={avatar.id}
                                 onClick={() => setSelectedPreset(avatar.id)}
-                                style={{
-                                    cursor: 'pointer',
-                                    borderRadius: '16px',
-                                    padding: '8px',
-                                    textAlign: 'center',
-                                    border: isSelected
-                                        ? '3px solid #00f3ff'
-                                        : '2px solid rgba(255, 255, 255, 0.1)',
-                                    backgroundColor: isSelected
-                                        ? 'rgba(0, 243, 255, 0.15)'
-                                        : 'rgba(255, 255, 255, 0.03)',
-                                    boxShadow: isSelected
-                                        ? '0 0 16px rgba(0, 243, 255, 0.4)'
-                                        : 'none',
-                                    transition: 'all 0.2s ease',
-                                    width: '100%',
-                                }}
+                                className={`${styles.avatarCard} ${isSelected ? styles.selected : ''}`}
                             >
-                                <img
-                                    src={avatar.svgDataUri}
-                                    alt={title}
-                                    style={{
-                                        width: '72px',
-                                        height: '72px',
-                                        borderRadius: '50%',
-                                        display: 'block',
-                                        margin: '0 auto 6px',
-                                    }}
-                                />
-                                <div
-                                    style={{
-                                        fontSize: '0.75rem',
-                                        fontWeight: 600,
-                                        color: isSelected ? '#00f3ff' : '#cccccc',
-                                    }}
-                                >
+                                {isSelected && (
+                                    <div className={styles.checkBadge}>
+                                        <FaCheck />
+                                    </div>
+                                )}
+                                <div className={styles.avatarImgWrapper}>
+                                    <img
+                                        src={avatar.svgDataUri}
+                                        alt={title}
+                                        className={styles.avatarImg}
+                                    />
+                                </div>
+                                <div className={styles.avatarTitle}>
                                     {title}
                                 </div>
                             </div>
@@ -97,12 +82,19 @@ export const PresetAvatarModal: React.FC<PresetAvatarModalProps> = ({
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose}>
-                    {t('common.cancel')}
-                </Button>
-                <Button variant="primary" onClick={handleApply} disabled={isLoading}>
-                    {isLoading ? t('common.loading') : t('avatarModal.applyBtn')}
-                </Button>
+                <div className={styles.modalFooter}>
+                    <Button variant="neutral" onClick={onClose} disabled={isLoading}>
+                        {t('common.cancel')}
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleApply}
+                        disabled={isLoading}
+                        className={styles.applyBtn}
+                    >
+                        {isLoading ? t('common.loading') : t('avatarModal.applyBtn')}
+                    </Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );

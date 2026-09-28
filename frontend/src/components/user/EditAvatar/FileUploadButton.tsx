@@ -1,6 +1,7 @@
 import React from 'react';
-import { FaUpload } from 'react-icons/fa6';
+import { FaUpload, FaCheck } from 'react-icons/fa6';
 import styles from '../UserInfoPage.module.css';
+import { useTranslation } from '../../../i18n/LanguageContext';
 
 interface FileUploadButtonProps {
     onFileSelect: (file: File) => void;
@@ -13,12 +14,26 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
     newAvatar,
     setErrorMessage,
 }) => {
+    const { language } = useTranslation();
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
 
         if (file) {
             if (!file.type.startsWith('image/')) {
-                setErrorMessage('Будь ласка, завантажте лише зображення!');
+                setErrorMessage(
+                    language === 'uk'
+                        ? 'Будь ласка, завантажте лише зображення!'
+                        : 'Please upload an image file!'
+                );
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setErrorMessage(
+                    language === 'uk'
+                        ? 'Розмір файлу не повинен перевищувати 5MB!'
+                        : 'File size must not exceed 5MB!'
+                );
                 return;
             }
             onFileSelect(file);
@@ -29,15 +44,22 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
         <label
             className={`${styles.fileButton} ${newAvatar ? styles.selected : ''}`}
         >
+            {newAvatar ? (
+                <FaCheck className={styles.fileButtonIcon} />
+            ) : (
+                <FaUpload className={styles.fileButtonIcon} />
+            )}
+
             <span>
-                <FaUpload className={styles.icon} />
+                {newAvatar
+                    ? (language === 'uk' ? `Обрано: ${newAvatar.name}` : `Selected: ${newAvatar.name}`)
+                    : (language === 'uk' ? 'Виберіть файл з пристрою' : 'Choose File from Device')}
             </span>
 
-            {newAvatar ? 'Файл обрано' : 'Виберіть файл'}
             <input
                 type="file"
                 onChange={handleFileChange}
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp,image/gif"
                 className={styles.hiddenInput}
             />
         </label>
