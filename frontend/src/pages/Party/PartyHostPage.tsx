@@ -19,12 +19,15 @@ import {
     clearMediaSessionPlayback,
 } from '../../utils/audio/blockMediaSessionHardwareKeys';
 import { FaVolumeUp } from 'react-icons/fa';
+import { calculateStartTime } from '../../utils/calculateStartTime';
 import styles from './PartyHostPage.module.css';
 
 interface RoundPayload {
     roundNumber: number;
     options: string[];
     preview: string;
+    startedAt?: number;
+    endsAt?: number;
 }
 
 interface RoundResultItem {
@@ -53,6 +56,8 @@ const PartyHostPage: React.FC = () => {
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const roundStartedAtRef = useRef<number | null>(null);
+    const isResumingRef = useRef<boolean>(false);
 
     const [currentRound, setCurrentRound] = useState<RoundPayload | null>(null);
     const [timeLeft, setTimeLeft] = useState(25);
@@ -183,15 +188,50 @@ const PartyHostPage: React.FC = () => {
         }
     }, [joinUrl, displayCode]);
 
-    // Handle Unblocking audio via click or any user gesture
+    // Handle Unblocking audio via click or any user gesture with real-time sync
     const unlockAudio = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.muted = isMuted;
-            audioRef.current.volume = 0.8;
-            audioRef.current.play().then(() => {
-                setIsAudioBlocked(false);
-            }).catch(() => {});
+        if (isResumingRef.current) return;
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        // If a round is active, calculate the EXACT real-time moment (accounting for pause/wait time)
+        const currentStartedAt = roundStartedAtRef.current;
+        if (currentStartedAt) {
+            const seekTo = calculateStartTime(currentStartedAt);
+            if (Number.isFinite(seekTo)) {
+                try {
+                    audio.currentTime = seekTo;
+                } catch (e) {
+                    console.warn('Could not seek audio on TV unlock', e);
+                }
+            }
         }
+
+        isResumingRef.current = true;
+        audio.muted = isMuted;
+        audio.volume = 0.8;
+        audio.play()
+            .then(() => {
+                if (currentStartedAt) {
+                    const correctedSeek = calculateStartTime(currentStartedAt);
+                    if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
+                        try {
+                            audio.currentTime = correctedSeek;
+                        } catch {}
+                    }
+                }
+                setIsAudioBlocked(false);
+                isResumingRef.current = false;
+                if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+                    try {
+                        navigator.mediaSession.playbackState = 'playing';
+                    } catch {}
+                }
+            })
+            .catch((err) => {
+                console.warn('Playback still prevented on TV unlock', err);
+                isResumingRef.current = false;
+            });
     }, [isMuted]);
 
     useEffect(() => {
@@ -210,6 +250,8 @@ const PartyHostPage: React.FC = () => {
     // Listen to gameplay events
     useEffect(() => {
         const handleRoundStarted = (payload: RoundPayload) => {
+            const startedAt = payload.startedAt || Date.now();
+            roundStartedAtRef.current = startedAt;
             setCurrentRound(payload);
             setRoundResult(null);
             setAnsweredPlayerIds(new Set());
@@ -219,7 +261,10 @@ const PartyHostPage: React.FC = () => {
 
             if (audioRef.current && payload.preview) {
                 audioRef.current.src = payload.preview;
-                audioRef.current.currentTime = 0;
+                const seekTo = payload.startedAt ? calculateStartTime(startedAt) : 0;
+                try {
+                    audioRef.current.currentTime = seekTo;
+                } catch {}
                 audioRef.current.volume = 0.8;
                 audioRef.current.muted = isMuted;
                 audioRef.current.play().then(() => {
@@ -240,12 +285,22 @@ const PartyHostPage: React.FC = () => {
         };
 
         const handleRoundResult = (payload: RoundResultPayload) => {
+            roundStartedAtRef.current = null;
+            setIsAudioBlocked(false);
             setRoundResult(payload);
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
             clearMediaSessionPlayback(audioRef.current);
         };
 
         const handleGameFinished = () => {
+            roundStartedAtRef.current = null;
+            setIsAudioBlocked(false);
             setIsGameFinished(true);
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
             clearMediaSessionPlayback(audioRef.current);
             try {
                 confetti({
@@ -258,13 +313,17 @@ const PartyHostPage: React.FC = () => {
 
         const handleReconnectToRound = (payload: any) => {
             if (!payload) return;
+            const startedAt = payload.startedAt || Date.now();
+            roundStartedAtRef.current = startedAt;
             setCurrentRound({
                 roundNumber: payload.roundNumber,
                 options: payload.options,
                 preview: payload.preview,
+                startedAt: payload.startedAt,
+                endsAt: payload.endsAt,
             });
             setRoundResult(null);
-            const elapsed = payload.startedAt ? Math.floor((Date.now() - payload.startedAt) / 1000) : 0;
+            const elapsed = Math.floor((Date.now() - startedAt) / 1000);
             setTimeLeft(Math.max(0, 25 - elapsed));
             if (payload.answer) {
                 setIsHostAnswerSubmitted(true);
@@ -275,9 +334,10 @@ const PartyHostPage: React.FC = () => {
                 audioRef.current.src = payload.preview;
                 audioRef.current.volume = 0.8;
                 audioRef.current.muted = isMuted;
-                if (payload.startedAt) {
-                    audioRef.current.currentTime = Math.min(25, elapsed);
-                }
+                const seekTo = calculateStartTime(startedAt);
+                try {
+                    audioRef.current.currentTime = seekTo;
+                } catch {}
                 audioRef.current.play().then(() => {
                     setIsAudioBlocked(false);
                     if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
@@ -307,17 +367,22 @@ const PartyHostPage: React.FC = () => {
         };
     }, []);
 
-    // Round countdown timer
+    // Round countdown timer (synchronized with roundStartedAtRef)
     useEffect(() => {
         if (!currentRound || roundResult) return;
         const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
+            if (roundStartedAtRef.current) {
+                const elapsed = (Date.now() - roundStartedAtRef.current) / 1000;
+                setTimeLeft(Math.max(0, Math.ceil(25 - elapsed)));
+            } else {
+                setTimeLeft((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }
         }, 1000);
         return () => clearInterval(timer);
     }, [currentRound, roundResult]);
