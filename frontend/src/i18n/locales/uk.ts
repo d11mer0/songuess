@@ -308,6 +308,8 @@ export const uk: TranslationDictionary = {
         musicDetailsContributors: 'Співавтори та учасники',
         musicDetailsRadioAvailable: 'Радіохвиля виконавця',
         musicDetailsCleanLyrics: 'Без ненормативної лексики',
+        musicDetailsRelatedArtists: 'Схожі виконавці',
+        musicDetailsDiscography: 'Дискографія та альбоми',
     },
     shareModal: {
         title: 'Запросити у кімнату',

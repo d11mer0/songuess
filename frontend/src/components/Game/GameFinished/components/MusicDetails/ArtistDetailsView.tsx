@@ -3,11 +3,13 @@ import styles from './MusicDetailsModal.module.css';
 import { 
     useGetArtistByIdQuery, 
     useSearchDeezerQuery, 
-    useGetTopTracksByArtistQuery 
+    useGetTopTracksByArtistQuery,
+    useGetAlbumsByArtistQuery,
+    useGetRelatedArtistsQuery 
 } from '../../../../../store/api/deezerApi';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
 import { fetchArtistBio, ArtistBioResult } from '../../../../../utils/music/artistBio';
-import { getArtistStreamingLinks } from '../../../../../utils/music/streamingLinks';
+import { getArtistStreamingLinks, getAlbumStreamingLinks } from '../../../../../utils/music/streamingLinks';
 import StreamingLinksGrid from './StreamingLinksGrid';
 import { 
     FaUser, 
@@ -19,15 +21,20 @@ import {
     FaFire, 
     FaExternalLinkAlt,
     FaBroadcastTower,
-    FaClock
+    FaClock,
+    FaRecordVinyl
 } from 'react-icons/fa';
+import { SiSpotify } from 'react-icons/si';
+import { FaDeezer } from 'react-icons/fa6';
 
 interface ArtistDetailsViewProps {
     artistName: string;
     artistId?: number;
+    onSelectArtist?: (artistName: string, artistId?: number) => void;
 }
 
 const DEFAULT_ARTIST_AVATAR = 'https://e-cdns-images.dzcdn.net/images/artist/d41d8cd98f00b204e9800998ecf8427e/250x250-000000-80-0-0.jpg';
+const DEFAULT_ALBUM_COVER = 'https://e-cdns-images.dzcdn.net/images/cover/d41d8cd98f00b204e9800998ecf8427e/250x250-000000-80-0-0.jpg';
 
 const formatFansCount = (fans: number) => {
     if (!fans || isNaN(fans)) return '0';
@@ -47,7 +54,11 @@ const formatSeconds = (sec: number) => {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
 };
 
-const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artistId: initialArtistId }) => {
+const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ 
+    artistName, 
+    artistId: initialArtistId,
+    onSelectArtist 
+}) => {
     const { t, language } = useTranslation();
 
     // 1. Fetch by artistId if provided
@@ -79,7 +90,21 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
         skip: !effectiveId,
     });
 
-    // 3. Fetch Wikipedia biography
+    // 3. Fetch artist albums / discography
+    const {
+        data: albumsData,
+    } = useGetAlbumsByArtistQuery(Number(effectiveId), {
+        skip: !effectiveId,
+    });
+
+    // 4. Fetch related artists
+    const {
+        data: relatedData,
+    } = useGetRelatedArtistsQuery(Number(effectiveId), {
+        skip: !effectiveId,
+    });
+
+    // 5. Fetch Wikipedia biography
     const [bio, setBio] = useState<ArtistBioResult | null>(null);
     const [isBioLoading, setIsBioLoading] = useState(false);
 
@@ -147,6 +172,23 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
         ? topTracksData.data.slice(0, 5)
         : [];
 
+    // Parse albums: prioritize official albums, take top 6
+    const rawAlbums: any[] = Array.isArray(albumsData)
+        ? albumsData
+        : albumsData?.data || [];
+    
+    // Sort albums: unique titles, studio albums first, latest dates
+    const studioAlbums = rawAlbums.filter((a) => a.record_type === 'album');
+    const displayAlbums = (studioAlbums.length >= 3 ? studioAlbums : rawAlbums)
+        .slice(0, 6);
+
+    // Parse related artists: top 6
+    const relatedArtists: any[] = Array.isArray(relatedData)
+        ? relatedData.slice(0, 6)
+        : relatedData?.data
+        ? relatedData.data.slice(0, 6)
+        : [];
+
     const isGlobalLoading = (isNumericId && isArtistLoading) || (shouldSearch && isSearchLoading);
 
     return (
@@ -168,6 +210,9 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
                 </div>
                 <div className={styles.heroMeta}>
                     <h3 className={styles.trackTitle}>{displayName}</h3>
+                    {bio?.description && (
+                        <p className={styles.artistSubtitle}>{bio.description}</p>
+                    )}
                     <div className={styles.artistStatsRow}>
                         {nbFans !== undefined && (
                             <span 
@@ -284,6 +329,106 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
                             );
                         })}
                     </ul>
+                </div>
+            )}
+
+            {/* Discography & Key Albums */}
+            {displayAlbums.length > 0 && (
+                <div className={styles.albumsSection}>
+                    <div className={styles.sectionHeader}>
+                        <FaRecordVinyl style={{ color: '#9b5de5' }} />
+                        <span>{t('gameplay.musicDetailsDiscography')}</span>
+                    </div>
+                    <div className={styles.albumsGrid}>
+                        {displayAlbums.map((album: any) => {
+                            const albumLinks = getAlbumStreamingLinks(album.title, displayName, album.link);
+                            const releaseYear = album.release_date ? album.release_date.slice(0, 4) : '';
+                            return (
+                                <div key={album.id} className={styles.albumCard}>
+                                    <div className={styles.albumCardCoverWrapper}>
+                                        <img
+                                            src={album.cover_medium || DEFAULT_ALBUM_COVER}
+                                            alt={album.title}
+                                            className={styles.albumCardCover}
+                                            onError={(e) => {
+                                                e.currentTarget.src = DEFAULT_ALBUM_COVER;
+                                            }}
+                                        />
+                                    </div>
+                                    <div className={styles.albumCardBody}>
+                                        <div className={styles.albumCardTitle} title={album.title}>
+                                            {album.title}
+                                        </div>
+                                        <div className={styles.albumCardMeta}>
+                                            {releaseYear && <span>{releaseYear}</span>}
+                                            {album.record_type && (
+                                                <span className={styles.albumTypeChip}>
+                                                    {album.record_type.toUpperCase()}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className={styles.albumMiniActions}>
+                                            <a
+                                                href={albumLinks.spotify}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={styles.albumMiniBtnSpotify}
+                                                title={t('gameplay.musicDetailsOpenAlbumSpotify')}
+                                            >
+                                                <SiSpotify />
+                                                <span>Spotify</span>
+                                            </a>
+                                            <a
+                                                href={albumLinks.deezer}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={styles.albumMiniBtnDeezer}
+                                                title={t('gameplay.musicDetailsOpenAlbumDeezer')}
+                                            >
+                                                <FaDeezer />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Similar / Related Artists */}
+            {relatedArtists.length > 0 && (
+                <div className={styles.relatedSection}>
+                    <div className={styles.sectionHeader}>
+                        <FaUsers style={{ color: '#00f3ff' }} />
+                        <span>{t('gameplay.musicDetailsRelatedArtists')}</span>
+                    </div>
+                    <div className={styles.relatedArtistsGrid}>
+                        {relatedArtists.map((artist: any) => (
+                            <button
+                                key={artist.id}
+                                type="button"
+                                className={styles.relatedArtistCard}
+                                onClick={() => onSelectArtist?.(artist.name, artist.id)}
+                                title={artist.name}
+                            >
+                                <img
+                                    src={artist.picture_medium || DEFAULT_ARTIST_AVATAR}
+                                    alt={artist.name}
+                                    className={styles.relatedArtistAvatar}
+                                    onError={(e) => {
+                                        e.currentTarget.src = DEFAULT_ARTIST_AVATAR;
+                                    }}
+                                />
+                                <span className={styles.relatedArtistName}>{artist.name}</span>
+                                {artist.nb_fan ? (
+                                    <span className={styles.relatedArtistFans}>
+                                        {formatFansCount(artist.nb_fan)}
+                                    </span>
+                                ) : null}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 

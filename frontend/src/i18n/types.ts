@@ -308,6 +308,8 @@ export interface TranslationDictionary {
         musicDetailsContributors: string;
         musicDetailsRadioAvailable: string;
         musicDetailsCleanLyrics: string;
+        musicDetailsRelatedArtists: string;
+        musicDetailsDiscography: string;
     };
     shareModal: {
         title: string;

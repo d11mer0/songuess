@@ -23,6 +23,9 @@ export const deezerApi = createApi({
         getAlbumsByArtist: builder.query({
             query: (artistId) => `/deezer/artist/${artistId}/albums`,
         }),
+        getRelatedArtists: builder.query({
+            query: (artistId) => `/deezer/artist/${artistId}/related`,
+        }),
 
         // 🔹 Отримати плейліст за ID
         getPlaylistById: builder.query({
@@ -67,6 +70,7 @@ export const {
     useGetAlbumByIdQuery,
     useGetArtistByIdQuery,
     useGetAlbumsByArtistQuery,
+    useGetRelatedArtistsQuery,
     useGetPlaylistByIdQuery,
     useGetTopTracksByArtistQuery,
     useSearchDeezerQuery,

@@ -156,6 +156,17 @@ export class DeezerService {
         return res;
     }
 
+    // 🔹 Отримати схожих артистів
+    async getRelatedArtists(artistId: number) {
+        const cacheKey = `deezer:artist_related:${artistId}`;
+        const cached = await this.getCached(cacheKey);
+        if (cached) return cached;
+
+        const res = await this.deezerApi.fetch(`/artist/${artistId}/related`);
+        await this.setCached(cacheKey, res, 86400);
+        return res;
+    }
+
     // 🔹 Отримати інформацію про плейліст за ID
     async getPlaylistById(playlistId: number) {
         const cacheKey = `deezer:playlist:${playlistId}`;

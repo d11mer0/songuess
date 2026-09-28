@@ -308,6 +308,8 @@ export const en: TranslationDictionary = {
         musicDetailsContributors: 'Contributors & Artists',
         musicDetailsRadioAvailable: 'Artist Radio Available',
         musicDetailsCleanLyrics: 'Clean Lyrics',
+        musicDetailsRelatedArtists: 'Similar Artists',
+        musicDetailsDiscography: 'Discography & Albums',
     },
     shareModal: {
         title: 'Invite to Room',

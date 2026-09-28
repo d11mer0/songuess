@@ -15,7 +15,6 @@ import {
     FaClock, 
     FaHeartbeat, 
     FaFire, 
-    FaFingerprint, 
     FaBroadcastTower, 
     FaExternalLinkAlt, 
     FaLayerGroup 
@@ -88,7 +87,6 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
     const popularityRank = deezerTrack?.rank;
     const trackPosition = deezerTrack?.track_position;
     const diskNumber = deezerTrack?.disk_number;
-    const isrc = deezerTrack?.isrc;
     const hasRadio = Boolean(deezerTrack?.artist?.radio);
     const contributors = Array.isArray(deezerTrack?.contributors) ? deezerTrack.contributors : [];
 
@@ -328,15 +326,6 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                             <span className={styles.metaLabel}>{t('gameplay.musicDetailsBpm')}</span>
                         </div>
                         <span className={styles.metaValue}>{bpm} BPM</span>
-                    </div>
-                )}
-                {isrc && (
-                    <div className={styles.metaCard}>
-                        <div className={styles.metaHeaderRow}>
-                            <FaFingerprint className={styles.metaIcon} style={{ color: '#00f3ff' }} />
-                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsISRC')}</span>
-                        </div>
-                        <span className={styles.metaValueMonospace} title={isrc}>{isrc}</span>
                     </div>
                 )}
                 {hasRadio && (

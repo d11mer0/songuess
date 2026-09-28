@@ -30,6 +30,11 @@ export class DeezerController {
         return this.deezerService.getAlbumsByArtist(Number(artistId));
     }
 
+    @Get('artist/:artistId/related')
+    async getRelatedArtists(@Param('artistId') artistId: string) {
+        return this.deezerService.getRelatedArtists(Number(artistId));
+    }
+
     // 🔹 Отримати інформацію про плейліст
     @Get('playlist/:playlistId')
     async getPlaylist(@Param('playlistId') playlistId: string) {

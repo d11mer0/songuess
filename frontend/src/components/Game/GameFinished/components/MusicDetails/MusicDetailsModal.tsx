@@ -128,6 +128,7 @@ const MusicDetailsModal: React.FC<MusicDetailsModalProps> = ({
                     <ArtistDetailsView
                         artistName={artistName}
                         artistId={artistId}
+                        onSelectArtist={handleSelectArtist}
                     />
                 )}
             </div>
