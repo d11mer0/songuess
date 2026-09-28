@@ -49,7 +49,9 @@
     -webkit-text-fill-color: transparent;
     display: block;
     margin-bottom: 8px;
+    filter: drop-shadow(0 0 10px rgba(0, 201, 255, 0.35));
     animation: textShimmer 3s ease-in-out infinite;
+    will-change: opacity;
 }
 
 .emptySubtext {
@@ -84,12 +86,10 @@
 
 @keyframes textShimmer {
     0%, 100% {
-        opacity: 0.95;
-        filter: drop-shadow(0 0 6px rgba(0, 201, 255, 0.25));
+        opacity: 0.88;
     }
     50% {
         opacity: 1;
-        filter: drop-shadow(0 0 16px rgba(146, 254, 157, 0.5));
     }
 }
 

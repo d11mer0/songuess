@@ -6,6 +6,8 @@
     box-sizing: border-box;
     color: var(--text-main);
     width: 100%;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 320px;
 }
 
 .footerInner {
@@ -85,15 +87,14 @@
     background: #00f3ff;
     box-shadow: 0 0 8px #00f3ff;
     animation: pulseDot 2s infinite ease-in-out;
+    will-change: opacity;
 }
 
 @keyframes pulseDot {
     0%, 100% {
-        transform: scale(1);
-        opacity: 0.8;
+        opacity: 0.6;
     }
     50% {
-        transform: scale(1.3);
         opacity: 1;
     }
 }

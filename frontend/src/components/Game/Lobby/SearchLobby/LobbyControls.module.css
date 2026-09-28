@@ -34,6 +34,7 @@
     margin: 0;
     position: relative;
     box-sizing: border-box;
+    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -420,6 +421,7 @@
     margin: 0;
     text-align: center;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 0, 127, 0.12);
+    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -521,6 +523,7 @@
     margin: 0;
     text-align: center;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 243, 255, 0.12);
+    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 

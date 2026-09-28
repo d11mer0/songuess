@@ -10,10 +10,10 @@ import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
 import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 
 interface UseGameRoomListenersProps {
-    updateSearchParams: (id: string | null) => void;
+    updateSearchParams?: (id: string | null) => void;
 }
 
-export const useGameRoomListeners = ({updateSearchParams}: UseGameRoomListenersProps) => {
+export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListenersProps = {}) => {
     const { user } = useSelector((state: RootState) => state.user);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();

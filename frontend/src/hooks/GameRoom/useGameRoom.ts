@@ -33,7 +33,7 @@ export const useGameRoom = () => {
     );
     
     useSocketConnection();
-    useGameRoomListeners({updateSearchParams});
+    useGameRoomListeners();
     useEffect(() => { socketEmitter.emit('getRooms') }, []);
     
     const createRoom = useCallback((lobbyOptions: LobbyOptions) => {
