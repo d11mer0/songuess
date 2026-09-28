@@ -3,9 +3,25 @@ import styles from './MusicDetailsModal.module.css';
 import { RoundTrackWithoutPreview } from '../../../../../types/gameEndedTypes';
 import { useGetTrackByIdQuery, useSearchDeezerQuery } from '../../../../../store/api/deezerApi';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
-import { getTrackStreamingLinks } from '../../../../../utils/music/streamingLinks';
+import { getTrackStreamingLinks, getAlbumStreamingLinks } from '../../../../../utils/music/streamingLinks';
+import { formatReleaseDate } from '../../../../../utils/music/dateFormatter';
 import StreamingLinksGrid from './StreamingLinksGrid';
-import { FaPlay, FaPause, FaMusic, FaUser, FaCompactDisc, FaClock, FaHeartbeat } from 'react-icons/fa';
+import { 
+    FaPlay, 
+    FaPause, 
+    FaMusic, 
+    FaUser, 
+    FaCompactDisc, 
+    FaClock, 
+    FaHeartbeat, 
+    FaFire, 
+    FaFingerprint, 
+    FaBroadcastTower, 
+    FaExternalLinkAlt, 
+    FaLayerGroup 
+} from 'react-icons/fa';
+import { SiSpotify, SiApplemusic } from 'react-icons/si';
+import { FaDeezer } from 'react-icons/fa6';
 
 interface TrackDetailsViewProps {
     track: RoundTrackWithoutPreview;
@@ -22,7 +38,7 @@ const formatSeconds = (sec: number) => {
 };
 
 const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArtist }) => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const isNumericId = !isNaN(Number(track.id)) && Number(track.id) > 0;
 
     // Fetch by Deezer Track ID
@@ -56,19 +72,28 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
     const artistName = deezerTrack?.artist?.name || track.artistName || t('gameplay.singer');
     const artistId = deezerTrack?.artist?.id || track.artistId;
     const albumTitle = deezerTrack?.album?.title || track.albumName;
-    const coverUrl =
+    const albumCover =
         deezerTrack?.album?.cover_xl ||
         deezerTrack?.album?.cover_big ||
         deezerTrack?.album?.cover_medium ||
         track.albumCover ||
         DEFAULT_COVER;
+    const coverUrl = albumCover;
     const previewUrl = deezerTrack?.preview;
     const trackDuration = deezerTrack?.duration;
-    const releaseDate = deezerTrack?.release_date || deezerTrack?.album?.release_date;
+    const rawReleaseDate = deezerTrack?.release_date || deezerTrack?.album?.release_date;
+    const formattedReleaseDate = formatReleaseDate(rawReleaseDate, language === 'uk' ? 'uk' : 'en');
     const bpm = deezerTrack?.bpm && deezerTrack.bpm > 0 ? Math.round(deezerTrack.bpm) : null;
     const isExplicit = Boolean(deezerTrack?.explicit_lyrics);
+    const popularityRank = deezerTrack?.rank;
+    const trackPosition = deezerTrack?.track_position;
+    const diskNumber = deezerTrack?.disk_number;
+    const isrc = deezerTrack?.isrc;
+    const hasRadio = Boolean(deezerTrack?.artist?.radio);
+    const contributors = Array.isArray(deezerTrack?.contributors) ? deezerTrack.contributors : [];
 
     const streamingLinks = getTrackStreamingLinks(title, artistName, deezerTrack?.link);
+    const albumLinks = albumTitle ? getAlbumStreamingLinks(albumTitle, artistName, deezerTrack?.album?.link) : null;
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -109,7 +134,8 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
         }
     };
 
-    const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+    // Calculate scale factor for GPU-accelerated progress animation (avoids layout reflow in Firefox)
+    const progressScale = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
 
     return (
         <div className={styles.modalBody}>
@@ -145,7 +171,7 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                 </div>
             </div>
 
-            {/* Audio Preview Card (if audio preview available) */}
+            {/* Audio Preview Card (GPU-accelerated progress bar) */}
             {previewUrl && (
                 <div className={styles.audioPreviewCard}>
                     <audio ref={audioRef} src={previewUrl} preload="none" />
@@ -165,7 +191,7 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                         <div className={styles.progressBarTrack}>
                             <div
                                 className={styles.progressBarFill}
-                                style={{ width: `${progressPercent}%` }}
+                                style={{ transform: `scaleX(${progressScale})` }}
                             />
                         </div>
                     </div>
@@ -180,39 +206,192 @@ const TrackDetailsView: React.FC<TrackDetailsViewProps> = ({ track, onSelectArti
                 </div>
             )}
 
-            {/* Metadata Grid */}
+            {/* Dedicated Full Album Showcase Card */}
+            {albumTitle && albumLinks && (
+                <div className={styles.albumBannerCard}>
+                    <div className={styles.albumBannerHeader}>
+                        <div className={styles.albumBannerCover}>
+                            <img
+                                src={albumCover}
+                                alt={albumTitle}
+                                onError={(e) => {
+                                    e.currentTarget.src = DEFAULT_COVER;
+                                }}
+                            />
+                            <div className={styles.albumBannerVinyl} />
+                        </div>
+                        <div className={styles.albumBannerInfo}>
+                            <span className={styles.albumBannerTag}>{t('gameplay.musicDetailsAlbum')}</span>
+                            <h4 className={styles.albumBannerTitle} title={albumTitle}>
+                                {albumTitle}
+                            </h4>
+                            <div className={styles.albumBannerSubRow}>
+                                {trackPosition ? (
+                                    <span className={styles.albumPositionChip}>
+                                        <FaLayerGroup style={{ fontSize: 11 }} />
+                                        <span>
+                                            {t('gameplay.musicDetailsTrackIndex')} #{trackPosition}
+                                            {diskNumber && diskNumber > 1 ? ` • ${t('gameplay.musicDetailsDisc')} ${diskNumber}` : ''}
+                                        </span>
+                                    </span>
+                                ) : null}
+                                {formattedReleaseDate && (
+                                    <span className={styles.albumDateChip}>
+                                        {formattedReleaseDate}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Direct Album Actions on Spotify, Deezer & Apple Music */}
+                    <div className={styles.albumBannerActions}>
+                        <a
+                            href={albumLinks.spotify}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.albumActionBtnSpotify}
+                            title={t('gameplay.musicDetailsOpenAlbumSpotify')}
+                        >
+                            <SiSpotify style={{ fontSize: 16 }} />
+                            <span>{t('gameplay.musicDetailsOpenAlbumSpotify')}</span>
+                            <FaExternalLinkAlt style={{ fontSize: 10, opacity: 0.6 }} />
+                        </a>
+                        <a
+                            href={albumLinks.deezer}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.albumActionBtnSecondary}
+                            title={t('gameplay.musicDetailsOpenAlbumDeezer')}
+                        >
+                            <FaDeezer style={{ fontSize: 16, color: '#ef5466' }} />
+                            <span>Deezer</span>
+                        </a>
+                        <a
+                            href={albumLinks.apple}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.albumActionBtnSecondary}
+                            title={t('gameplay.musicDetailsOpenAlbumApple')}
+                        >
+                            <SiApplemusic style={{ fontSize: 16, color: '#fc3c44' }} />
+                            <span>Apple</span>
+                        </a>
+                    </div>
+                </div>
+            )}
+
+            {/* Enriched Metadata Grid */}
             <div className={styles.metadataGrid}>
                 {trackDuration && (
                     <div className={styles.metaCard}>
-                        <span className={styles.metaLabel}>{t('gameplay.musicDetailsDuration')}</span>
+                        <div className={styles.metaHeaderRow}>
+                            <FaClock className={styles.metaIcon} style={{ color: '#00f3ff' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsDuration')}</span>
+                        </div>
                         <span className={styles.metaValue}>{formatSeconds(trackDuration)}</span>
                     </div>
                 )}
-                {releaseDate && (
+                {formattedReleaseDate && (
                     <div className={styles.metaCard}>
-                        <span className={styles.metaLabel}>{t('gameplay.musicDetailsReleaseDate')}</span>
-                        <span className={styles.metaValue}>{releaseDate}</span>
+                        <div className={styles.metaHeaderRow}>
+                            <FaCompactDisc className={styles.metaIcon} style={{ color: '#f15bb5' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsReleaseDate')}</span>
+                        </div>
+                        <span className={styles.metaValue}>{formattedReleaseDate}</span>
+                    </div>
+                )}
+                {popularityRank !== undefined && popularityRank !== null && (
+                    <div className={styles.metaCard}>
+                        <div className={styles.metaHeaderRow}>
+                            <FaFire className={styles.metaIcon} style={{ color: '#ffd700' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsPopularity')}</span>
+                        </div>
+                        <span className={styles.metaValue}>#{popularityRank.toLocaleString()}</span>
+                    </div>
+                )}
+                {trackPosition && (
+                    <div className={styles.metaCard}>
+                        <div className={styles.metaHeaderRow}>
+                            <FaLayerGroup className={styles.metaIcon} style={{ color: '#9b5de5' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsTrackNumber')}</span>
+                        </div>
+                        <span className={styles.metaValue}>
+                            #{trackPosition} {diskNumber && diskNumber > 1 ? `(${t('gameplay.musicDetailsDisc')} ${diskNumber})` : ''}
+                        </span>
                     </div>
                 )}
                 {bpm && (
                     <div className={styles.metaCard}>
-                        <span className={styles.metaLabel}>{t('gameplay.musicDetailsBpm')}</span>
+                        <div className={styles.metaHeaderRow}>
+                            <FaHeartbeat className={styles.metaIcon} style={{ color: '#ff4d6d' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsBpm')}</span>
+                        </div>
                         <span className={styles.metaValue}>{bpm} BPM</span>
                     </div>
                 )}
-                {albumTitle && (
+                {isrc && (
                     <div className={styles.metaCard}>
-                        <span className={styles.metaLabel}>{t('gameplay.musicDetailsAlbum')}</span>
-                        <span className={styles.metaValue}>{albumTitle}</span>
+                        <div className={styles.metaHeaderRow}>
+                            <FaFingerprint className={styles.metaIcon} style={{ color: '#00f3ff' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsISRC')}</span>
+                        </div>
+                        <span className={styles.metaValueMonospace} title={isrc}>{isrc}</span>
                     </div>
                 )}
-                {isExplicit && (
+                {hasRadio && (
                     <div className={styles.metaCard}>
+                        <div className={styles.metaHeaderRow}>
+                            <FaBroadcastTower className={styles.metaIcon} style={{ color: '#00bbf9' }} />
+                            <span className={styles.metaLabel}>{t('gameplay.musicDetailsRadioAvailable')}</span>
+                        </div>
+                        <span className={styles.metaValueChip}>✓ Live</span>
+                    </div>
+                )}
+                <div className={styles.metaCard}>
+                    <div className={styles.metaHeaderRow}>
                         <span className={styles.metaLabel}>{t('gameplay.musicDetailsExplicit')}</span>
-                        <span className={styles.explicitBadge}>EXPLICIT 18+</span>
                     </div>
-                )}
+                    {isExplicit ? (
+                        <span className={styles.explicitBadge}>EXPLICIT 18+</span>
+                    ) : (
+                        <span className={styles.cleanBadge}>CLEAN</span>
+                    )}
+                </div>
             </div>
+
+            {/* Contributors & Co-artists (if available) */}
+            {contributors.length > 0 && (
+                <div className={styles.contributorsSection}>
+                    <div className={styles.sectionHeader}>
+                        <FaUser style={{ color: '#f15bb5' }} />
+                        <span>{t('gameplay.musicDetailsContributors')}</span>
+                    </div>
+                    <div className={styles.contributorsList}>
+                        {contributors.map((contrib: any) => (
+                            <button
+                                key={contrib.id}
+                                type="button"
+                                className={styles.contributorChip}
+                                onClick={() => onSelectArtist(contrib.name, contrib.id)}
+                                title={t('gameplay.musicDetailsArtistTab')}
+                            >
+                                {contrib.picture_small && (
+                                    <img
+                                        src={contrib.picture_small}
+                                        alt={contrib.name}
+                                        className={styles.contributorAvatar}
+                                    />
+                                )}
+                                <span className={styles.contributorName}>{contrib.name}</span>
+                                {contrib.role && (
+                                    <span className={styles.contributorRole}>{contrib.role}</span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* External Streaming Services */}
             <div className={styles.servicesSection}>

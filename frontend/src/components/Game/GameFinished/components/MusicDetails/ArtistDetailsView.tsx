@@ -17,7 +17,9 @@ import {
     FaPlay, 
     FaPause, 
     FaFire, 
-    FaExternalLinkAlt 
+    FaExternalLinkAlt,
+    FaBroadcastTower,
+    FaClock
 } from 'react-icons/fa';
 
 interface ArtistDetailsViewProps {
@@ -36,6 +38,13 @@ const formatFansCount = (fans: number) => {
         return `${(fans / 1_000).toFixed(1)}K`;
     }
     return fans.toLocaleString();
+};
+
+const formatSeconds = (sec: number) => {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
 };
 
 const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artistId: initialArtistId }) => {
@@ -66,7 +75,6 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
     // 2. Fetch top tracks
     const {
         data: topTracksData,
-        isLoading: isTopTracksLoading,
     } = useGetTopTracksByArtistQuery(Number(effectiveId), {
         skip: !effectiveId,
     });
@@ -130,6 +138,7 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
         DEFAULT_ARTIST_AVATAR;
     const nbFans = deezerArtist?.nb_fan;
     const nbAlbums = deezerArtist?.nb_album;
+    const hasRadio = Boolean(deezerArtist?.radio);
 
     const streamingLinks = getArtistStreamingLinks(displayName, deezerArtist?.link);
     const topTracks = Array.isArray(topTracksData)
@@ -161,7 +170,10 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
                     <h3 className={styles.trackTitle}>{displayName}</h3>
                     <div className={styles.artistStatsRow}>
                         {nbFans !== undefined && (
-                            <span className={styles.artistStatChip}>
+                            <span 
+                                className={styles.artistStatChip} 
+                                title={`${nbFans.toLocaleString()} ${t('gameplay.musicDetailsArtistFans')}`}
+                            >
                                 <FaUsers style={{ color: '#00f3ff' }} />
                                 <span>{formatFansCount(nbFans)} {t('gameplay.musicDetailsArtistFans')}</span>
                             </span>
@@ -170,6 +182,12 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
                             <span className={styles.artistStatChip}>
                                 <FaCompactDisc style={{ color: '#f15bb5' }} />
                                 <span>{nbAlbums} {t('gameplay.musicDetailsArtistAlbums')}</span>
+                            </span>
+                        )}
+                        {hasRadio && (
+                            <span className={styles.artistStatChip}>
+                                <FaBroadcastTower style={{ color: '#00bbf9' }} />
+                                <span>{t('gameplay.musicDetailsRadioAvailable')}</span>
                             </span>
                         )}
                     </div>
@@ -228,18 +246,34 @@ const ArtistDetailsView: React.FC<ArtistDetailsViewProps> = ({ artistName, artis
                     <ul className={styles.topTracksList}>
                         {topTracks.map((tr: any, idx: number) => {
                             const isPlaying = playingTrackId === tr.id;
+                            const rankBadgeClass = 
+                                idx === 0 ? styles.topTrackIndexGold :
+                                idx === 1 ? styles.topTrackIndexSilver :
+                                idx === 2 ? styles.topTrackIndexBronze : styles.topTrackIndex;
+
                             return (
                                 <li key={tr.id || idx} className={styles.topTrackItem}>
-                                    <span className={styles.topTrackIndex}>#{idx + 1}</span>
+                                    <span className={rankBadgeClass}>#{idx + 1}</span>
                                     <div className={styles.topTrackInfo}>
                                         <div className={styles.topTrackTitle} title={tr.title}>
                                             {tr.title}
+                                        </div>
+                                        <div className={styles.topTrackSub}>
+                                            {tr.album?.title && (
+                                                <span className={styles.topTrackAlbum}>{tr.album.title}</span>
+                                            )}
+                                            {tr.duration && (
+                                                <span className={styles.topTrackDuration}>
+                                                    <FaClock style={{ fontSize: 10, marginRight: 3, opacity: 0.7 }} />
+                                                    {formatSeconds(tr.duration)}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     {tr.preview && (
                                         <button
                                             type="button"
-                                            className={styles.miniPlayBtn}
+                                            className={`${styles.miniPlayBtn} ${isPlaying ? styles.miniPlayBtnActive : ''}`}
                                             onClick={() => handlePlayTopTrack(tr.id, tr.preview)}
                                             title={isPlaying ? t('gameplay.musicDetailsPausePreview') : t('gameplay.musicDetailsPlayPreview')}
                                         >

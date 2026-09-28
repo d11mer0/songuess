@@ -86,3 +86,24 @@ export function getArtistStreamingLinks(
         },
     ];
 }
+
+export interface AlbumStreamingLinks {
+    spotify: string;
+    deezer: string;
+    apple: string;
+}
+
+export function getAlbumStreamingLinks(
+    albumTitle: string,
+    artistName?: string,
+    directDeezerLink?: string
+): AlbumStreamingLinks {
+    const query = `${albumTitle} ${artistName || ''}`.trim();
+    const encoded = encodeURIComponent(query);
+
+    return {
+        spotify: `https://open.spotify.com/search/${encoded}`,
+        deezer: directDeezerLink || `https://www.deezer.com/search/${encoded}`,
+        apple: `https://music.apple.com/search?term=${encoded}`,
+    };
+}

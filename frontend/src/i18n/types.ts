@@ -297,6 +297,17 @@ export interface TranslationDictionary {
         musicDetailsArtistNotFound: string;
         musicDetailsClose: string;
         musicDetailsClickForDetails: string;
+        musicDetailsOpenAlbumSpotify: string;
+        musicDetailsOpenAlbumDeezer: string;
+        musicDetailsOpenAlbumApple: string;
+        musicDetailsTrackNumber: string;
+        musicDetailsTrackIndex: string;
+        musicDetailsDisc: string;
+        musicDetailsPopularity: string;
+        musicDetailsISRC: string;
+        musicDetailsContributors: string;
+        musicDetailsRadioAvailable: string;
+        musicDetailsCleanLyrics: string;
     };
     shareModal: {
         title: string;
