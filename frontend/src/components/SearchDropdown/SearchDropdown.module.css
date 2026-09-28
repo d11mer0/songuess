@@ -145,9 +145,8 @@
 }
 
 .highlightedMatch {
-    font-weight: 700;
+    font-weight: 800;
     color: #00f3ff;
-    text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
 }
 
 .dropdownItem {

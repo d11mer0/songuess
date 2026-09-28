@@ -23,7 +23,7 @@
     background: linear-gradient(90deg, #00f3ff, #7928ca, #f15bb5);
     border-radius: 4px;
     transform-origin: left center;
-    transition: transform 0.1s linear;
+    transition: transform 0.2s linear;
     box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
     will-change: transform;
     transform: translateZ(0);

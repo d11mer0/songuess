@@ -50,7 +50,7 @@ const RoundTimer: React.FC = () => {
         };
 
         updateTimer();
-        const interval = setInterval(updateTimer, 100);
+        const interval = setInterval(updateTimer, 200);
 
         return () => clearInterval(interval);
     }, [trackInfo?.startedAt, trackInfo?.endsAt, roundResult, fallbackRoundMs]);

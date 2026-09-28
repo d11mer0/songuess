@@ -2,6 +2,8 @@ import SearchDropdown from '../../SearchDropdown/SearchDropdown';
 import { useSearchDeezerQuery } from '../../../store/api/deezerApi';
 import { ArtistInfo } from '../../../types/gameTypes';
 
+import { useDebounce } from '../../../hooks/useDebounce';
+
 interface ArtistSearchProps {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -15,11 +17,13 @@ const ArtistSearch: React.FC<ArtistSearchProps> = ({
     onSelect,
     autoFocus = false,
 }) => {
+    const debouncedQuery = useDebounce(searchQuery, 300);
+
     const {
         data: searchData,
     } = useSearchDeezerQuery(
-        { query: searchQuery, type: 'artist' },
-        { skip: !searchQuery },
+        { query: debouncedQuery, type: 'artist' },
+        { skip: !debouncedQuery },
     );
 
     return (

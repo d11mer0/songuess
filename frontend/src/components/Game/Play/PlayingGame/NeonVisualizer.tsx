@@ -134,10 +134,15 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
         }
 
         let phase = 0;
-        const render = () => {
+        let lastTime = 0;
+        const targetInterval = 1000 / 36; // 36 FPS is smooth while eliminating high-refresh (144Hz) CPU load
+
+        const render = (time: number) => {
+            animFrameRef.current = requestAnimationFrame(render);
+            if (time - lastTime < targetInterval) return;
+            lastTime = time;
             phase += 0.08;
             drawFrame(true, phase);
-            animFrameRef.current = requestAnimationFrame(render);
         };
 
         animFrameRef.current = requestAnimationFrame(render);

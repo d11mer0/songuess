@@ -8,9 +8,7 @@
 }
 
 .card {
-    background: rgba(42, 42, 42, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(30, 24, 44, 0.95);
     border: 1px solid rgba(155, 93, 229, 0.35);
     border-radius: 20px;
     padding: 40px 32px;

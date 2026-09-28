@@ -9,9 +9,7 @@
 .triggerPill {
     display: inline-flex;
     align-items: center;
-    background: rgba(24, 20, 38, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(24, 20, 38, 0.95);
     border: 1px solid rgba(155, 93, 229, 0.35);
     border-radius: 9999px;
     padding: 4px 6px;
@@ -180,9 +178,7 @@
     left: 0;
     width: 290px;
     max-width: calc(100vw - 32px);
-    background: linear-gradient(160deg, rgba(26, 20, 44, 0.96) 0%, rgba(14, 10, 24, 0.98) 100%);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    background: linear-gradient(160deg, rgba(26, 20, 44, 0.98) 0%, rgba(14, 10, 24, 0.99) 100%);
     border: 1px solid rgba(155, 93, 229, 0.4);
     border-radius: 16px;
     padding: 16px 18px;
@@ -537,8 +533,7 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.88);
     cursor: pointer;
     animation: overlayFadeIn 0.25s ease;
 }

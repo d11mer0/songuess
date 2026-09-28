@@ -1,6 +1,8 @@
 import SearchDropdown from '../../SearchDropdown/SearchDropdown';
 import { useSearchDeezerQuery } from '../../../store/api/deezerApi';
 
+import { useDebounce } from '../../../hooks/useDebounce';
+
 interface Playlist {
     id: number;
     title: string;
@@ -20,9 +22,11 @@ const PlaylistSearch: React.FC<PlaylistSearchProps> = ({
     onSelect,
     autoFocus = false,
 }) => {
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
     const { data: searchResults } = useSearchDeezerQuery(
-        { query: searchTerm, type: 'playlist' },
-        { skip: searchTerm.length < 2 },
+        { query: debouncedSearchTerm, type: 'playlist' },
+        { skip: debouncedSearchTerm.length < 2 },
     );
 
     return (

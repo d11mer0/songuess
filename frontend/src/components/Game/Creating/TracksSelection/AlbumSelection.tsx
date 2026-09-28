@@ -7,6 +7,8 @@ import ClearSelectionButton from './components/ClearSelectionButton';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './TrackSelection.module.css';
 
+import { useDebounce } from '../../../../hooks/useDebounce';
+
 interface Props {
     handleStart: (payload: SelectedTracks) => void;
     autoFocus?: boolean;
@@ -17,9 +19,11 @@ const AlbumSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props) =>
     const [albumName, setAlbumName] = useState('');
     const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
 
+    const debouncedAlbumName = useDebounce(albumName, 300);
+
     const { data: albumResults, isLoading: isSearching } = useSearchDeezerQuery(
-        { query: albumName, type: 'album' },
-        { skip: albumName.length < 3 },
+        { query: debouncedAlbumName, type: 'album' },
+        { skip: debouncedAlbumName.length < 3 },
     );
 
     return (

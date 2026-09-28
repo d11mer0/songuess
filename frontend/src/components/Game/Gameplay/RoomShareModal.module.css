@@ -90,7 +90,7 @@
 .titleIcon {
     color: #00f3ff;
     font-size: 22px;
-    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
 }
 
 .subtitle {

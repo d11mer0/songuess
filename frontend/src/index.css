@@ -132,19 +132,6 @@ input:focus {
     outline: none;
     box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
 }
-
-/* Firefox backdrop-filter performance optimization:
-   Firefox triggers expensive software rasterization for backdrop-filter on large containers,
-   which severely degrades FPS. Disabling backdrop-filter in Firefox ensures steady 60+ FPS. */
-@supports (-moz-appearance: none) {
-    *,
-    *::before,
-    *::after {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-    }
-}
-
 /* МОДАЛЬНЕ:*/
 
 .modal-dialog {
