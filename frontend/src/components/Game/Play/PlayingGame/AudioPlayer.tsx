@@ -1,14 +1,21 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectTrackInfo, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import { useAudioPlayer } from '../../../../hooks/useAudioPlayer';
 import { soundEffects } from '../../../../utils/audio/soundEffects';
 
-import { FaVolumeUp, FaVolumeMute, FaBell, FaBellSlash } from 'react-icons/fa';
-import { MdVolumeOff, MdVolumeUp } from 'react-icons/md';
+import {
+    FaVolumeUp,
+    FaVolumeDown,
+    FaVolumeMute,
+    FaBell,
+    FaBellSlash,
+    FaSlidersH,
+    FaTimes,
+    FaMusic,
+} from 'react-icons/fa';
 import styles from './AudioPlayer.module.css';
-import { useState, useEffect } from 'react';
 import { useTranslation } from '../../../../i18n/LanguageContext';
-
 import { clearMediaSessionPlayback } from '../../../../utils/audio/blockMediaSessionHardwareKeys';
 
 interface AudioPlayerProps {
@@ -16,11 +23,19 @@ interface AudioPlayerProps {
     onPlayingChange?: (isPlaying: boolean) => void;
 }
 
+const PRESETS = [
+    { label: '0%', value: 0 },
+    { label: '30%', value: 0.3 },
+    { label: '70%', value: 0.7 },
+    { label: '100%', value: 1.0 },
+];
+
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingChange }) => {
     const { t } = useTranslation();
     const trackInfo = useAppSelector(selectTrackInfo);
     const roundResult = useAppSelector(selectRoundResult);
-    const [showSlider, setShowSlider] = useState(false);
+
+    const [isOpen, setIsOpen] = useState(false);
     const [sfxMuted, setSfxMuted] = useState(() => soundEffects.isMuted());
 
     const { audioRef, volume, setVolume, isPlaying, isAutoplayBlocked, resumeAudio } = useAudioPlayer({
@@ -29,6 +44,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         initialVolume: 0.7,
         maxPlayDuration,
     });
+
+    const previousVolumeRef = useRef<number>(volume > 0 ? volume : 0.7);
+    const popoverRef = useRef<HTMLDivElement | null>(null);
+    const triggerRef = useRef<HTMLButtonElement | null>(null);
+
+    // Keep previous non-zero volume updated
+    useEffect(() => {
+        if (volume > 0) {
+            previousVolumeRef.current = volume;
+        }
+    }, [volume]);
 
     useEffect(() => {
         onPlayingChange?.(isPlaying);
@@ -54,18 +80,66 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         return unsubscribe;
     }, []);
 
+    // Outside click & Escape to close popover
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+            const target = e.target as Node;
+            if (
+                popoverRef.current &&
+                !popoverRef.current.contains(target) &&
+                triggerRef.current &&
+                !triggerRef.current.contains(target)
+            ) {
+                setIsOpen(false);
+            }
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen]);
+
+    const toggleMute = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (volume > 0) {
+            previousVolumeRef.current = volume;
+            setVolume(0);
+        } else {
+            const restored = previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.7;
+            setVolume(restored);
+        }
+    };
+
     const toggleSfx = () => {
         const next = soundEffects.toggleMute();
         setSfxMuted(next);
+        if (!next) {
+            soundEffects.playCorrect();
+        }
     };
 
-    const getSliderBackground = (value: number): string => {
-        const percent = value * 100;
-        return `linear-gradient(to right, 
-            var(--primary-color) 0%, 
-            var(--primary-color) ${percent}%, 
-            var(--background-highlight) ${percent}%, 
-            var(--background-highlight) 100%)`;
+    const renderVolumeIcon = () => {
+        if (volume === 0) {
+            return <FaVolumeMute className={styles.volumeIconMuted} />;
+        }
+        if (volume < 0.5) {
+            return <FaVolumeDown className={styles.volumeIconLow} />;
+        }
+        return <FaVolumeUp className={styles.volumeIconHigh} />;
     };
 
     if (!trackInfo) return null;
@@ -89,55 +163,181 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
                 </div>
             )}
 
-            <div className={styles.controlsRow}>
+            <div className={styles.widgetWrapper}>
                 <audio ref={audioRef} style={{ display: 'none' }} />
 
-                <div
-                    className={styles.volumeContainer}
-                    onMouseEnter={() => setShowSlider(true)}
-                    onMouseLeave={() => setShowSlider(false)}
-                >
-                    {volume === 0 ? (
-                        <FaVolumeMute className={styles.volumeIcon} />
-                    ) : (
-                        <FaVolumeUp className={styles.volumeIcon} />
-                    )}
-                    {showSlider && (
-                        <div className={styles.sliderPopup}>
-                            <span className={styles.sliderLabel}>Music</span>
-                            <div className={styles.sliderRow}>
-                                <MdVolumeOff className={styles.sideIcon} />
-                                <input
-                                    type="range"
-                                    className={`${styles.volumeSlider} ${styles.volumeSliderDynamicTrack}`}
-                                    min={0}
-                                    max={1}
-                                    step={0.01}
-                                    value={volume}
-                                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                                    style={{
-                                        ['--slider-track-fill' as any]: getSliderBackground(volume),
-                                    }}
-                                />
-                                <MdVolumeUp className={styles.sideIcon} />
-                            </div>
-                        </div>
-                    )}
+                {/* Main Interactive Trigger Pill */}
+                <div className={`${styles.triggerPill} ${isOpen ? styles.triggerOpen : ''}`}>
+                    <button
+                        type="button"
+                        className={styles.quickMuteBtn}
+                        onClick={toggleMute}
+                        title={volume === 0 ? t('gameplay.unmute') : t('gameplay.mute')}
+                        aria-label={volume === 0 ? t('gameplay.unmute') : t('gameplay.mute')}
+                    >
+                        {renderVolumeIcon()}
+                    </button>
+
+                    <button
+                        ref={triggerRef}
+                        type="button"
+                        className={styles.settingsToggleBtn}
+                        onClick={() => setIsOpen((prev) => !prev)}
+                        aria-expanded={isOpen}
+                        aria-label={t('gameplay.soundSettings')}
+                        title={t('gameplay.soundSettings')}
+                    >
+                        {isPlaying && volume > 0 && (
+                            <span className={styles.equalizer} aria-hidden="true">
+                                <span className={styles.bar} />
+                                <span className={styles.bar} />
+                                <span className={styles.bar} />
+                            </span>
+                        )}
+
+                        <span className={styles.volumePercentText}>
+                            {volume === 0 ? '0%' : `${Math.round(volume * 100)}%`}
+                        </span>
+
+                        <span
+                            className={styles.sfxBadge}
+                            title={sfxMuted ? 'SFX Off' : 'SFX On'}
+                        >
+                            {sfxMuted ? (
+                                <FaBellSlash className={styles.sfxBadgeIconMuted} />
+                            ) : (
+                                <FaBell className={styles.sfxBadgeIcon} />
+                            )}
+                        </span>
+
+                        <FaSlidersH className={`${styles.slidersIcon} ${isOpen ? styles.rotated : ''}`} />
+                    </button>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={toggleSfx}
-                    className={styles.sfxButton}
-                    title={sfxMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
-                >
-                    {sfxMuted ? (
-                        <FaBellSlash className={styles.sfxIconMuted} />
-                    ) : (
-                        <FaBell className={styles.sfxIcon} />
-                    )}
-                    <span className={styles.sfxLabel}>SFX</span>
-                </button>
+                {/* Modern Sound Settings Popover */}
+                {isOpen && (
+                    <div
+                        ref={popoverRef}
+                        className={styles.settingsCard}
+                        role="dialog"
+                        aria-label={t('gameplay.soundSettings')}
+                    >
+                        {/* Header */}
+                        <div className={styles.cardHeader}>
+                            <div className={styles.cardTitle}>
+                                <FaSlidersH className={styles.headerIcon} />
+                                <span>{t('gameplay.soundSettings')}</span>
+                            </div>
+                            <button
+                                type="button"
+                                className={styles.closeBtn}
+                                onClick={() => setIsOpen(false)}
+                                aria-label="Close"
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+
+                        {/* Music Volume Section */}
+                        <div className={styles.controlGroup}>
+                            <div className={styles.controlLabelRow}>
+                                <span className={styles.groupTitle}>
+                                    <FaMusic className={styles.musicIcon} />
+                                    {t('gameplay.musicVolume')}
+                                </span>
+                                <span className={styles.percentageBadge}>
+                                    {Math.round(volume * 100)}%
+                                </span>
+                            </div>
+
+                            <div className={styles.sliderRow}>
+                                <button
+                                    type="button"
+                                    className={styles.sliderIconBtn}
+                                    onClick={toggleMute}
+                                    title={volume === 0 ? t('gameplay.unmute') : t('gameplay.mute')}
+                                >
+                                    {volume === 0 ? <FaVolumeMute /> : <FaVolumeDown />}
+                                </button>
+
+                                <div className={styles.sliderTrackContainer}>
+                                    <input
+                                        type="range"
+                                        className={styles.neonSlider}
+                                        min={0}
+                                        max={1}
+                                        step={0.01}
+                                        value={volume}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value);
+                                            setVolume(val);
+                                        }}
+                                        style={{
+                                            ['--slider-fill-percent' as any]: `${volume * 100}%`,
+                                        }}
+                                        aria-label={t('gameplay.musicVolume')}
+                                    />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className={styles.sliderIconBtn}
+                                    onClick={() => setVolume(1.0)}
+                                    title="100%"
+                                >
+                                    <FaVolumeUp />
+                                </button>
+                            </div>
+
+                            {/* Quick Presets */}
+                            <div className={styles.presetsRow}>
+                                {PRESETS.map((p) => {
+                                    const isCurrent = Math.abs(volume - p.value) < 0.04;
+                                    return (
+                                        <button
+                                            key={p.label}
+                                            type="button"
+                                            className={`${styles.presetBtn} ${isCurrent ? styles.presetActive : ''}`}
+                                            onClick={() => setVolume(p.value)}
+                                        >
+                                            {p.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className={styles.divider} />
+
+                        {/* Sound Effects Section */}
+                        <div className={styles.sfxRow}>
+                            <div className={styles.sfxInfo}>
+                                <div className={styles.sfxTitleRow}>
+                                    {sfxMuted ? (
+                                        <FaBellSlash className={styles.sfxMutedIcon} />
+                                    ) : (
+                                        <FaBell className={styles.sfxActiveIcon} />
+                                    )}
+                                    <span className={styles.groupTitle}>{t('gameplay.soundEffects')}</span>
+                                </div>
+                                <span className={styles.sfxHintText}>{t('gameplay.sfxHint')}</span>
+                            </div>
+
+                            {/* Cyberpunk Animated Toggle Switch */}
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={!sfxMuted}
+                                className={`${styles.switchTrack} ${!sfxMuted ? styles.switchOn : styles.switchOff}`}
+                                onClick={toggleSfx}
+                                title={sfxMuted ? t('gameplay.unmute') : t('gameplay.mute')}
+                            >
+                                <span className={styles.switchThumb} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

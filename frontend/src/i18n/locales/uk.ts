@@ -263,6 +263,13 @@ export const uk: TranslationDictionary = {
         loadingAlbums: 'Завантаження альбомів, зачекайте...',
         selectedCollectionIncludes: 'Обрана колекція містить {count} треків',
         andMoreTracks: 'та інші треки у цій колекції...',
+        soundSettings: 'Налаштування звуку',
+        musicVolume: 'Гучність музики',
+        soundEffects: 'Звукові ефекти (SFX)',
+        sfxHint: 'Звуки гри, таймер, відповіді',
+        mute: 'Вимкнути звук',
+        unmute: 'Увімкнути звук',
+        quickPresets: 'Швидкі налаштування',
     },
     shareModal: {
         title: 'Запросити у кімнату',

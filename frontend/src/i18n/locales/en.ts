@@ -263,6 +263,13 @@ export const en: TranslationDictionary = {
         loadingAlbums: 'Albums are loading, please wait...',
         selectedCollectionIncludes: 'Selected collection includes {count} tracks',
         andMoreTracks: 'and more tracks in this collection...',
+        soundSettings: 'Sound Settings',
+        musicVolume: 'Music Volume',
+        soundEffects: 'Sound Effects (SFX)',
+        sfxHint: 'Game sounds, answers & streaks',
+        mute: 'Mute',
+        unmute: 'Unmute',
+        quickPresets: 'Presets',
     },
     shareModal: {
         title: 'Invite to Room',

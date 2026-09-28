@@ -1,4 +1,4 @@
-﻿.layout {
+.layout {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 16px;
@@ -249,8 +249,9 @@
     position: relative;
     display: flex;
     justify-content: flex-start;
-    align-items: flex-end;
-    height: 60px;
+    align-items: center;
+    margin-top: 24px;
+    z-index: 50;
 }
 
 /* Mobile Responsiveness Improvements */

@@ -1,218 +1,528 @@
-.controlsRow {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+/* ── Widget Wrapper ── */
+.widgetWrapper {
     position: relative;
-    bottom: -80px;
+    display: inline-flex;
+    align-items: center;
 }
 
-.volumeContainer {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+/* ── Trigger Pill ── */
+.triggerPill {
+    display: inline-flex;
     align-items: center;
-    padding-bottom: 40px;
+    background: rgba(24, 20, 38, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    border-radius: 9999px;
+    padding: 4px 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    gap: 4px;
 }
 
-.volumeIcon {
-    font-size: 24px;
+.triggerPill:hover,
+.triggerOpen {
+    background: rgba(30, 24, 48, 0.95);
+    border-color: rgba(0, 243, 255, 0.55);
+    box-shadow: 0 4px 20px rgba(0, 243, 255, 0.2), 0 0 12px rgba(155, 93, 229, 0.3);
+    transform: translateY(-1px);
+}
+
+.triggerOpen {
+    border-color: #00f3ff;
+}
+
+/* ── Quick Mute Button inside Pill ── */
+.quickMuteBtn {
+    background: transparent;
+    border: none;
     color: var(--text-main);
-    transition: transform 0.3s ease;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.volumeContainer:hover .volumeIcon {
+.quickMuteBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.12);
+}
+
+.volumeIconMuted {
+    color: var(--danger-color, #ff6f61);
+    filter: drop-shadow(0 0 5px rgba(255, 111, 97, 0.6));
+}
+
+.volumeIconLow {
+    color: #b075f7;
+    filter: drop-shadow(0 0 4px rgba(176, 117, 247, 0.5));
+}
+
+.volumeIconHigh {
+    color: #00f3ff;
+    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.6));
+}
+
+/* ── Settings Toggle Button inside Pill ── */
+.settingsToggleBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+}
+
+.settingsToggleBtn:hover {
+    color: #ffffff;
+}
+
+/* ── Animated Equalizer ── */
+.equalizer {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2.5px;
+    height: 12px;
+}
+
+.bar {
+    width: 2.5px;
+    height: 100%;
+    background: #00f3ff;
+    border-radius: 1px;
+    animation: eqPulse 0.9s ease-in-out infinite alternate;
+}
+
+.bar:nth-child(1) {
+    animation-delay: 0s;
+    height: 60%;
+}
+.bar:nth-child(2) {
+    animation-delay: 0.25s;
+    height: 100%;
+}
+.bar:nth-child(3) {
+    animation-delay: 0.5s;
+    height: 40%;
+}
+
+@keyframes eqPulse {
+    0% {
+        transform: scaleY(0.3);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+/* ── Volume Percentage Label ── */
+.volumePercentText {
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    min-width: 34px;
+    text-align: left;
+}
+
+/* ── SFX Mini Badge ── */
+.sfxBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
+.sfxBadgeIcon {
+    color: var(--primary-color, #9b5de5);
+    transition: color 0.2s ease;
+}
+
+.sfxBadgeIconMuted {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Sliders Icon ── */
+.slidersIcon {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.settingsToggleBtn:hover .slidersIcon {
+    color: #00f3ff;
+}
+
+.rotated {
+    transform: rotate(90deg);
+    color: #00f3ff;
+}
+
+/* ── Settings Popover Card ── */
+.settingsCard {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    width: 290px;
+    max-width: calc(100vw - 32px);
+    background: linear-gradient(160deg, rgba(26, 20, 44, 0.96) 0%, rgba(14, 10, 24, 0.98) 100%);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(155, 93, 229, 0.4);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(155, 93, 229, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    z-index: 1000;
+    animation: cardFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: bottom left;
+}
+
+/* Subtle notch pointer at bottom of card */
+.settingsCard::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 24px;
+    width: 12px;
+    height: 12px;
+    background: rgba(14, 10, 24, 0.98);
+    border-right: 1px solid rgba(155, 93, 229, 0.4);
+    border-bottom: 1px solid rgba(155, 93, 229, 0.4);
+    transform: rotate(45deg);
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Card Header ── */
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.cardTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.headerIcon {
+    color: var(--primary-color, #9b5de5);
+    font-size: 13px;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+    color: var(--danger-color, #ff6f61);
+    background: rgba(255, 255, 255, 0.08);
     transform: scale(1.1);
 }
 
-.sfxButton {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    padding: 6px 12px;
+/* ── Control Group ── */
+.controlGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.controlLabelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.groupTitle {
     display: flex;
     align-items: center;
     gap: 6px;
-    cursor: pointer;
-    color: var(--text-main);
-    transition: all 0.2s ease;
-    margin-bottom: 40px;
-}
-
-.sfxButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary-color);
-}
-
-.sfxIcon {
-    font-size: 16px;
-    color: var(--secondary-color);
-}
-
-.sfxIconMuted {
-    font-size: 16px;
-    color: var(--danger-color);
-}
-
-.sfxLabel {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    color: var(--text-main, #e0e0e0);
 }
 
-.volumeSlider {
+.musicIcon {
+    color: var(--secondary-color, #f15bb5);
+    font-size: 13px;
+}
+
+.percentageBadge {
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+    font-weight: 700;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.25);
+    padding: 2px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);
+}
+
+/* ── Slider Row ── */
+.sliderRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.sliderIconBtn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.sliderIconBtn:hover {
+    color: #00f3ff;
+    transform: scale(1.15);
+}
+
+.sliderTrackContainer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* ── Neon Slider ── */
+.neonSlider {
     -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 6px;
-    border-radius: 4px;
-    background: transparent;
+    border-radius: 9999px;
     outline: none;
+    background: linear-gradient(
+        to right,
+        #9b5de5 0%,
+        #00f3ff var(--slider-fill-percent, 70%),
+        rgba(255, 255, 255, 0.12) var(--slider-fill-percent, 70%),
+        rgba(255, 255, 255, 0.12) 100%
+    );
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.05s linear;
     border: none;
 }
 
-/* Трек (фон) */
-.volumeSliderDynamicTrack::-webkit-slider-runnable-track {
+.neonSlider::-webkit-slider-runnable-track {
     height: 6px;
-    border-radius: 4px;
-    background: var(--slider-track-fill, var(--primary-color));
+    border-radius: 9999px;
+    background: transparent;
     border: none;
 }
 
-.volumeSliderDynamicTrack::-moz-range-track {
+.neonSlider::-moz-range-track {
     height: 6px;
-    border-radius: 4px;
-    background: var(--slider-track-fill, var(--primary-color));
+    border-radius: 9999px;
+    background: transparent;
     border: none;
 }
 
-/* Повзунок (handle) */
-.volumeSlider::-webkit-slider-thumb {
+/* ── Webkit Slider Thumb ── */
+.neonSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, var(--text-main), var(--text-hover));
-    border: 2px solid rgba(var(--primary-color));
+    background: #ffffff;
+    border: 2px solid #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
     margin-top: -5px;
-    box-shadow: 0 0 4px rgba(var(--primary-color));
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.volumeSlider::-webkit-slider-thumb:hover {
-    background: radial-gradient(circle at 30% 30%, var(--text-hover), var(--text-main));
-    transform: scale(1.2);
-    box-shadow: 0 0 6px rgba(var(--primary-color));
+.neonSlider::-webkit-slider-thumb:hover,
+.neonSlider:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-.volumeSlider::-moz-range-thumb {
+/* ── Moz Range Thumb ── */
+.neonSlider::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, var(--text-main), var(--text-hover));
-    border: 2px solid rgba(var(--primary-color));
-    box-shadow: 0 0 4px rgba(var(--primary-color));
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    background: #ffffff;
+    border: 2px solid #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.volumeSlider::-moz-range-thumb:hover {
-    background: radial-gradient(circle at 30% 30%, var(--text-hover), var(--text-main));
-    transform: scale(1.2);
-    box-shadow: 0 0 6px rgba(var(--primary-color));
+.neonSlider::-moz-range-thumb:hover,
+.neonSlider:active::-moz-range-thumb {
+    transform: scale(1.25);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 1), 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-.volumeSlider:focus,
-.volumeSlider:active {
-    outline: none;
-    box-shadow: none;
-    border: none;
+/* ── Presets Row ── */
+.presetsRow {
+    display: flex;
+    gap: 6px;
+    width: 100%;
 }
 
-.sliderPopup {
-    position: absolute;
-    bottom: 36px;
-    left: -15px;
-    background-color: var(--background-secondary);
-    padding: 10px;
+.presetBtn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
     border-radius: 8px;
-    box-shadow: 0 4px 8px var(--primary-box-shadow-color);
+    padding: 4px 0;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono, monospace);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.presetBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(155, 93, 229, 0.4);
+}
+
+.presetActive {
+    background: rgba(155, 93, 229, 0.2);
+    border-color: #00f3ff;
+    color: #00f3ff;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+}
+
+/* ── Glowing Divider ── */
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(155, 93, 229, 0.35), transparent);
+    margin: 14px 0 12px 0;
+}
+
+/* ── SFX Row ── */
+.sfxRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sfxInfo {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 180px;
-    max-width: 200px;
-    z-index: 10;
+    gap: 2px;
 }
 
-.sliderRow {
+.sfxTitleRow {
     display: flex;
     align-items: center;
-    gap: 8px;
-    width: 100%;
+    gap: 6px;
 }
 
-.sideIcon {
-    font-size: 32px;
-    color: var(--text-secondary);
-}
-
-.sliderLabel {
-    color: var(--text-main);
-    font-weight: bold;
-    margin-bottom: 0px;
-    font-size: 18px;
-    align-self: flex-start;
-    text-align: left;
-    width: 100%;
-}
-
-.unmuteBanner {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, #ff0055, #ff5500);
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
+.sfxActiveIcon {
+    color: var(--primary-color, #9b5de5);
     font-size: 13px;
-    font-weight: 700;
+}
+
+.sfxMutedIcon {
+    color: var(--danger-color, #ff6f61);
+    font-size: 13px;
+}
+
+.sfxHintText {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-left: 20px;
+}
+
+/* ── Cyberpunk Animated Switch Track ── */
+.switchTrack {
+    width: 44px;
+    height: 24px;
+    border-radius: 9999px;
+    border: none;
     cursor: pointer;
-    box-shadow: 0 0 14px rgba(255, 0, 85, 0.6);
-    animation: unmutePulse 1.2s infinite alternate ease-in-out;
-    margin-bottom: 40px;
-    white-space: nowrap;
-    transition: transform 0.15s ease;
+    position: relative;
+    padding: 2px;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
-.unmuteBanner:hover {
-    transform: scale(1.05);
+.switchOn {
+    background: linear-gradient(90deg, #9b5de5, #00f3ff);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
 }
 
-.pulseMuteIcon {
-    font-size: 16px;
-    animation: bounce 0.8s infinite alternate;
+.switchOff {
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: none;
 }
 
-@keyframes unmutePulse {
-    from {
-        box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
-    }
-    to {
-        box-shadow: 0 0 20px rgba(255, 85, 0, 0.8);
-    }
+.switchThumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes bounce {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(-2px);
-    }
+.switchOn .switchThumb {
+    transform: translateX(20px);
 }
+
+.switchOff .switchThumb {
+    transform: translateX(0);
+}
+
 /* ── Fullscreen autoplay overlay ── */
 .autoplayOverlay {
     position: fixed;
@@ -239,7 +549,7 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(0,243,255,0.1));
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 243, 255, 0.1));
     border: 1.5px solid rgba(139, 92, 246, 0.5);
     border-radius: 20px;
     padding: 36px 48px;
@@ -264,22 +574,33 @@
 
 .autoplaySubtitle {
     font-size: 14px;
-    color: rgba(255,255,255,0.55);
+    color: rgba(255, 255, 255, 0.55);
     margin: 0;
 }
 
 .autoplayHint {
     font-size: 13px;
-    color: rgba(255,255,255,0.35);
+    color: rgba(255, 255, 255, 0.35);
     letter-spacing: 0.3px;
 }
 
 @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes iconPulse {
-    0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 8px rgba(139,92,246,0.6)); }
-    50%       { transform: scale(1.12); filter: drop-shadow(0 0 18px rgba(0,243,255,0.8)); }
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+    }
+    50% {
+        transform: scale(1.12);
+        filter: drop-shadow(0 0 18px rgba(0, 243, 255, 0.8));
+    }
 }

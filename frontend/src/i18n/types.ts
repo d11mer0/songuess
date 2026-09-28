@@ -263,6 +263,13 @@ export interface TranslationDictionary {
         loadingAlbums: string;
         selectedCollectionIncludes: string;
         andMoreTracks: string;
+        soundSettings: string;
+        musicVolume: string;
+        soundEffects: string;
+        sfxHint: string;
+        mute: string;
+        unmute: string;
+        quickPresets: string;
     };
     shareModal: {
         title: string;
