@@ -1,6 +1,6 @@
-import { useState } from 'react';
+﻿import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './defaultInputs.module.css';
-import React from 'react';
 
 type PasswordInputProps = {
     label: string;
@@ -30,8 +30,9 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 type="button"
                 className={styles.togglePassword}
                 onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
         </div>
     );

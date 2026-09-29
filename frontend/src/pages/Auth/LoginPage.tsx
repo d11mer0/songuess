@@ -43,7 +43,7 @@ const LoginPage: React.FC = () => {
                 submitButtonText="Sign in"
                 isLoading={isLoading}
                 links={[
-                    { to: '/auth/register', label: 'Sign up' },
+                    { to: '/auth/register', label: "Don't have an account? Sign up" },
                     { to: '/auth/forgot-password', label: 'Forgot password?' },
                     {
                         to: '/auth/verify',
@@ -51,6 +51,11 @@ const LoginPage: React.FC = () => {
                     },
                 ]}
             >
+                <div className={styles.dividerRow}>
+                    <span className={styles.dividerLine}></span>
+                    <span className={styles.dividerText}>or</span>
+                    <span className={styles.dividerLine}></span>
+                </div>
                 <div className={styles.googleButton}>
                     <GoogleLoginButton />
                 </div>

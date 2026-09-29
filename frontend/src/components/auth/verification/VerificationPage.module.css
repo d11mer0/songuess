@@ -1,50 +1,171 @@
-.auth-button {
-    display: inline-block;
-    padding: 12px 20px;
-    background-color: var(--primary-color);
-    color: var(--text-main);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    transition:
-        background-color 0.2s,
-        transform 0.2s;
-}
-
-.auth-button:hover {
-    background-color: var(--primary-hover);
-    transform: scale(1.05);
-}
-
-.auth-button.try-again {
-    background-color: var(--danger-color);
-    font-weight: bold;
-}
-
-.auth-button.try-again:hover {
-    background-color: var(--danger-hover);
-    transform: scale(1.08);
-}
-
-.auth-message .auth-success,
-.auth-error {
-    font-size: 16px;
+.statusBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    margin-bottom: 15px;
+    gap: 12px;
+    width: 100%;
 }
 
-.auth-message {
-    color: var(--text-secondary);
+.iconInfo {
+    font-size: 46px;
+    color: #00f3ff;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
 }
 
-.auth-success {
-    color: var(--success-color);
-    font-weight: bold;
+.iconSuccess {
+    font-size: 46px;
+    color: #10b981;
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
 }
 
-.auth-error {
-    color: var(--danger-color);
-    font-weight: bold;
+.iconError {
+    font-size: 46px;
+    color: #ef4444;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.title {
+    font-family: var(--font-title);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 50%, #9b5de5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.message {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: var(--font-main);
+    margin: 0;
+}
+
+.errorMessage {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ff6b6b;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin: 4px 0 0 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.successMessage {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-main);
+    margin: 0;
+}
+
+.loginLink {
+    margin-top: 14px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 100%);
+    color: #ffffff;
+    font-family: var(--font-title);
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 243, 255, 0.35);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-block;
+}
+
+.loginLink:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(155, 93, 229, 0.5), 0 0 20px rgba(0, 243, 255, 0.45);
+    color: #ffffff;
+}
+
+.resendSection {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(155, 93, 229, 0.2);
+}
+
+.resendDivider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.resendDividerLine {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(155, 93, 229, 0.35), transparent);
+}
+
+.resendDividerText {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: var(--font-title);
+}
+
+.resendButton {
+    padding: 11px 22px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(155, 93, 229, 0.5);
+    color: #00f3ff;
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.resendButton:hover {
+    background: rgba(0, 243, 255, 0.15);
+    border-color: #00f3ff;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 243, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.cooldownBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(155, 93, 229, 0.3);
+    border-radius: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: var(--font-main);
+}
+
+.cooldownIcon {
+    font-size: 14px;
+}
+
+.cooldownTime {
+    color: #f15bb5;
+    font-weight: 700;
+    font-family: var(--font-title);
 }

@@ -1,5 +1,5 @@
+import React from 'react';
 import styles from './VerificationPage.module.css';
-import Button from '../../../components/UI/Button/Button';
 
 interface ResendVerificationProps {
     canResend: boolean;
@@ -12,18 +12,32 @@ const ResendVerification: React.FC<ResendVerificationProps> = ({
     resendTimeout,
     onOpenModal,
 }) => {
-    return canResend ? (
-        <Button
-            width={'200px'}
-            onClick={onOpenModal}
-            className={`${styles['auth-button']} ${styles['try-again']}`}
-        >
-            Try again
-        </Button>
-    ) : (
-        <p className={styles['auth-message']}>
-            Retry request will be available in {resendTimeout} seconds.
-        </p>
+    return (
+        <div className={styles.resendSection}>
+            <div className={styles.resendDivider}>
+                <span className={styles.resendDividerLine} />
+                <span className={styles.resendDividerText}>Didn't receive email?</span>
+                <span className={styles.resendDividerLine} />
+            </div>
+
+            {canResend ? (
+                <button
+                    type="button"
+                    onClick={onOpenModal}
+                    className={styles.resendButton}
+                >
+                    Resend Verification Email
+                </button>
+            ) : (
+                <div className={styles.cooldownBadge}>
+                    <span className={styles.cooldownIcon}>⏳</span>
+                    <span>
+                        Resend available in{' '}
+                        <strong className={styles.cooldownTime}>{resendTimeout}s</strong>
+                    </span>
+                </div>
+            )}
+        </div>
     );
 };
 

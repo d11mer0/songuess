@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useSendTokenMutation } from '../../store/api/authApi';
 import useForm from '../../hooks/useForm';
 import AuthFormWrapper from '../../components/auth/AuthFormWrapper';
@@ -26,21 +27,28 @@ const ForgotPassword: React.FC = () => {
     return (
         <div className={styles['auth-container']}>
             {emailSent ? (
-                <p className={styles['auth-message']}>
-                    An email with instructions on how to reset your password has 
-                    been sent to your inbox. Please check your inbox or spam folder.
-                </p>
+                <div className={styles.messageCard}>
+                    <div className={styles.messageIcon}>✉️</div>
+                    <h3 className={styles.messageTitle}>Check your inbox</h3>
+                    <p className={styles['auth-message']}>
+                        An email with instructions on how to reset your password has 
+                        been sent to your inbox. Please check your inbox or spam folder.
+                    </p>
+                    <Link to="/auth/login" className={styles.returnLink}>
+                        Back to Login
+                    </Link>
+                </div>
             ) : (
                 <AuthFormWrapper
-                    title="Password recovery"
+                    title="Password Recovery"
                     onSubmit={handleSubmit}
                     inputs={['email']}
                     formData={formData}
                     handleChange={handleChange}
-                    submitButtonText="Send"
+                    submitButtonText="Send Reset Link"
                     error={error as any}
                     isLoading={isLoading}
-                    links={[{ to: '/auth/login', label: 'Log in' }]}
+                    links={[{ to: '/auth/login', label: 'Remember password? Log in' }]}
                 />
             )}
         </div>

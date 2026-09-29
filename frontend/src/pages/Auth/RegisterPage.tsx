@@ -42,7 +42,7 @@ const RegisterPage: React.FC = () => {
                 error={error as any}
                 submitButtonText="Sign up"
                 isLoading={isLoading}
-                links={[{ to: '/auth/login', label: 'Log in' }]}
+                links={[{ to: '/auth/login', label: 'Already have an account? Log in' }]}
             />
         </div>
     );

@@ -41,14 +41,24 @@ const VerifyPage: React.FC = () => {
         return <Loader />;
     }
 
+    const isSuccess = !!token && !error && !isLoading;
+
     return (
         <div className={styles['auth-container']}>
-            <VerificationStatus token={token} error={error} />
-            <ResendVerification
-                canResend={canResend}
-                resendTimeout={resendTimeout}
-                onOpenModal={() => setIsModalOpen(true)}
-            />
+            <div className={styles.messageCard}>
+                <VerificationStatus
+                    token={token}
+                    error={error}
+                    isSuccess={isSuccess}
+                />
+                {!isSuccess && (
+                    <ResendVerification
+                        canResend={canResend}
+                        resendTimeout={resendTimeout}
+                        onOpenModal={() => setIsModalOpen(true)}
+                    />
+                )}
+            </div>
             <ResendModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

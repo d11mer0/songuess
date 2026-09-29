@@ -1,3 +1,4 @@
+﻿import React from 'react';
 import AuthFormLinks from './authFormElements/AuthFormLinks';
 import AuthFormInputs from './authFormElements/AuthFormInputs';
 import AuthFormError from './authFormElements/AuthFormError';
@@ -34,7 +35,7 @@ const AuthFormWrapper: React.FC<AuthFormWrapperProps> = ({
         <div className={styles.container}>
             <div className={styles.titleWrapper}>
                 <img src="/logo.png" alt="SonGuess" className={styles.authLogo} />
-                <h2 className={styles.title}>{title}</h2>
+                {title && <h2 className={styles.title}>{title}</h2>}
             </div>
             <form onSubmit={onSubmit} className={styles.form}>
                 <AuthFormInputs
@@ -43,14 +44,18 @@ const AuthFormWrapper: React.FC<AuthFormWrapperProps> = ({
                     handleChange={handleChange}
                 />
                 <AuthFormError error={error} />
-                <Button variant="primary" type="submit" disabled={isLoading}>
+                <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isLoading}
+                    className={styles.submitBtn}
+                >
                     {isLoading ? 'Loading...' : submitButtonText}
                 </Button>
                 {children}
                 {isLoading && (
-                    <div style={{ margin: '20px 0px' }}>
-                        {' '}
-                        <Loader />{' '}
+                    <div style={{ margin: '16px 0 0 0' }}>
+                        <Loader />
                     </div>
                 )}
             </form>

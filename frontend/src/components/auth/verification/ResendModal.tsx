@@ -15,7 +15,7 @@ const ResendModal: React.FC<ResendModalProps> = ({ isOpen, onClose }) => {
     const { formData, handleChange } = useForm<{ email: string }>({
         email: '',
     });
-    const [sendToken, { isLoading, error, reset }] = useSendTokenMutation();
+    const [sendToken, { isLoading, error }] = useSendTokenMutation();
 
     const handleResend = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,13 +29,14 @@ const ResendModal: React.FC<ResendModalProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <CustomModal isOpen={isOpen} onClose={onClose}>
+        <CustomModal isOpen={isOpen} onClose={onClose} title="Resend Verification">
             <AuthFormWrapper
+                title="Resend Link"
                 onSubmit={handleResend}
                 inputs={['email']}
                 formData={formData}
                 handleChange={handleChange}
-                submitButtonText="Надіслати"
+                submitButtonText="Send Verification Link"
                 error={
                     error
                         ? 'data' in error &&
