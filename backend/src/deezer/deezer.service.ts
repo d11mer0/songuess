@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+﻿import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { DeezerApi } from '../utils/deezer-api';
 import { RedisService } from '../redis/redis.service';
@@ -7,6 +7,7 @@ import {
     filterTracks,
     filterTracksByArtist,
 } from '../utils/track-utils';
+
 function pLimit(concurrency: number) {
     const queue: (() => void)[] = [];
     let active = 0;
@@ -134,21 +135,44 @@ export class DeezerService {
         return res;
     }
 
-    // 🔹 Отримати альбоми артиста
-    async getAlbumsByArtist(artistId: number) {
+    // 🔹 Отримати релізи артиста (альбоми, сингли, EP)
+    async getAlbumsByArtist(artistId: number): Promise<{ data: any[]; total?: number }> {
         const cacheKey = `deezer:artist_albums:${artistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCached<{ data: any[]; total?: number }>(cacheKey);
         if (cached) return cached;
 
-        const res = await this.deezerApi.fetch(`/artist/${artistId}/albums`);
-        await this.setCached(cacheKey, res, 43200);
-        return res;
+        let allData: any[] = [];
+        let url = `/artist/${artistId}/albums?limit=100`;
+        let pages = 0;
+        const maxPages = 3; // Обмежуємо до 300 релізів
+
+        while (url && pages < maxPages) {
+            pages++;
+            const res = await this.deezerApi.fetch(url);
+            if (res?.data && Array.isArray(res.data)) {
+                allData = allData.concat(res.data);
+            }
+            if (
+                res?.next &&
+                res.data?.length === 100 &&
+                allData.length < (res.total || 0)
+            ) {
+                const match = res.next.match(/\/artist\/\d+\/albums[^\s]*/);
+                url = match ? match[0] : '';
+            } else {
+                url = '';
+            }
+        }
+
+        const result = { data: allData, total: allData.length };
+        await this.setCached(cacheKey, result, 43200);
+        return result;
     }
 
     // 🔹 Отримати інформацію про артиста за ID
     async getArtistById(artistId: number) {
         const cacheKey = `deezer:artist:${artistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCached<{ data: any[]; total?: number }>(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/artist/${artistId}`);
@@ -159,7 +183,7 @@ export class DeezerService {
     // 🔹 Отримати схожих артистів
     async getRelatedArtists(artistId: number) {
         const cacheKey = `deezer:artist_related:${artistId}`;
-        const cached = await this.getCached(cacheKey);
+        const cached = await this.getCached<{ data: any[]; total?: number }>(cacheKey);
         if (cached) return cached;
 
         const res = await this.deezerApi.fetch(`/artist/${artistId}/related`);
@@ -193,32 +217,60 @@ export class DeezerService {
     }
 
     private async getFilteredArtistAlbums(artistId: number) {
-        const albums = await this.getAlbumsByArtist(artistId);
-        return albums.data.filter((album) => album.record_type === 'album');
+        const albumsResponse = await this.getAlbumsByArtist(artistId);
+        const allReleases: any[] = albumsResponse?.data || [];
+
+        // Включаємо повноцінні альбоми, сингли та EP
+        const validTypes = new Set(['album', 'single', 'ep']);
+
+        // Фільтруємо суто збірки реміксів, інструменталів, караоке та коментарів
+        const nonOriginalAlbumRegex =
+            /\b(remixes|remix album|instrumentals?|commentary|karaoke|tribute to|backing tracks?|acapella)\b/i;
+
+        const filtered = allReleases.filter((rel) => {
+            if (!validTypes.has(rel.record_type)) return false;
+            if (nonOriginalAlbumRegex.test(rel.title)) return false;
+            return true;
+        });
+
+        // Пріоритезуємо: спочатку студійні альбоми, потім EP, потім сингли
+        filtered.sort((a, b) => {
+            const typeScore = (t: string) => (t === 'album' ? 3 : t === 'ep' ? 2 : 1);
+            const scoreDiff = typeScore(b.record_type) - typeScore(a.record_type);
+            if (scoreDiff !== 0) return scoreDiff;
+            return (b.fans || 0) - (a.fans || 0);
+        });
+
+        // Безпечний ліміт до 60 найважливіших релізів (запобігає надмірному навантаженню API)
+        return filtered.slice(0, 60);
     }
 
     private async getTracksFromAlbums(albums: any[]) {
-        const limit = pLimit(5); // 🔹 Обмеження: максимум 5 запитів одночасно
+        const limit = pLimit(3); // Консервативний ліміт паралельності для безпеки API
         const trackPromises = albums.map((album) =>
             limit(async () => {
                 try {
                     const res = await this.deezerApi.fetchWithRetry(
-                        `/album/${album.id}/tracks`,
+                        `/album/${album.id}/tracks?limit=100`,
                     );
+                    if (!res?.data || !Array.isArray(res.data)) {
+                        return [];
+                    }
                     return res.data.map((track) => ({
                         ...track,
-                        release_date: album.release_date,
+                        record_type: album.record_type,
+                        release_date: album.release_date || track.release_date,
                         album: {
                             id: album.id,
                             title: album.title,
-                            picture: album.cover_big,
+                            picture: album.cover_big || album.cover,
                         },
                     }));
                 } catch (error) {
                     console.warn(
-                        `❌ Не вдалося отримати треки для альбому ${album.id}: ${error.message}`,
+                        `❌ Не вдалося отримати треки для альбому ${album.id} (${album.title}): ${error.message}`,
                     );
-                    return []; // Якщо не вдалося отримати треки, повертаємо пустий масив
+                    return [];
                 }
             }),
         );
@@ -232,10 +284,10 @@ export class DeezerService {
         const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
-        const albums = await this.getFilteredArtistAlbums(artistId);
-        const allTracks = await this.getTracksFromAlbums(albums);
+        const releases = await this.getFilteredArtistAlbums(artistId);
+        const allTracks = await this.getTracksFromAlbums(releases);
         const res = filterTracksByArtist(allTracks, this.nonOriginalKeywords);
-        await this.setCached(cacheKey, res, 1800);
+        await this.setCached(cacheKey, res, 43200);
         return res;
     }
 
