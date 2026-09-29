@@ -7,6 +7,7 @@ import { GameRoom, GameRoomState } from '../../interfaces/game.interface';
 import { SelectedTracks, TrackItem } from '../../interfaces/tracks.interface';
 import { createInitialPlayerResults, validateAnswerSubmission, createPlayerRoundResult} from '../../../utils/gameplay/player-results.utils';
 import {checkAllPlayersAnswered } from '../../../utils/gameplay/round.util';
+import { filterTracks } from '../../../utils/track-utils';
 import { RoundManagerService } from './round-manager.service';
 import { GameEventsService } from './game-events.service';
 import { GameResultService } from './game-result.service';
@@ -38,15 +39,20 @@ export class GameplayService {
         const userId = client.data.user?.id;
         if (room.leaderId !== userId) return;
         if (room.state === GameRoomState.STARTED) return;
-        if (!selectedTracks?.tracks || selectedTracks.tracks.length < 3) return;
+        
+        const playableTracks = filterTracks(selectedTracks?.tracks || []);
+        if (playableTracks.length < 3) return;
 
         this.roundManager.cancelRoomGame(room.id);
 
-        room.gameData = selectedTracks;
+        room.gameData = {
+            ...selectedTracks,
+            tracks: playableTracks,
+        };
         room.state = GameRoomState.STARTED;
 
         const roundsCount = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
-        const rounds = this.roundManager.generateGameRounds(selectedTracks.tracks, roundsCount);
+        const rounds = this.roundManager.generateGameRounds(playableTracks, roundsCount);
         const playerResults = createInitialPlayerResults(room.players);
 
         const totalScores: Record<number, number> = room.players.reduce(

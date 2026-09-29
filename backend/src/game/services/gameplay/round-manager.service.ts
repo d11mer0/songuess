@@ -5,6 +5,7 @@ import { GameRound, PlayerRoundResult, GameProgress } from '../../interfaces/gam
 import { shuffleArray } from '../../../utils/array';
 import { assignMissedAnswers } from '../../../utils/gameplay/player-results.utils';
 import { isGameFinished, prepareNextRound, buildGameRound } from '../../../utils/gameplay/round.util';
+import { filterTracks } from '../../../utils/track-utils';
 import { ScoringService } from './scoring.service';
 import { GameResultService } from './game-result.service';
 import { GameEventsService } from './game-events.service';
@@ -30,13 +31,14 @@ export class RoundManagerService {
     }
 
     generateGameRounds(tracks: any[], roundsCount: number = ROUNDS_NUMBER): GameRound[] {
-        const count = Math.min(tracks.length, roundsCount);
+        const playableTracks = filterTracks(tracks || []);
+        const count = Math.min(playableTracks.length, roundsCount);
         if (count < 3) {
             throw new Error('Not enough tracks to generate round options');
         }
         
-        const selectedTracks = shuffleArray(tracks).slice(0, count);
-        return selectedTracks.map((track, index) => buildGameRound(track, tracks, index));
+        const selectedTracks = shuffleArray(playableTracks).slice(0, count);
+        return selectedTracks.map((track, index) => buildGameRound(track, playableTracks, index));
     }
 
     startRound(roomId: string, roundNumber: number, round: GameRound) {

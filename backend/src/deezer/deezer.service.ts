@@ -1,4 +1,4 @@
-﻿import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { DeezerApi } from '../utils/deezer-api';
 import { RedisService } from '../redis/redis.service';
@@ -211,7 +211,10 @@ export class DeezerService {
         const cached = await this.getCachedValid(cacheKey);
         if (cached) return cached;
 
-        const res = await this.deezerApi.fetch(`/artist/${artistId}/top?limit=10`);
+        const res = await this.deezerApi.fetch(`/artist/${artistId}/top?limit=25`);
+        if (res?.data && Array.isArray(res.data)) {
+            res.data = filterTracks(res.data).slice(0, 10);
+        }
         await this.setCached(cacheKey, res, 1800);
         return res;
     }
@@ -223,9 +226,9 @@ export class DeezerService {
         // Включаємо повноцінні альбоми, сингли та EP
         const validTypes = new Set(['album', 'single', 'ep']);
 
-        // Фільтруємо суто збірки реміксів, інструменталів, караоке та коментарів
+        // Фільтруємо суто збірки реміксів, інструменталів, караоке, коментарів та drumless
         const nonOriginalAlbumRegex =
-            /\b(remixes|remix album|instrumentals?|commentary|karaoke|tribute to|backing tracks?|acapella)\b/i;
+            /\b(remixes|remix album|instrumentals?|commentary|karaoke|tribute to|backing tracks?|acapella|drumless)\b/i;
 
         const filtered = allReleases.filter((rel) => {
             if (!validTypes.has(rel.record_type)) return false;
@@ -256,7 +259,8 @@ export class DeezerService {
                     if (!res?.data || !Array.isArray(res.data)) {
                         return [];
                     }
-                    return res.data.map((track) => ({
+                    const validTracks = filterTracks(res.data);
+                    return validTracks.map((track) => ({
                         ...track,
                         record_type: album.record_type,
                         release_date: album.release_date || track.release_date,
@@ -304,6 +308,9 @@ export class DeezerService {
         const res = await this.deezerApi.fetch(
             `/search/${type}?q=${encodeURIComponent(query)}&limit=${limit}`,
         );
+        if (type === 'track' && res?.data && Array.isArray(res.data)) {
+            res.data = filterTracks(res.data);
+        }
         const ttl = type === 'track' ? 1800 : 7200;
         await this.setCached(cacheKey, res, ttl);
         return res;
@@ -409,7 +416,7 @@ export class DeezerService {
                 id: theme.id,
                 title: theme.title,
                 picture_big: theme.cover,
-                tracks: { data: tracksRes?.data || [] },
+                tracks: { data: filterTracks(tracksRes?.data || []) },
             };
         }
 

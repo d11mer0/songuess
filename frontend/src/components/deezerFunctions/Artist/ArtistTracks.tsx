@@ -21,16 +21,23 @@ const ArtistTracks: React.FC<ArtistTracksProps> = ({
     const { data, error, isLoading, isFetching } = useGetAllTracksByArtistQuery(artistId);
 
     const tracks =
-        data?.map((track: TrackItem) => ({
-            id: track.id,
-            title: track.title,
-            preview: track.preview,
-            album: {
-                id: track.album?.id,
-                title: track.album?.title,
-                picture: track.album?.picture,
-            },
-        })) || [];
+        (data || [])
+            .filter(
+                (track: TrackItem) =>
+                    track &&
+                    typeof track.preview === 'string' &&
+                    track.preview.trim().length > 0,
+            )
+            .map((track: TrackItem) => ({
+                id: track.id,
+                title: track.title,
+                preview: track.preview,
+                album: {
+                    id: track.album?.id,
+                    title: track.album?.title,
+                    picture: track.album?.picture,
+                },
+            }));
 
     if (isFetching || isLoading) {
         return <Loader text={t('gameCreation.tracksLoading')} />;
