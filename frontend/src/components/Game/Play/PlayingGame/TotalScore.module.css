@@ -309,11 +309,9 @@
 
 @keyframes flamePulse {
     from {
-        transform: scale(1) translateZ(0);
-        opacity: 0.9;
+        opacity: 0.88;
     }
     to {
-        transform: scale(1.05) translateZ(0);
         opacity: 1;
     }
 }

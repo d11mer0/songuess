@@ -25,7 +25,6 @@
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
     animation: cardPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     transform: translateZ(0);
-    will-change: transform;
 }
 
 .playerCard:hover {
@@ -109,7 +108,6 @@
 
 .incorrectCard .playerAvatar {
     border-color: rgba(255, 71, 87, 0.5);
-    filter: grayscale(0.2);
 }
 
 /* ── Top Status Badges ── */
@@ -375,11 +373,9 @@
 
 @keyframes flamePulse {
     from {
-        transform: scale(1) translateZ(0);
-        opacity: 0.9;
+        opacity: 0.88;
     }
     to {
-        transform: scale(1.03) translateZ(0);
         opacity: 1;
     }
 }

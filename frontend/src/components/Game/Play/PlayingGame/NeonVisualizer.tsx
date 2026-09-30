@@ -20,13 +20,15 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        let width = (canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1));
-        let height = (canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1));
+        // Cache devicePixelRatio — avoid window property lookup on every frame
+        const dpr = window.devicePixelRatio || 1;
+        let width = (canvas.width = canvas.offsetWidth * dpr);
+        let height = (canvas.height = canvas.offsetHeight * dpr);
 
         const drawFrame = (active: boolean, phase: number) => {
             ctx.clearRect(0, 0, width, height);
 
-            const gap = 3 * (window.devicePixelRatio || 1);
+            const gap = 3 * dpr;
             const totalGaps = gap * (BAR_COUNT - 1);
             const barWidth = Math.max(2, (width - totalGaps) / BAR_COUNT);
 
@@ -86,38 +88,35 @@ const NeonVisualizer: React.FC<NeonVisualizerProps> = ({ isPlaying }) => {
                 }
             }
 
-            // Малювання неонової хвилі (двошаровий векторний шлейф замість CPU-blur)
+            // Малювання неонової хвилі — два шари в одному batched pass
             if (active) {
-                // Зовнішнє напівпрозоре сяйво хвилі
+                // Будуємо path одного разу, малюємо двічі (outer glow + inner line)
+                const wavePath = new Path2D();
+                for (let i = 0; i < BAR_COUNT; i++) {
+                    const x = i * (barWidth + gap) + barWidth / 2;
+                    const y = height - heightsRef.current[i];
+                    if (i === 0) wavePath.moveTo(x, y);
+                    else wavePath.lineTo(x, y);
+                }
+
+                // Outer glow
                 ctx.beginPath();
                 ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
-                ctx.lineWidth = 5 * (window.devicePixelRatio || 1);
-                for (let i = 0; i < BAR_COUNT; i++) {
-                    const x = i * (barWidth + gap) + barWidth / 2;
-                    const y = height - heightsRef.current[i];
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
+                ctx.lineWidth = 5 * dpr;
+                ctx.stroke(wavePath);
 
-                // Внутрішній лазерний промінь хвилі
+                // Inner laser line
                 ctx.beginPath();
                 ctx.strokeStyle = '#00f3ff';
-                ctx.lineWidth = 2 * (window.devicePixelRatio || 1);
-                for (let i = 0; i < BAR_COUNT; i++) {
-                    const x = i * (barWidth + gap) + barWidth / 2;
-                    const y = height - heightsRef.current[i];
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
+                ctx.lineWidth = 2 * dpr;
+                ctx.stroke(wavePath);
             }
         };
 
         const handleResize = () => {
             if (!canvas) return;
-            width = canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
-            height = canvas.height = canvas.offsetHeight * (window.devicePixelRatio || 1);
+            width = canvas.width = canvas.offsetWidth * dpr;
+            height = canvas.height = canvas.offsetHeight * dpr;
             if (!isPlaying) {
                 drawFrame(false, 0);
             }

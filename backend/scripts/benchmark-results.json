@@ -1,0 +1,1493 @@
+{
+  "summary": {
+    "totalRawTracks": 18024,
+    "totalBeforeTracks": 14831,
+    "totalAfterTracks": 11329,
+    "totalInvalidPreviewsInAfter": 0,
+    "totalDuplicatesEliminated": 6695
+  },
+  "results": [
+    {
+      "rank": 1,
+      "artistId": 12246,
+      "artistName": "Taylor Swift",
+      "rawCount": 241,
+      "beforeCount": 133,
+      "afterCount": 111,
+      "validPreviewsCount": 111,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Elizabeth Taylor",
+        "Father Figure",
+        "Eldest Daughter"
+      ]
+    },
+    {
+      "rank": 2,
+      "artistId": 92,
+      "artistName": "Linkin Park",
+      "rawCount": 324,
+      "beforeCount": 292,
+      "afterCount": 169,
+      "validPreviewsCount": 169,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Inception/Intro - Unshatter Film Soundtrack (Live in São Paulo)",
+        "Break Collapse/Interlude - Unshatter Film Soundtrack (Live in São Paulo)",
+        "Resolution/Intro - Unshatter Film Soundtrack (Live in São Paulo)"
+      ]
+    },
+    {
+      "rank": 3,
+      "artistId": 7872340,
+      "artistName": "Dawid Podsiadło",
+      "rawCount": 162,
+      "beforeCount": 118,
+      "afterCount": 100,
+      "validPreviewsCount": 100,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "WiRUS",
+        "TAZOSy",
+        "Halo"
+      ]
+    },
+    {
+      "rank": 4,
+      "artistId": 542,
+      "artistName": "David Guetta",
+      "rawCount": 228,
+      "beforeCount": 167,
+      "afterCount": 100,
+      "validPreviewsCount": 100,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "2U (feat. Justin Bieber)",
+        "Like I Do",
+        "Lovers on the Sun (feat. Sam Martin)"
+      ]
+    },
+    {
+      "rank": 5,
+      "artistId": 8090229,
+      "artistName": "Taco Hemingway",
+      "rawCount": 153,
+      "beforeCount": 153,
+      "afterCount": 140,
+      "validPreviewsCount": 140,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "#2 - GRZĘZNĄĆ W CISZY",
+        "TU RADIO MARMUR #1",
+        "#7 - PRACA DOMOWA"
+      ]
+    },
+    {
+      "rank": 6,
+      "artistId": 2051671,
+      "artistName": "Sanah",
+      "rawCount": 195,
+      "beforeCount": 149,
+      "afterCount": 123,
+      "validPreviewsCount": 123,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Coda",
+        "Intro (Bankietowy live)",
+        "Co ja robię tutaj? (Bankietowy live)"
+      ]
+    },
+    {
+      "rank": 7,
+      "artistId": 259,
+      "artistName": "Michael Jackson",
+      "rawCount": 261,
+      "beforeCount": 215,
+      "afterCount": 140,
+      "validPreviewsCount": 140,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Beat It",
+        "Thriller",
+        "Billie Jean"
+      ]
+    },
+    {
+      "rank": 8,
+      "artistId": 7858492,
+      "artistName": "Otsochodzi",
+      "rawCount": 152,
+      "beforeCount": 134,
+      "afterCount": 126,
+      "validPreviewsCount": 126,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "ceha joint 3 (skitt)",
+        "0:00",
+        "Ceha Joint 2 (Skit)"
+      ]
+    },
+    {
+      "rank": 9,
+      "artistId": 1424821,
+      "artistName": "Lana Del Rey",
+      "rawCount": 179,
+      "beforeCount": 144,
+      "afterCount": 136,
+      "validPreviewsCount": 136,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Lust for Life",
+        "Video Games",
+        "Cruel World"
+      ]
+    },
+    {
+      "rank": 10,
+      "artistId": 119,
+      "artistName": "Metallica",
+      "rawCount": 211,
+      "beforeCount": 140,
+      "afterCount": 154,
+      "validPreviewsCount": 154,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "The Ecstasy Of Gold (Live)",
+        "The Call Of Ktulu (Live)",
+        "For Whom The Bell Tolls (Live)"
+      ]
+    },
+    {
+      "rank": 11,
+      "artistId": 54499262,
+      "artistName": "Vito Bambino",
+      "rawCount": 83,
+      "beforeCount": 59,
+      "afterCount": 59,
+      "validPreviewsCount": 59,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Mustang",
+        "Teleniekspress: Upgrade Need",
+        "Nudy"
+      ]
+    },
+    {
+      "rank": 12,
+      "artistId": 13,
+      "artistName": "Eminem",
+      "rawCount": 270,
+      "beforeCount": 183,
+      "afterCount": 146,
+      "validPreviewsCount": 146,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Bad Guy",
+        "Arose",
+        "Rap God"
+      ]
+    },
+    {
+      "rank": 13,
+      "artistId": 6635436,
+      "artistName": "Męskie Granie Orkiestra",
+      "rawCount": 333,
+      "beforeCount": 329,
+      "afterCount": 323,
+      "validPreviewsCount": 323,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Mieć czy być (feat. Myslovitz)",
+        "Kryzysowa narzeczona (feat. Lady Pank)",
+        "Supermoce (feat. Mrozu & Igo)"
+      ]
+    },
+    {
+      "rank": 14,
+      "artistId": 4509344,
+      "artistName": "Gibbs",
+      "rawCount": 146,
+      "beforeCount": 145,
+      "afterCount": 141,
+      "validPreviewsCount": 141,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "OUTROJAKW2010",
+        "Zobaczyć jak (Blinders Remix)",
+        "Kevlar (Jonatan Remix)"
+      ]
+    },
+    {
+      "rank": 15,
+      "artistId": 160,
+      "artistName": "Shakira",
+      "rawCount": 210,
+      "beforeCount": 180,
+      "afterCount": 157,
+      "validPreviewsCount": 157,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Flash from the Past (Bonus Track)",
+        "Puntería",
+        "She Wolf (El Dorado World Tour Live)"
+      ]
+    },
+    {
+      "rank": 16,
+      "artistId": 1480436,
+      "artistName": "Artur Rojek",
+      "rawCount": 75,
+      "beforeCount": 71,
+      "afterCount": 59,
+      "validPreviewsCount": 59,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro",
+        "Outro",
+        "Pomysł 2 (Live)"
+      ]
+    },
+    {
+      "rank": 17,
+      "artistId": 9635624,
+      "artistName": "Billie Eilish",
+      "rawCount": 58,
+      "beforeCount": 58,
+      "afterCount": 53,
+      "validPreviewsCount": 53,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "!!!!!!!",
+        "INTRO (HIT ME HARD AND SOFT TOUR)",
+        "L’AMOUR DE MA VIE [OVER NOW EXTENDED EDIT]"
+      ]
+    },
+    {
+      "rank": 18,
+      "artistId": 106363912,
+      "artistName": "Lohleq",
+      "rawCount": 79,
+      "beforeCount": 58,
+      "afterCount": 51,
+      "validPreviewsCount": 51,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "ceha joint 3 (skitt)",
+        "DJ OCHO SKIT",
+        "OCHO FREESTYLE SKIT"
+      ]
+    },
+    {
+      "rank": 19,
+      "artistId": 4050205,
+      "artistName": "The Weeknd",
+      "rawCount": 249,
+      "beforeCount": 142,
+      "afterCount": 103,
+      "validPreviewsCount": 103,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "I Can't Fucking Sing",
+        "Until We're Skin & Bones",
+        "Intro (Live)"
+      ]
+    },
+    {
+      "rank": 20,
+      "artistId": 903431,
+      "artistName": "Mrozu",
+      "rawCount": 93,
+      "beforeCount": 90,
+      "afterCount": 76,
+      "validPreviewsCount": 76,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Zapnij pas (MTV Unplugged)",
+        "Jak nie my to kto (MTV Unplugged)",
+        "Napad (MTV Unplugged)"
+      ]
+    },
+    {
+      "rank": 21,
+      "artistId": 11152580,
+      "artistName": "Olivia Rodrigo",
+      "rawCount": 106,
+      "beforeCount": 78,
+      "afterCount": 74,
+      "validPreviewsCount": 74,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "drop dead",
+        "stupid song",
+        "honeybee"
+      ]
+    },
+    {
+      "rank": 22,
+      "artistId": 10071714,
+      "artistName": "PRO8L3M",
+      "rawCount": 205,
+      "beforeCount": 187,
+      "afterCount": 147,
+      "validPreviewsCount": 147,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Strange days (Instrumental)",
+        "Monza (Instrumental)",
+        "Forever (Instrumental)"
+      ]
+    },
+    {
+      "rank": 23,
+      "artistId": 399,
+      "artistName": "Radiohead",
+      "rawCount": 160,
+      "beforeCount": 138,
+      "afterCount": 100,
+      "validPreviewsCount": 100,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "2 + 2 = 5 (Live)",
+        "Sit Down. Stand Up (Live)",
+        "Sail To The Moon (Live)"
+      ]
+    },
+    {
+      "rank": 24,
+      "artistId": 134790,
+      "artistName": "Tame Impala",
+      "rawCount": 101,
+      "beforeCount": 100,
+      "afterCount": 76,
+      "validPreviewsCount": 76,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Breathe Deeper (Lil Yachty Remix)",
+        "One More Year (NTS Version)",
+        "Patience (Maurice Fulton Remix)"
+      ]
+    },
+    {
+      "rank": 25,
+      "artistId": 75491,
+      "artistName": "Lady Gaga",
+      "rawCount": 191,
+      "beforeCount": 152,
+      "afterCount": 121,
+      "validPreviewsCount": 121,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Perfect Celebrity",
+        "Killah",
+        "Don't Call Tonight"
+      ]
+    },
+    {
+      "rank": 26,
+      "artistId": 12003876,
+      "artistName": "Kaśka Sochacka",
+      "rawCount": 94,
+      "beforeCount": 75,
+      "afterCount": 55,
+      "validPreviewsCount": 55,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Zostaję przy tym, co już znam (Live)",
+        "Spaleni słońcem (Live)",
+        "Nie było Cię (Live)"
+      ]
+    },
+    {
+      "rank": 27,
+      "artistId": 860,
+      "artistName": "Pink Floyd",
+      "rawCount": 233,
+      "beforeCount": 221,
+      "afterCount": 141,
+      "validPreviewsCount": 141,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Wish You Were Here",
+        "Have A Cigar (Alternate Version)",
+        "Wish You Were Here (feat. Stéphane Grappelli)"
+      ]
+    },
+    {
+      "rank": 28,
+      "artistId": 464,
+      "artistName": "Rammstein",
+      "rawCount": 239,
+      "beforeCount": 207,
+      "afterCount": 89,
+      "validPreviewsCount": 89,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Du riechst so gut (Scal Remix)",
+        "Du riechst so gut ('98)",
+        "Du riechst so gut (Rmx By Faith No More)"
+      ]
+    },
+    {
+      "rank": 29,
+      "artistId": 1562681,
+      "artistName": "Ariana Grande",
+      "rawCount": 244,
+      "beforeCount": 139,
+      "afterCount": 57,
+      "validPreviewsCount": 57,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Commentary",
+        "Every Day More Wicked (Commentary)",
+        "Every Day More Wicked"
+      ]
+    },
+    {
+      "rank": 30,
+      "artistId": 536146,
+      "artistName": "Pezet",
+      "rawCount": 183,
+      "beforeCount": 153,
+      "afterCount": 126,
+      "validPreviewsCount": 126,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Poranek (Outro)",
+        "Przypomina mi (Rework 2026)",
+        "WWA-LA INTRO"
+      ]
+    },
+    {
+      "rank": 31,
+      "artistId": 1182,
+      "artistName": "Arctic Monkeys",
+      "rawCount": 111,
+      "beforeCount": 105,
+      "afterCount": 85,
+      "validPreviewsCount": 85,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Four Out Of Five (Live)",
+        "Brianstorm (Live)",
+        "Crying Lightning (Live)"
+      ]
+    },
+    {
+      "rank": 32,
+      "artistId": 9659202,
+      "artistName": "Zalia",
+      "rawCount": 56,
+      "beforeCount": 42,
+      "afterCount": 40,
+      "validPreviewsCount": 40,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "WWA-LA INTRO",
+        "nie mam dla ciebie nic",
+        "julia"
+      ]
+    },
+    {
+      "rank": 33,
+      "artistId": 230,
+      "artistName": "Kanye West",
+      "rawCount": 213,
+      "beforeCount": 146,
+      "afterCount": 146,
+      "validPreviewsCount": 146,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "FATHER (feat. Travis Scott)",
+        "ALL THE LOVE (feat. Andre Troutman)",
+        "PUNCH DRUNK"
+      ]
+    },
+    {
+      "rank": 34,
+      "artistId": 564,
+      "artistName": "Rihanna",
+      "rawCount": 156,
+      "beforeCount": 115,
+      "afterCount": 64,
+      "validPreviewsCount": 64,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Consideration",
+        "James Joint",
+        "Kiss It Better"
+      ]
+    },
+    {
+      "rank": 35,
+      "artistId": 353802652,
+      "artistName": "Mata",
+      "rawCount": 118,
+      "beforeCount": 115,
+      "afterCount": 104,
+      "validPreviewsCount": 104,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "BĘDĘ PREZYDENTEM :)",
+        "intro",
+        "IKEA (intro)"
+      ]
+    },
+    {
+      "rank": 36,
+      "artistId": 7699874,
+      "artistName": "AURORA",
+      "rawCount": 173,
+      "beforeCount": 119,
+      "afterCount": 103,
+      "validPreviewsCount": 103,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Echo Of My Shadow",
+        "To Be Alright",
+        "Your Blood"
+      ]
+    },
+    {
+      "rank": 37,
+      "artistId": 458,
+      "artistName": "System of a Down",
+      "rawCount": 140,
+      "beforeCount": 89,
+      "afterCount": 73,
+      "validPreviewsCount": 73,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Soldier Side - Intro",
+        "Chic 'N' Stu",
+        "Innervision"
+      ]
+    },
+    {
+      "rank": 38,
+      "artistId": 892,
+      "artistName": "Coldplay",
+      "rawCount": 159,
+      "beforeCount": 149,
+      "afterCount": 100,
+      "validPreviewsCount": 100,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "MOON MUSiC",
+        "feelslikeimfallinginlove",
+        "WE PRAY"
+      ]
+    },
+    {
+      "rank": 39,
+      "artistId": 12552,
+      "artistName": "OKI",
+      "rawCount": 127,
+      "beforeCount": 114,
+      "afterCount": 109,
+      "validPreviewsCount": 109,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "JEREMY SOCHAN SKIT",
+        "Sonic Skit",
+        "SKIT O MARIHUANIE"
+      ]
+    },
+    {
+      "rank": 40,
+      "artistId": 6047108,
+      "artistName": "Daria Zawiałow",
+      "rawCount": 111,
+      "beforeCount": 76,
+      "afterCount": 66,
+      "validPreviewsCount": 66,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro On",
+        "Kaonashi",
+        "Za krótki sen"
+      ]
+    },
+    {
+      "rank": 41,
+      "artistId": 163,
+      "artistName": "U2",
+      "rawCount": 190,
+      "beforeCount": 165,
+      "afterCount": 104,
+      "validPreviewsCount": 104,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Every Breaking Wave (Songs Of Surrender)",
+        "Get Out Of Your Own Way (Songs Of Surrender)",
+        "The Miracle (Of Joey Ramone) (Songs Of Surrender)"
+      ]
+    },
+    {
+      "rank": 42,
+      "artistId": 290,
+      "artistName": "Madonna",
+      "rawCount": 193,
+      "beforeCount": 146,
+      "afterCount": 94,
+      "validPreviewsCount": 94,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "I Feel So Free",
+        "Good For The Soul",
+        "One Step Away"
+      ]
+    },
+    {
+      "rank": 43,
+      "artistId": 412,
+      "artistName": "Queen",
+      "rawCount": 175,
+      "beforeCount": 172,
+      "afterCount": 120,
+      "validPreviewsCount": 120,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Father To Son (2026 Mix)",
+        "White Queen (As It Began) (2026 Mix)",
+        "Some Day One Day (2026 Mix)"
+      ]
+    },
+    {
+      "rank": 44,
+      "artistId": 271210292,
+      "artistName": "KATSEYE",
+      "rawCount": 36,
+      "beforeCount": 32,
+      "afterCount": 17,
+      "validPreviewsCount": 17,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Gnarly (Extended Version)",
+        "Gabriela (JULiA LEWiS Reggaeton Remix)",
+        "Gabriela (Extended Version)"
+      ]
+    },
+    {
+      "rank": 45,
+      "artistId": 1188,
+      "artistName": "Maroon 5",
+      "rawCount": 172,
+      "beforeCount": 91,
+      "afterCount": 79,
+      "validPreviewsCount": 79,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Hideaway",
+        "Yes I Did",
+        "Love Is Like"
+      ]
+    },
+    {
+      "rank": 46,
+      "artistId": 415,
+      "artistName": "Nirvana",
+      "rawCount": 392,
+      "beforeCount": 279,
+      "afterCount": 80,
+      "validPreviewsCount": 80,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Smells Like Teen Spirit (Remastered 2021)",
+        "In Bloom (Remastered 2021)",
+        "Come As You Are (Remastered 2021)"
+      ]
+    },
+    {
+      "rank": 47,
+      "artistId": 545,
+      "artistName": "Depeche Mode",
+      "rawCount": 290,
+      "beforeCount": 282,
+      "afterCount": 80,
+      "validPreviewsCount": 80,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro (Live in Mexico City)",
+        "My Cosmos Is Mine (Live in Mexico City)",
+        "Wagging Tongue (Live in Mexico City)"
+      ]
+    },
+    {
+      "rank": 48,
+      "artistId": 384236,
+      "artistName": "Ed Sheeran",
+      "rawCount": 256,
+      "beforeCount": 154,
+      "afterCount": 102,
+      "validPreviewsCount": 102,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Opening",
+        "Sapphire",
+        "Azizam"
+      ]
+    },
+    {
+      "rank": 49,
+      "artistId": 5097020,
+      "artistName": "Quebonafide",
+      "rawCount": 104,
+      "beforeCount": 103,
+      "afterCount": 103,
+      "validPreviewsCount": 103,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Love"
+      ]
+    },
+    {
+      "rank": 50,
+      "artistId": 187799287,
+      "artistName": "Bedoes 2115",
+      "rawCount": 90,
+      "beforeCount": 89,
+      "afterCount": 86,
+      "validPreviewsCount": 86,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro",
+        "Introdukcja",
+        "Intro"
+      ]
+    },
+    {
+      "rank": 51,
+      "artistId": 198,
+      "artistName": "Céline Dion",
+      "rawCount": 237,
+      "beforeCount": 190,
+      "afterCount": 146,
+      "validPreviewsCount": 146,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "River Deep, Mountain High",
+        "Love Again",
+        "I'm Alive"
+      ]
+    },
+    {
+      "rank": 52,
+      "artistId": 13754,
+      "artistName": "Kult",
+      "rawCount": 195,
+      "beforeCount": 189,
+      "afterCount": 137,
+      "validPreviewsCount": 137,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro",
+        "Darkness Return (Demo Version)",
+        "... and Forever Winter (Demo Version)"
+      ]
+    },
+    {
+      "rank": 53,
+      "artistId": 2303061,
+      "artistName": "Sokół",
+      "rawCount": 168,
+      "beforeCount": 151,
+      "afterCount": 133,
+      "validPreviewsCount": 133,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Hybryda (ENKLAWA LIVE)",
+        "Lepiej jak jest lepiej (ENKLAWA LIVE)",
+        "Myśl pozytywnie (ENKLAWA LIVE)"
+      ]
+    },
+    {
+      "rank": 54,
+      "artistId": 13941819,
+      "artistName": "Skolim",
+      "rawCount": 41,
+      "beforeCount": 41,
+      "afterCount": 28,
+      "validPreviewsCount": 28,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "To Jest to (Remix)",
+        "Nie Dzwoń Do Mnie Mała (Remix)",
+        "Dziewczyno Piękna (Remix)"
+      ]
+    },
+    {
+      "rank": 55,
+      "artistId": 416239,
+      "artistName": "Imagine Dragons",
+      "rawCount": 198,
+      "beforeCount": 172,
+      "afterCount": 126,
+      "validPreviewsCount": 126,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "I Bet My Life (Demo)",
+        "Introduction (Recorded in Paris)",
+        "Fire in These Hills (Recorded in Paris)"
+      ]
+    },
+    {
+      "rank": 56,
+      "artistId": 6982223,
+      "artistName": "BTS",
+      "rawCount": 216,
+      "beforeCount": 155,
+      "afterCount": 105,
+      "validPreviewsCount": 105,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "ON - Live",
+        "Burning Up (FIRE) - Live",
+        "DNA - Live"
+      ]
+    },
+    {
+      "rank": 57,
+      "artistId": 14444347,
+      "artistName": "Louis Villain",
+      "rawCount": 87,
+      "beforeCount": 79,
+      "afterCount": 77,
+      "validPreviewsCount": 77,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Prolog",
+        "Epilog",
+        "Intro"
+      ]
+    },
+    {
+      "rank": 58,
+      "artistId": 11270412,
+      "artistName": "Malik Montana",
+      "rawCount": 139,
+      "beforeCount": 139,
+      "afterCount": 130,
+      "validPreviewsCount": 130,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Adwokat Diabła Intro",
+        "outro/ślad",
+        "Niesprawiedliwe (SKIT)"
+      ]
+    },
+    {
+      "rank": 59,
+      "artistId": 1222879,
+      "artistName": "Agatha Christie",
+      "rawCount": 1117,
+      "beforeCount": 1115,
+      "afterCount": 1115,
+      "validPreviewsCount": 1115,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": []
+    },
+    {
+      "rank": 60,
+      "artistId": 169,
+      "artistName": "Fleetwood Mac",
+      "rawCount": 354,
+      "beforeCount": 339,
+      "afterCount": 180,
+      "validPreviewsCount": 180,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Get Like You Used to Be (Live at Capitol Theatre, Passaic, NJ, 10/17/75)",
+        "Station Man (Live at Jorgenson Auditorium, University of Connecticut, Storrs, CT, 10/25/75)",
+        "Spare Me a Little (Live at Jorgenson Auditorium, University of Connecticut, Storrs, CT, 10/25/75)"
+      ]
+    },
+    {
+      "rank": 61,
+      "artistId": 12436,
+      "artistName": "Miley Cyrus",
+      "rawCount": 180,
+      "beforeCount": 154,
+      "afterCount": 140,
+      "validPreviewsCount": 140,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Prelude",
+        "Something Beautiful",
+        "End of the World"
+      ]
+    },
+    {
+      "rank": 62,
+      "artistId": 3469,
+      "artistName": "Sia",
+      "rawCount": 183,
+      "beforeCount": 137,
+      "afterCount": 94,
+      "validPreviewsCount": 94,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Sunday (Extended Club Version)",
+        "Are There Any Queens in the House? (Extended Club Version)",
+        "House on Fire (Extended Club Version)"
+      ]
+    },
+    {
+      "rank": 63,
+      "artistId": 429675,
+      "artistName": "Bruno Mars",
+      "rawCount": 78,
+      "beforeCount": 65,
+      "afterCount": 51,
+      "validPreviewsCount": 51,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Silk Sonic Intro",
+        "Treasure (Sharam Club Remix)",
+        "Treasure (Sharam Dub)"
+      ]
+    },
+    {
+      "rank": 64,
+      "artistId": 64927672,
+      "artistName": "Teddy Swims",
+      "rawCount": 119,
+      "beforeCount": 81,
+      "afterCount": 59,
+      "validPreviewsCount": 59,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Not Your Man",
+        "Funeral",
+        "Your Kind of Crazy"
+      ]
+    },
+    {
+      "rank": 65,
+      "artistId": 246791,
+      "artistName": "Drake",
+      "rawCount": 204,
+      "beforeCount": 181,
+      "afterCount": 173,
+      "validPreviewsCount": 173,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Rusty Intro",
+        "Virginia Beach",
+        "Amen"
+      ]
+    },
+    {
+      "rank": 66,
+      "artistId": 306607671,
+      "artistName": "ADÉLA",
+      "rawCount": 40,
+      "beforeCount": 21,
+      "afterCount": 18,
+      "validPreviewsCount": 18,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Ain't In LA",
+        "KGB",
+        "Nicole Kidman"
+      ]
+    },
+    {
+      "rank": 67,
+      "artistId": 3266441,
+      "artistName": "Kortez",
+      "rawCount": 142,
+      "beforeCount": 109,
+      "afterCount": 76,
+      "validPreviewsCount": 76,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Dobry moment (Live)",
+        "Zostań (Live)",
+        "Nic tu po mnie (Live)"
+      ]
+    },
+    {
+      "rank": 68,
+      "artistId": 10583405,
+      "artistName": "Bad Bunny",
+      "rawCount": 135,
+      "beforeCount": 132,
+      "afterCount": 131,
+      "validPreviewsCount": 131,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "EUROPA :)",
+        "PIToRRO DE COCO",
+        "EL CLúB"
+      ]
+    },
+    {
+      "rank": 69,
+      "artistId": 8706544,
+      "artistName": "Dua Lipa",
+      "rawCount": 195,
+      "beforeCount": 138,
+      "afterCount": 61,
+      "validPreviewsCount": 61,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Training Season (Live From Mexico)",
+        "End Of An Era (Live From Mexico)",
+        "Break My Heart (Live From Mexico)"
+      ]
+    },
+    {
+      "rank": 70,
+      "artistId": 413,
+      "artistName": "Elton John",
+      "rawCount": 347,
+      "beforeCount": 304,
+      "afterCount": 268,
+      "validPreviewsCount": 268,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "In Or Out (Pt. 1)",
+        "The Greatest Discovery (Live From The Rainbow Theatre)",
+        "Where To Now St. Peter? (Live From The Rainbow Theatre)"
+      ]
+    },
+    {
+      "rank": 71,
+      "artistId": 202,
+      "artistName": "Sade",
+      "rawCount": 134,
+      "beforeCount": 121,
+      "afterCount": 67,
+      "validPreviewsCount": 67,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Soldier of Love (Live 2011)",
+        "Skin (Live 2011)",
+        "Kiss of Life (Live 2011)"
+      ]
+    },
+    {
+      "rank": 72,
+      "artistId": 805948,
+      "artistName": "Raye",
+      "rawCount": 99,
+      "beforeCount": 90,
+      "afterCount": 56,
+      "validPreviewsCount": 56,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro: Girl Under The Grey Cloud.",
+        "The Thrill Is Gone. (Live at Montreux Jazz Festival)",
+        "Worth It. (Live at Montreux Jazz Festival)"
+      ]
+    },
+    {
+      "rank": 73,
+      "artistId": 144227,
+      "artistName": "Katy Perry",
+      "rawCount": 177,
+      "beforeCount": 103,
+      "afterCount": 92,
+      "validPreviewsCount": 92,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "The One That Got Away",
+        "Last Friday Night (T.G.I.F.)",
+        "California Gurls"
+      ]
+    },
+    {
+      "rank": 74,
+      "artistId": 14000817,
+      "artistName": "White 2115",
+      "rawCount": 147,
+      "beforeCount": 125,
+      "afterCount": 122,
+      "validPreviewsCount": 122,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Infinity Pool",
+        "Presja",
+        "Opuszczony dach"
+      ]
+    },
+    {
+      "rank": 75,
+      "artistId": 1097709,
+      "artistName": "Sam Smith",
+      "rawCount": 191,
+      "beforeCount": 140,
+      "afterCount": 109,
+      "validPreviewsCount": 109,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Good Thing (BBC Proms At The Royal Albert Hall)",
+        "I’m Not The Only One (BBC Proms At The Royal Albert Hall)",
+        "I’ve Told You Now (BBC Proms At The Royal Albert Hall)"
+      ]
+    },
+    {
+      "rank": 76,
+      "artistId": 117,
+      "artistName": "Slipknot",
+      "rawCount": 269,
+      "beforeCount": 188,
+      "afterCount": 105,
+      "validPreviewsCount": 105,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Sarcastrophe (Live)",
+        "The Heretic Anthem (Live)",
+        "Psychosocial (Live)"
+      ]
+    },
+    {
+      "rank": 77,
+      "artistId": 196,
+      "artistName": "The Cranberries",
+      "rawCount": 272,
+      "beforeCount": 184,
+      "afterCount": 105,
+      "validPreviewsCount": 105,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Pretty (Live At The London Astoria II, 1994)",
+        "Dreaming My Dreams (Live At The London Astoria II, 1994)",
+        "Linger (Live At The London Astoria II, 1994)"
+      ]
+    },
+    {
+      "rank": 78,
+      "artistId": 115,
+      "artistName": "AC/DC",
+      "rawCount": 233,
+      "beforeCount": 210,
+      "afterCount": 133,
+      "validPreviewsCount": 133,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Rock N Roll Train (Live at River Plate Stadium, Buenos Aires, Argentina - December 2009)",
+        "Hell Ain't a Bad Place to Be (Live at River Plate Stadium, Buenos Aires, Argentina - December 2009)",
+        "Back In Black (Live at River Plate Stadium, Buenos Aires, Argentina - December 2009)"
+      ]
+    },
+    {
+      "rank": 79,
+      "artistId": 182,
+      "artistName": "Red Hot Chili Peppers",
+      "rawCount": 132,
+      "beforeCount": 116,
+      "afterCount": 100,
+      "validPreviewsCount": 100,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Stone Cold Bush (Live)",
+        "Blood Sugar Sex Magic (Live)",
+        "Magic Johnson (Live)"
+      ]
+    },
+    {
+      "rank": 80,
+      "artistId": 13612387,
+      "artistName": "Måneskin",
+      "rawCount": 74,
+      "beforeCount": 50,
+      "afterCount": 50,
+      "validPreviewsCount": 50,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "HONEY (ARE U COMING?)",
+        "MAMMAMIA",
+        "SUPERMODEL"
+      ]
+    },
+    {
+      "rank": 81,
+      "artistId": 218288355,
+      "artistName": "Sherlock Holmes Legends",
+      "rawCount": 425,
+      "beforeCount": 303,
+      "afterCount": 303,
+      "validPreviewsCount": 303,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": []
+    },
+    {
+      "rank": 82,
+      "artistId": 2210161,
+      "artistName": "Nothing But Thieves",
+      "rawCount": 145,
+      "beforeCount": 95,
+      "afterCount": 76,
+      "validPreviewsCount": 76,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Welcome to the DCC",
+        "Overcome",
+        "Tomorrow Is Closed"
+      ]
+    },
+    {
+      "rank": 83,
+      "artistId": 1319,
+      "artistName": "Pearl Jam",
+      "rawCount": 195,
+      "beforeCount": 165,
+      "afterCount": 113,
+      "validPreviewsCount": 113,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Release (Live at Melbourne Park, Melbourne, Australia - March 5, 1998)",
+        "Faithfull (Live at Melbourne Park, Melbourne, Australia - March 5, 1998)",
+        "Even Flow (Live at Melbourne Park, Melbourne, Australia - March 5, 1998)"
+      ]
+    },
+    {
+      "rank": 84,
+      "artistId": 176,
+      "artistName": "Dire Straits",
+      "rawCount": 201,
+      "beforeCount": 168,
+      "afterCount": 73,
+      "validPreviewsCount": 73,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Portobello Belle (Extended Intro / Live At Hammersmith Odeon, London / 1983 / Mixed And Remastered 2023)",
+        "Romeo And Juliet (Live At Hammersmith Odeon, London / 1983 / Remastered 2023)",
+        "Twisting By The Pool (Live At Hammersmith Odeon, London / 1983 / Mixed And Remastered 2023)"
+      ]
+    },
+    {
+      "rank": 85,
+      "artistId": 353613822,
+      "artistName": "Jonatan",
+      "rawCount": 49,
+      "beforeCount": 47,
+      "afterCount": 44,
+      "validPreviewsCount": 44,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Obejmuję noce",
+        "Róż (Blinders Remix)",
+        "Mantraskit przeznaczenie"
+      ]
+    },
+    {
+      "rank": 86,
+      "artistId": 5323661,
+      "artistName": "Krzysztof Zalewski",
+      "rawCount": 125,
+      "beforeCount": 100,
+      "afterCount": 77,
+      "validPreviewsCount": 77,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "ZGŁOWY (Live)",
+        "Nienasycenie (Live)",
+        "Oddech (Live)"
+      ]
+    },
+    {
+      "rank": 87,
+      "artistId": 11,
+      "artistName": "The Rolling Stones",
+      "rawCount": 272,
+      "beforeCount": 239,
+      "afterCount": 186,
+      "validPreviewsCount": 186,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Angry",
+        "Get Close",
+        "Depending On You"
+      ]
+    },
+    {
+      "rank": 88,
+      "artistId": 383273001,
+      "artistName": "Imael Angel",
+      "rawCount": 26,
+      "beforeCount": 25,
+      "afterCount": 25,
+      "validPreviewsCount": 25,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": []
+    },
+    {
+      "rank": 89,
+      "artistId": 13918545,
+      "artistName": "Tiakola",
+      "rawCount": 99,
+      "beforeCount": 78,
+      "afterCount": 75,
+      "validPreviewsCount": 75,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "MANON B (feat. Ryflo, Oskoow & MC Cebezinho) (Brazilian Remix)",
+        "OUTRO",
+        "24/34"
+      ]
+    },
+    {
+      "rank": 90,
+      "artistId": 535,
+      "artistName": "Deftones",
+      "rawCount": 207,
+      "beforeCount": 129,
+      "afterCount": 125,
+      "validPreviewsCount": 125,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Hexagram",
+        "Needles and Pins",
+        "Minerva"
+      ]
+    },
+    {
+      "rank": 91,
+      "artistId": 4602528,
+      "artistName": "Igor Herbut",
+      "rawCount": 32,
+      "beforeCount": 32,
+      "afterCount": 28,
+      "validPreviewsCount": 28,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Jasny (Band Version)",
+        "Tańczmy (Bonus Track)",
+        "Niech żyje bal (Live MTV Unplugged; Single Version)"
+      ]
+    },
+    {
+      "rank": 92,
+      "artistId": 381,
+      "artistName": "The Cure",
+      "rawCount": 194,
+      "beforeCount": 134,
+      "afterCount": 73,
+      "validPreviewsCount": 73,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "I Can Never Say Goodbye (Paul Oakenfold \"Cinematic\" Remix)",
+        "Endsong (Orbital Remix)",
+        "Drone:Nodrone (Daniel Avery Remix)"
+      ]
+    },
+    {
+      "rank": 93,
+      "artistId": 7803478,
+      "artistName": "HUGEL",
+      "rawCount": 58,
+      "beforeCount": 56,
+      "afterCount": 26,
+      "validPreviewsCount": 26,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro",
+        "Making Love In New York (Interlude)",
+        "Shine"
+      ]
+    },
+    {
+      "rank": 94,
+      "artistId": 230720285,
+      "artistName": "Avi",
+      "rawCount": 78,
+      "beforeCount": 69,
+      "afterCount": 67,
+      "validPreviewsCount": 67,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Intro",
+        "Outro",
+        "Prolog"
+      ]
+    },
+    {
+      "rank": 95,
+      "artistId": 105646042,
+      "artistName": "Rumak",
+      "rawCount": 4,
+      "beforeCount": 4,
+      "afterCount": 4,
+      "validPreviewsCount": 4,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": []
+    },
+    {
+      "rank": 96,
+      "artistId": 10045900,
+      "artistName": "Kaz Bałagane",
+      "rawCount": 215,
+      "beforeCount": 179,
+      "afterCount": 174,
+      "validPreviewsCount": 174,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Milionerek Skit",
+        "Digital Scale Music",
+        "40 i 4"
+      ]
+    },
+    {
+      "rank": 97,
+      "artistId": 997,
+      "artistName": "David Bowie",
+      "rawCount": 493,
+      "beforeCount": 480,
+      "afterCount": 224,
+      "validPreviewsCount": 224,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Keep Up With The Jones (Instrumental)",
+        "You've Got a Habit of Leaving (Alternative Overdub/Vocal, 2026 Remaster)",
+        "I Pity the Fool (Alternative Vocal, 2026 Remaster)"
+      ]
+    },
+    {
+      "rank": 98,
+      "artistId": 27,
+      "artistName": "Daft Punk",
+      "rawCount": 214,
+      "beforeCount": 195,
+      "afterCount": 108,
+      "validPreviewsCount": 108,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "Give Life Back to Music (Drumless Edition)",
+        "The Game of Love (Drumless Edition)",
+        "Giorgio by Moroder (Drumless Edition)"
+      ]
+    },
+    {
+      "rank": 99,
+      "artistId": 145468192,
+      "artistName": "sombr",
+      "rawCount": 28,
+      "beforeCount": 24,
+      "afterCount": 24,
+      "validPreviewsCount": 24,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "12 to 12",
+        "back to friends",
+        "undressed"
+      ]
+    },
+    {
+      "rank": 100,
+      "artistId": 500,
+      "artistName": "Gorillaz",
+      "rawCount": 141,
+      "beforeCount": 97,
+      "afterCount": 109,
+      "validPreviewsCount": 109,
+      "allPreviewsValid": true,
+      "sampleDuplicatesCleaned": [
+        "More Bounce to the Ounce",
+        "Freedom",
+        "Brand New Player"
+      ]
+    }
+  ]
+}

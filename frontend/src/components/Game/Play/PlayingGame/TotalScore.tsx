@@ -1,3 +1,4 @@
+import { useMemo, memo } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import { useTranslation } from '../../../../i18n/LanguageContext';
@@ -5,15 +6,17 @@ import styles from './TotalScore.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 import { FaCrown, FaStar, FaTrophy } from 'react-icons/fa';
 
-const TotalScore = () => {
+const TotalScore = memo(() => {
     const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { user } = useAppSelector((state) => state.user);
-    if (!currentRoom) return null;
 
-    const sortedPlayers = [...currentRoom.players].sort(
-        (a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)
+    const sortedPlayers = useMemo(
+        () => currentRoom ? [...currentRoom.players].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)) : [],
+        [currentRoom?.players]
     );
+
+    if (!currentRoom) return null;
 
     return (
         <div className={styles.wrapper}>
@@ -108,6 +111,6 @@ const TotalScore = () => {
             </ul>
         </div>
     );
-};
+});
 
 export default TotalScore;

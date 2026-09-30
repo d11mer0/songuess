@@ -22,7 +22,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: none;
-    filter: drop-shadow(0 0 12px rgba(155, 93, 229, 0.35));
 }
 
 .gameFinishedSection {
@@ -81,7 +80,6 @@
     position: relative;
     box-sizing: border-box;
     transform: translateZ(0);
-    will-change: transform;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
     animation: popIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

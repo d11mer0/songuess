@@ -260,7 +260,8 @@
     position: absolute;
     top: -20px;
     left: 50%;
-    transform: translateX(-50%);
+    /* translate is separate from transform — keyframes won't override centering */
+    translate: -50% 0;
     z-index: 5;
     pointer-events: none;
     display: flex;
@@ -284,15 +285,14 @@
     font-size: 26px;
     color: #ffd700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.9);
-    transform: rotate(-7deg);
 }
 
 @keyframes crownFloat {
     0%, 100% {
-        transform: translateX(-50%) translateY(0) rotate(-7deg);
+        transform: translateY(0) rotate(-7deg);
     }
     50% {
-        transform: translateX(-50%) translateY(-3px) rotate(-3deg);
+        transform: translateY(-3px) rotate(-3deg);
     }
 }
 

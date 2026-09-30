@@ -51,8 +51,7 @@
     -webkit-text-fill-color: transparent;
     display: block;
     margin-bottom: 8px;
-    animation: textShimmer 3s ease-in-out infinite;
-    will-change: opacity;
+    animation: textShimmer 4s ease-in-out infinite;
 }
 
 .emptySubtext {
