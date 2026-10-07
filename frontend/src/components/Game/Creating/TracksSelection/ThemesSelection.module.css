@@ -30,12 +30,10 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .themeCard:hover {
-    transform: translateY(-4px) translateZ(0);
+    transform: translateY(-4px);
     border-color: rgba(0, 243, 255, 0.6);
     box-shadow: 0 12px 30px rgba(0, 243, 255, 0.25), 0 0 14px rgba(0, 243, 255, 0.15);
 }

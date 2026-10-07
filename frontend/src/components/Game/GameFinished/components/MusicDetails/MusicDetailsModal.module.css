@@ -283,7 +283,7 @@
     height: 7px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .liveDotActive {
@@ -447,7 +447,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .seekStepBtn:hover {
@@ -502,7 +502,7 @@
     color: rgba(255, 255, 255, 0.6);
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .extraControlBtn:hover {
@@ -545,7 +545,7 @@
     min-width: 32px;
     height: 32px;
     box-sizing: border-box;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .speedBtn:hover {
@@ -607,7 +607,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: all 0.12s ease;
+    transition: background 0.12s ease, color 0.12s ease;
     text-align: left;
 }
 
@@ -1334,7 +1334,7 @@
     justify-content: center;
     gap: 5px;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .albumMiniBtnSpotify:hover {
@@ -1353,7 +1353,7 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .albumMiniBtnDeezer:hover {

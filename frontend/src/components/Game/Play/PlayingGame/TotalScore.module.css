@@ -6,7 +6,6 @@
     padding: 22px 18px;
     box-sizing: border-box;
     width: 100%;
-    transform: translateZ(0);
 }
 
 .header {
@@ -86,13 +85,12 @@
     border: 1px solid rgba(255, 255, 255, 0.07);
     transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     box-sizing: border-box;
-    transform: translateZ(0);
 }
 
 .item:hover {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(155, 93, 229, 0.45);
-    transform: translateX(2px) translateZ(0);
+    transform: translateX(2px);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
@@ -199,8 +197,6 @@
     border-color: #ff5500;
     box-shadow: 0 0 12px #ff5500, 0 0 20px rgba(255, 136, 0, 0.8);
     animation: flamePulse 1.2s infinite alternate;
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .flameIconMini {

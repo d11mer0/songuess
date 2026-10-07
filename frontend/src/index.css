@@ -135,7 +135,6 @@ input:focus {
 /* МОДАЛЬНЕ:*/
 
 .modal-dialog {
-    transform: translateZ(0);
 }
 
 .modal-content {
@@ -145,8 +144,6 @@ input:focus {
     border-radius: 22px !important;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(155, 93, 229, 0.15) !important;
     overflow: hidden;
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .modal-header {

@@ -14,7 +14,6 @@
     border-radius: 4px;
     overflow: hidden;
     position: relative;
-    transform: translateZ(0);
     contain: layout style paint;
 }
 
@@ -27,7 +26,6 @@
     transition: transform 0.2s linear;
     box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
     will-change: transform;
-    transform: translateZ(0);
 }
 
 .timerBar.danger {

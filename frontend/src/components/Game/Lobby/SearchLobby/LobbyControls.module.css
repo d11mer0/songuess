@@ -34,7 +34,6 @@
     margin: 0;
     position: relative;
     box-sizing: border-box;
-    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -97,7 +96,7 @@
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, background 0.2s ease;
     white-space: nowrap;
     display: flex;
     align-items: center;
@@ -145,7 +144,7 @@
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     text-align: center;
     font-family: inherit;
 }
@@ -182,7 +181,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease;
     user-select: none;
 }
 
@@ -207,7 +206,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .checkboxCardActive .checkboxBox {
@@ -267,7 +266,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .stepperBtn:hover:not(:disabled) {
@@ -326,7 +325,7 @@
     gap: 10px;
     margin-bottom: 16px;
     box-shadow: 0 4px 18px rgba(0, 243, 255, 0.15);
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease;
     font-family: inherit;
     letter-spacing: 0.5px;
 }
@@ -367,7 +366,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     font-family: inherit;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -398,7 +397,7 @@
     box-shadow: 0 6px 20px rgba(0, 243, 255, 0.35);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     font-family: inherit;
 }
 
@@ -421,7 +420,6 @@
     margin: 0;
     text-align: center;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 0, 127, 0.12);
-    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -466,7 +464,7 @@
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     box-shadow: 0 4px 18px rgba(255, 0, 127, 0.35);
@@ -505,7 +503,7 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .duelCancelButton:hover {
@@ -523,7 +521,6 @@
     margin: 0;
     text-align: center;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 243, 255, 0.12);
-    transform: translateZ(0);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -593,7 +590,7 @@
     font-weight: 800;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
     letter-spacing: 0.5px;
     text-transform: uppercase;

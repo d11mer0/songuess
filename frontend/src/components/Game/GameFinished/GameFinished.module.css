@@ -79,13 +79,12 @@
     border-radius: 18px;
     position: relative;
     box-sizing: border-box;
-    transform: translateZ(0);
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
     animation: popIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .podiumCard:hover {
-    transform: translate3d(0, -4px, 0);
+    transform: translateY(-4px);
 }
 
 @keyframes popIn {
@@ -364,7 +363,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 10px 16px;
     border-radius: 12px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     gap: 12px;
     box-sizing: border-box;
 }
@@ -590,7 +589,7 @@
     justify-content: center;
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     flex-shrink: 0;
 }
 

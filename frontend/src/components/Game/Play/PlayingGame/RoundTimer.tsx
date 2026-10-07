@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectTrackInfo, selectRoundResult, selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import { soundEffects } from '../../../../utils/audio/soundEffects';
@@ -6,7 +6,7 @@ import { FaRegClock } from 'react-icons/fa';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './RoundTimer.module.css';
 
-const RoundTimer: React.FC = () => {
+const RoundTimer: React.FC = memo(() => {
     const { t } = useTranslation();
     const trackInfo = useAppSelector(selectTrackInfo);
     const roundResult = useAppSelector(selectRoundResult);
@@ -79,6 +79,7 @@ const RoundTimer: React.FC = () => {
             </div>
         </div>
     );
-};
+});
 
 export default RoundTimer;
+

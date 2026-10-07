@@ -28,6 +28,10 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     const gameMode = currentRoom?.lobbyOptions?.gameMode || 'CLASSIC';
     const answerMode = currentRoom?.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
 
+    const [unlockedSeconds, setUnlockedSeconds] = useState<number>(1);
+    const [hasAnswered, setHasAnswered] = useState<boolean>(false);
+    const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+
     const roundDurationSec = trackInfo?.endsAt && trackInfo?.startedAt
         ? Math.max(1, Math.round((trackInfo.endsAt - trackInfo.startedAt) / 1000))
         : (currentRoom?.lobbyOptions?.roundDuration || 25);
@@ -35,10 +39,6 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     const effectiveMaxDuration = gameMode === 'HEARDLE'
         ? unlockedSeconds
         : roundDurationSec;
-
-    const [unlockedSeconds, setUnlockedSeconds] = useState<number>(1);
-    const [hasAnswered, setHasAnswered] = useState<boolean>(false);
-    const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
 
     // Скидаємо стан при зміні раунду
     useEffect(() => {

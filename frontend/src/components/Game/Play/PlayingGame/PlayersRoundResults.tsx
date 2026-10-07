@@ -1,3 +1,4 @@
+import { useMemo, memo } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom, selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import { useTranslation } from '../../../../i18n/LanguageContext';
@@ -5,25 +6,28 @@ import styles from './PlayerRoundResults.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 import { FaBolt, FaStar, FaRegClock, FaTimes } from 'react-icons/fa';
 
-const PlayersRoundResults = () => {
+const PlayersRoundResults = memo(() => {
     const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const roundResult = useAppSelector(selectRoundResult);
     const { user } = useAppSelector((state) => state.user);
 
+    const sortedResults = useMemo(() => {
+        if (!roundResult?.results) return [];
+        return [...roundResult.results].sort((a, b) => {
+            if (a.isCorrect && !b.isCorrect) return -1;
+            if (!a.isCorrect && b.isCorrect) return 1;
+
+            const aNoAnswer = a.timeTaken === null;
+            const bNoAnswer = b.timeTaken === null;
+            if (aNoAnswer && !bNoAnswer) return 1;
+            if (!aNoAnswer && bNoAnswer) return -1;
+
+            return (a.timeTaken ?? 999999) - (b.timeTaken ?? 999999);
+        });
+    }, [roundResult?.results]);
+
     if (!currentRoom || !roundResult) return null;
-
-    const sortedResults = [...roundResult.results].sort((a, b) => {
-        if (a.isCorrect && !b.isCorrect) return -1;
-        if (!a.isCorrect && b.isCorrect) return 1;
-
-        const aNoAnswer = a.timeTaken === null;
-        const bNoAnswer = b.timeTaken === null;
-        if (aNoAnswer && !bNoAnswer) return 1;
-        if (!aNoAnswer && bNoAnswer) return -1;
-
-        return (a.timeTaken ?? 999999) - (b.timeTaken ?? 999999);
-    });
 
     return (
         <div className={styles.playersResultsWrapper}>
@@ -151,6 +155,6 @@ const PlayersRoundResults = () => {
             })}
         </div>
     );
-};
+});
 
 export default PlayersRoundResults;

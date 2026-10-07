@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectRoundResult } from '../../../../store/gameplay/gameplaySelectors';
 import { soundEffects } from '../../../../utils/audio/soundEffects';
@@ -6,7 +6,7 @@ import styles from '../PlayingGame.module.css';
 import { FaCheckCircle, FaTimesCircle, FaRegClock, FaFire } from 'react-icons/fa';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 
-const RoundResult = () => {
+const RoundResult = memo(() => {
     const { t } = useTranslation();
     const result = useAppSelector(selectRoundResult);
 
@@ -62,6 +62,6 @@ const RoundResult = () => {
             )}
         </div>
     );
-};
+});
 
 export default RoundResult;

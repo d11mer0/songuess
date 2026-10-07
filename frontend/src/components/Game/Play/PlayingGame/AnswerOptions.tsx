@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import {
     selectCurrentRoom,
@@ -15,7 +15,7 @@ type Props = {
     onSubmit: (option: string) => void;
 };
 
-const AnswerOptions = ({ onSubmit }: Props) => {
+const AnswerOptions = memo(({ onSubmit }: Props) => {
     const { t } = useTranslation();
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
@@ -70,6 +70,6 @@ const AnswerOptions = ({ onSubmit }: Props) => {
             </div>
         </>
     );
-};
+});
 
 export default AnswerOptions;

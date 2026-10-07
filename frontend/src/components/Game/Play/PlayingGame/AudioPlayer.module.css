@@ -14,10 +14,9 @@
     border-radius: 9999px;
     padding: 4px 6px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     gap: 4px;
-    transform: translateZ(0);
 }
 
 .triggerPill:hover,
@@ -25,7 +24,7 @@
     background: rgba(30, 24, 48, 0.95);
     border-color: rgba(0, 243, 255, 0.55);
     box-shadow: 0 4px 20px rgba(0, 243, 255, 0.2), 0 0 12px rgba(155, 93, 229, 0.3);
-    transform: translateY(-1px) translateZ(0);
+    transform: translateY(-1px);
 }
 
 .triggerOpen {
@@ -78,7 +77,7 @@
     padding: 4px 6px;
     cursor: pointer;
     border-radius: 9999px;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .settingsToggleBtn:hover {
@@ -247,7 +246,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 6px;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .closeBtn:hover {
@@ -421,7 +420,7 @@
     font-weight: 600;
     font-family: var(--font-mono, monospace);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .presetBtn:hover {
