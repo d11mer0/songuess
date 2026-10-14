@@ -250,3 +250,14 @@ input:focus {
 .checkbox:hover {
     box-shadow: 0 0 5px rgba(143, 80, 255, 0.4); /* фіолетова тінь */
 }
+/* 🔹 Respect OS "reduce motion": stop decorative infinite animations */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-iteration-count: 1 !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

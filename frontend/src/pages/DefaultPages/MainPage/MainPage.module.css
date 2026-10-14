@@ -19,8 +19,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(155, 93, 229, 0.15);
-    transform: translateZ(0);
-    will-change: transform, opacity;
     animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -57,7 +55,7 @@
     height: 68px;
     border-radius: 18px;
     object-fit: cover;
-    filter: drop-shadow(0 0 16px rgba(0, 243, 255, 0.7));
+    box-shadow: 0 0 16px rgba(0, 243, 255, 0.55);
     flex-shrink: 0;
     animation: floatLogo 4s ease-in-out infinite;
 }
@@ -79,7 +77,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0;
-    text-shadow: 0 0 30px rgba(155, 93, 229, 0.3);
 }
 
 .subtitle {
@@ -117,7 +114,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transform: translateZ(0);
 }
 
 .primaryCta {
@@ -127,7 +123,7 @@
 }
 
 .primaryCta:hover {
-    transform: translateY(-2px) translateZ(0);
+    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(241, 91, 181, 0.6);
 }
 
@@ -138,7 +134,7 @@
 }
 
 .dailyCta:hover {
-    transform: translateY(-2px) translateZ(0);
+    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 243, 255, 0.6);
 }
 
@@ -150,7 +146,7 @@
 
 .leaderboardCta:hover {
     background: rgba(255, 215, 0, 0.15);
-    transform: translateY(-2px) translateZ(0);
+    transform: translateY(-2px);
     box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
 }
 
@@ -170,14 +166,12 @@
     padding: 20px;
     cursor: pointer;
     transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .featureCard:hover {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(155, 93, 229, 0.4);
-    transform: translateY(-3px) translateZ(0);
+    transform: translateY(-3px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
@@ -203,11 +197,11 @@
 /* 🔹 Hardware-accelerated entrance animation */
 @keyframes slideUp {
     from {
-        transform: translateY(14px) translateZ(0);
+        transform: translateY(14px);
         opacity: 0;
     }
     to {
-        transform: translateY(0) translateZ(0);
+        transform: translateY(0);
         opacity: 1;
     }
 }

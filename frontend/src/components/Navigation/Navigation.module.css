@@ -7,8 +7,6 @@
     background: linear-gradient(180deg, rgba(20, 15, 34, 0.97) 0%, rgba(13, 9, 22, 0.98) 100%);
     border-bottom: 1px solid rgba(155, 93, 229, 0.28);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 1px 15px rgba(155, 93, 229, 0.12);
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .navbar {
@@ -49,12 +47,12 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
 }
 
 .logo:hover {
-    transform: scale(1.03) translateZ(0);
+    transform: scale(1.03);
 }
 
 .logoImg {
