@@ -85,8 +85,9 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
     );
 
     const handleJoinedRoom = useCallback(
-        (data: Room) => {
+        (data: Room | null) => {
             if (data) {
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
                 if (data.lobbyOptions?.isPartyMode) {
                     const isLeader = Boolean(user?.id && data.leaderId && String(user.id) === String(data.leaderId));
                     if (isLeader) {
@@ -100,7 +101,6 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
                     navigate(`/game/${data.id}`);
                     return;
                 }
-                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
             } else {
                 dispatch(setCurrentRoom(null));
             }
@@ -149,6 +149,7 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
     useEffect(() => {
         socketHandlers.on('roomCreated', handleRoomCreated);
         socketHandlers.on('joinedRoom', handleJoinedRoom);
+        socketHandlers.on('currentRoom', handleJoinedRoom);
         socketHandlers.on('roomsList', handleRoomsUpdate);
         socketHandlers.on('duelMatchFound', handleDuelMatchFound);
         socketHandlers.on('playerLeft', handlePlayerLeft);
@@ -161,6 +162,7 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
             socketOffMany([
                 'roomCreated',
                 'joinedRoom',
+                'currentRoom',
                 'roomsList',
                 'duelMatchFound',
                 'playerLeft',

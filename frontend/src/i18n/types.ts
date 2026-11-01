@@ -23,6 +23,27 @@ export interface TranslationDictionary {
         menu: string;
         vipBadge: string;
     };
+    footer: {
+        tagline: string;
+        statusLive: string;
+        navigationTitle: string;
+        gameLobby: string;
+        dailyChallenge: string;
+        leaderboards: string;
+        tracksLibrary: string;
+        aboutTitle: string;
+        aboutUs: string;
+        contacts: string;
+        privacyPolicy: string;
+        termsOfUse: string;
+        newsletterTitle: string;
+        newsletterDesc: string;
+        emailPlaceholder: string;
+        subscribeBtn: string;
+        subscribed: string;
+        copyright: string;
+        craftedWith: string;
+    };
     mainPage: {
         badgeTrivia: string;
         badgeBlitz: string;
@@ -170,6 +191,7 @@ export interface TranslationDictionary {
         title: string;
         subtitle: string;
         attempt: string;
+        attemptsTitle: string;
         of: string;
         listenSnippet: string;
         typeGuess: string;

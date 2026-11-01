@@ -15,11 +15,9 @@ export function pickRandomWrongOptions(
     count: number = 3,
 ): string[] {
     const available = tracks.filter((t) => t.id !== correctTrackId);
+    if (available.length === 0) return [];
 
-    for (let i = available.length - 1; i > available.length - 1 - count; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [available[i], available[j]] = [available[j], available[i]];
-    }
-
-    return available.slice(-count).map((t) => t.title);
+    const actualCount = Math.min(count, available.length);
+    const shuffled = shuffleArray(available);
+    return shuffled.slice(0, actualCount).map((t) => t.title);
 }

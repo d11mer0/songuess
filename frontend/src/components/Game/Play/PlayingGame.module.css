@@ -223,6 +223,29 @@
     animation: flamePulse 1s infinite alternate;
 }
 
+.correctAnswerRevealed {
+    margin-top: 6px;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.45);
+    padding: 8px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(155, 93, 229, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.correctAnswerLabel {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.correctAnswerTitle {
+    color: #00f3ff;
+    font-weight: 700;
+}
+
 @keyframes popIn {
     0% {
         transform: scale(0.85);

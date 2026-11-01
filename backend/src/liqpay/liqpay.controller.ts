@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Req, HttpCode, HttpStatus, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { LiqPayService } from './liqpay.service';
 import { CreateCheckoutDto, CallbackDto } from './dto/liqpay.dto';
@@ -30,11 +30,16 @@ export class LiqPayController {
         return this.liqpayService.processCallback(body.data, body.signature);
     }
 
-    @Public()
     @Post('simulate-test')
     @ApiOperation({ summary: 'Тестова симуляція успішного донату (Dev sandbox)' })
     async simulateTest(@Req() req: AuthRequest, @Body() dto: CreateCheckoutDto) {
-        const userId = req.user?.id || (dto as any).userId || 1;
+        if (process.env.NODE_ENV === 'production') {
+            throw new ForbiddenException('Simulation is disabled in production environment');
+        }
+        const userId = req.user?.id || (dto as any).userId;
+        if (!userId) {
+            throw new BadRequestException('User ID is required');
+        }
         return this.liqpayService.simulateTestDonation(
             userId,
             dto.amount || 100,

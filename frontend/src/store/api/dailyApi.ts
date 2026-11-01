@@ -8,6 +8,7 @@ export interface DailyChallengeResponse {
     isCompleted: boolean;
     isSolved: boolean;
     guessesCount: number;
+    attemptsHistory?: Array<{ text: string; isCorrect: boolean }>;
     options: string[];
     streak: number;
     maxStreak: number;

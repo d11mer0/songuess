@@ -15,7 +15,7 @@ export function normalizeText(text: string): string {
         .replace(/[\u0300-\u036f]/g, '');
 
     // Видаляємо дужки з метаданими. Якщо за межами дужок залишається текст, видаляємо дужки
-    const withoutParens = cleaned.replace(/\([^)]*\)/g, '').replace(/\[[^\]]*\]/g, '').replace(/-(?:\s*.*)/g, '');
+    const withoutParens = cleaned.replace(/\([^)]*\)/g, '').replace(/\[[^\]]*\]/g, '');
     if (withoutParens.trim().length > 0) {
         cleaned = withoutParens;
     }
@@ -106,7 +106,8 @@ export function isFuzzyMatch(
     }
 
     if (!isMatch && normTitle.length >= 6 && normUser.length >= 5) {
-        if (normTitle.includes(normUser) || normUser.includes(normTitle)) {
+        const ratio = Math.min(normUser.length, normTitle.length) / Math.max(normUser.length, normTitle.length);
+        if (ratio >= 0.7 && (normTitle.includes(normUser) || normUser.includes(normTitle))) {
             isMatch = true;
         }
     }

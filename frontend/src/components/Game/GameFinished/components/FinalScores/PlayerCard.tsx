@@ -3,15 +3,7 @@ import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
 import { FaStar } from 'react-icons/fa';
-
-interface Player {
-    id: number;
-    login: string;
-    avatar: string | null;
-    totalScore?: number;
-    isPremium?: boolean;
-    nameColor?: string;
-}
+import { Player } from '../../../../../types/roomTypes';
 
 interface PlayerCardProps {
     player: Player;
@@ -37,11 +29,15 @@ const PlayerCard = memo(({ player, rank, isYou }: PlayerCardProps) => {
                 }}
             />
             <div className={styles.playerNameBlock}>
-                {(player as any).isPremium && (
+                {player.isPremium && (
                     <FaStar className={styles.premiumStar} title="Premium" />
                 )}
-                <span className={`${styles.playerName} ${isYou ? styles.playerNameYou : ''}`}>
-                    {isYou ? t('gameplay.youUpper') : player.login}
+                <span className={`${styles.playerName} ${isYou ? styles.playerNameYou : ''}`}
+                    style={{
+                        color: player.nameColor || (player.isPremium ? '#ffd700' : undefined),
+                    }}
+                >
+                    {player.login}
                 </span>
                 {isYou && <span className={styles.miniYouBadge}>{t('gameplay.youUpper')}</span>}
             </div>

@@ -40,12 +40,14 @@ export const useAudioPlayer = ({
     const startedAtRef = useRef<number | null>(startedAt);
     const previewUrlRef = useRef<string | null>(previewUrl);
     const volumeRef = useRef<number>(volume);
+    const maxPlayDurationRef = useRef<number | undefined>(maxPlayDuration);
     // Захист від double-call (window capture + overlay onClick спрацьовують разом)
     const isResumingRef = useRef(false);
 
     startedAtRef.current = startedAt;
     previewUrlRef.current = previewUrl;
     volumeRef.current = volume;
+    maxPlayDurationRef.current = maxPlayDuration;
 
     const setVolume = useCallback((newVolume: number) => {
         setVolumeState(newVolume);
@@ -75,8 +77,8 @@ export const useAudioPlayer = ({
 
         isResumingRef.current = true;
 
-        // Рахуємо ПОТОЧНИЙ час — враховує час очікування на оверлеї
-        const seekTo = calculateStartTime(currentStartedAt);
+        const isHeardle = Boolean(maxPlayDurationRef.current);
+        const seekTo = isHeardle ? 0 : calculateStartTime(currentStartedAt);
         if (Number.isFinite(seekTo)) {
             try {
                 audio.currentTime = seekTo;
@@ -88,10 +90,11 @@ export const useAudioPlayer = ({
         audio.volume = currentVolume;
         audio.play()
             .then(() => {
-                // Мікрокорекція після реального старту відтворення
-                const correctedSeek = calculateStartTime(currentStartedAt);
-                if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
-                    try { audio.currentTime = correctedSeek; } catch {}
+                if (!isHeardle) {
+                    const correctedSeek = calculateStartTime(currentStartedAt);
+                    if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
+                        try { audio.currentTime = correctedSeek; } catch {}
+                    }
                 }
                 setIsPlaying(true);
                 setIsAutoplayBlocked(false);
@@ -154,8 +157,8 @@ export const useAudioPlayer = ({
             if (hasStarted) return;
             hasStarted = true;
 
-            // Час рахується ЗАРАЗ — важливо якщо loadedmetadata затримався
-            const playbackStartTime = calculateStartTime(startedAt);
+            const isHeardle = Boolean(maxPlayDuration);
+            const playbackStartTime = isHeardle ? 0 : calculateStartTime(startedAt);
             if (Number.isFinite(playbackStartTime)) {
                 try {
                     audio.currentTime = playbackStartTime;
@@ -168,10 +171,11 @@ export const useAudioPlayer = ({
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
-                        // Мікрокорекція після старту
-                        const correctedTime = calculateStartTime(startedAt);
-                        if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
-                            try { audio.currentTime = correctedTime; } catch {}
+                        if (!isHeardle) {
+                            const correctedTime = calculateStartTime(startedAt);
+                            if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
+                                try { audio.currentTime = correctedTime; } catch {}
+                            }
                         }
                         setIsPlaying(true);
                         setIsAutoplayBlocked(false);
@@ -254,7 +258,8 @@ export const useAudioPlayer = ({
     useEffect(() => {
         if (audioRef.current && maxPlayDuration) {
             const audio = audioRef.current;
-            if (audio.paused && audio.currentTime < maxPlayDuration && !isAutoplayBlocked) {
+            audio.currentTime = 0;
+            if (!isAutoplayBlocked) {
                 audio.play()
                     .then(() => setIsPlaying(true))
                     .catch(() => {});

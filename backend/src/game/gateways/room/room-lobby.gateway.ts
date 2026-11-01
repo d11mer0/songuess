@@ -13,6 +13,7 @@ import { RoomHelperService } from '../../services/room/room-helper.service';
 import { MatchmakingService } from '../../services/room/matchmaking.service';
 import { LobbyOptions, GameRoomState } from '../../interfaces/game.interface';
 import { RoundSyncService } from '../../services/game/round-sync.service';
+import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 
 @WebSocketGateway({
     cors: {
@@ -72,7 +73,7 @@ export class RoomLobbyGateway {
         );
         if (room) {
             await client.join(room.id);
-            this.server.to(room.id).emit('joinedRoom', room);
+            this.server.to(room.id).emit('joinedRoom', sanitizeRoom(room));
             if (room.state === GameRoomState.STARTED && room.gameProgress) {
                 this.roundSyncService.syncOngoingRound(client, room);
             }
@@ -101,7 +102,7 @@ export class RoomLobbyGateway {
             const updatedRoom = await this.roomManagerService.joinRoom(room.id, user.id, user.login);
             if (updatedRoom) {
                 await client.join(updatedRoom.id);
-                this.server.to(updatedRoom.id).emit('joinedRoom', updatedRoom);
+                this.server.to(updatedRoom.id).emit('joinedRoom', sanitizeRoom(updatedRoom));
             }
         } else {
             const newRoomId = await this.roomManagerService.createRoom(

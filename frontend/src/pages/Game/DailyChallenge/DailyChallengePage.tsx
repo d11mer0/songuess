@@ -201,6 +201,8 @@ const DailyChallengePage: React.FC = () => {
                 });
             }
             setAttempts(reconstructed);
+        } else if (data?.attemptsHistory && data.attemptsHistory.length > 0) {
+            setAttempts(data.attemptsHistory);
         }
     }, [data, t]);
 
@@ -431,7 +433,7 @@ const DailyChallengePage: React.FC = () => {
 
                     {attempts.length > 0 && (
                         <div className={styles.attemptsHistory}>
-                            <div className={styles.historyTitle}>{t('daily.attempt')}s</div>
+                            <div className={styles.historyTitle}>{t('daily.attemptsTitle')}</div>
                             <div className={styles.historyChips}>
                                 {attempts.map((att, idx) => (
                                     <div

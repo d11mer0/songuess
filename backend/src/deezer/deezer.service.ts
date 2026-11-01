@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 import { DeezerApi } from '../utils/deezer-api';
 import { RedisService } from '../redis/redis.service';
 import {
@@ -454,9 +455,19 @@ export class DeezerService {
                 // 3. Spotify Playlist: open.spotify.com/playlist/ID
                 const spotifyPlaylistMatch = url.match(/spotify\.com\/playlist\/([a-zA-Z0-9]+)/i);
                 if (spotifyPlaylistMatch) {
-                    const searchRes = await this.search('top hits playlist', 'playlist');
-                    if (searchRes?.data?.length) {
-                        result = await this.getPlaylistById(searchRes.data[0].id);
+                    try {
+                        const oembedRes = await firstValueFrom(
+                            this.httpService.get(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, { timeout: 5000 }),
+                        );
+                        const spotifyTitle = oembedRes?.data?.title;
+                        if (spotifyTitle) {
+                            const searchRes = await this.search(spotifyTitle, 'playlist');
+                            if (searchRes?.data?.length) {
+                                result = await this.getPlaylistById(searchRes.data[0].id);
+                            }
+                        }
+                    } catch {
+                        // oEmbed unavailable or failed to find match
                     }
                 }
             }

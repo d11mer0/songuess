@@ -65,8 +65,17 @@ export class GameResultService {
                     });
                 }
 
-                if (this.achievementService && (currentRecord >= 5000 || totalScore >= 5000)) {
-                    this.achievementService.awardAchievement(player.id, 'CENTURION_100').catch(() => {});
+                if (this.achievementService) {
+                    const stats = await this.prisma.gameScore.aggregate({
+                        where: { userId: player.id },
+                        _sum: { score: true },
+                        _count: { id: true },
+                    });
+                    const cumulativeScore = stats._sum.score || 0;
+                    const gamesPlayed = stats._count.id || 0;
+                    if (cumulativeScore >= 5000 || gamesPlayed >= 10) {
+                        this.achievementService.awardAchievement(player.id, 'CENTURION_100').catch(() => {});
+                    }
                 }
             } catch (err) {
                 console.error('Failed to record game score for user', player.id, err);

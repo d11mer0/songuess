@@ -18,16 +18,18 @@ interface User {
 
 interface UserInfoSectionProps {
     user?: User;
-    onEditProfile: () => void;
-    onEditAvatar: () => void;
-    onOpenPresetAvatar: () => void;
-    onOpenDonation: () => void;
-    onOpenCosmetics: () => void;
-    onDelete: () => void;
+    isReadOnly?: boolean;
+    onEditProfile?: () => void;
+    onEditAvatar?: () => void;
+    onOpenPresetAvatar?: () => void;
+    onOpenDonation?: () => void;
+    onOpenCosmetics?: () => void;
+    onDelete?: () => void;
 }
 
 const UserInfoSection: React.FC<UserInfoSectionProps> = ({
     user,
+    isReadOnly = false,
     onEditProfile,
     onEditAvatar,
     onOpenPresetAvatar,
@@ -130,49 +132,61 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
                     </div>
                 </div>
 
-                <div className={styles.buttonContainer} style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    <Button variant="primary" onClick={onOpenPresetAvatar} style={{ background: '#7928ca', borderColor: '#7928ca' }}>
-                        {t('profile.choosePresetAvatar')}
-                    </Button>
-                    <Button variant="primary" onClick={onEditAvatar}>
-                        {t('profile.editAvatar')}
-                    </Button>
-                    <Button variant="primary" onClick={onEditProfile}>
-                        {t('profile.editProfile')}
-                    </Button>
+                {!isReadOnly && (
+                    <div className={styles.buttonContainer} style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {onOpenPresetAvatar && (
+                            <Button variant="primary" onClick={onOpenPresetAvatar} style={{ background: '#7928ca', borderColor: '#7928ca' }}>
+                                {t('profile.choosePresetAvatar')}
+                            </Button>
+                        )}
+                        {onEditAvatar && (
+                            <Button variant="primary" onClick={onEditAvatar}>
+                                {t('profile.editAvatar')}
+                            </Button>
+                        )}
+                        {onEditProfile && (
+                            <Button variant="primary" onClick={onEditProfile}>
+                                {t('profile.editProfile')}
+                            </Button>
+                        )}
 
-                    <Button
-                        variant="primary"
-                        onClick={onOpenDonation}
-                        style={{
-                            background: 'linear-gradient(135deg, #ffd700 0%, #ff8800 100%)',
-                            color: '#000000',
-                            border: 'none',
-                            fontWeight: 700,
-                        }}
-                    >
-                        {t('profile.buyCoffee')}
-                    </Button>
+                        {onOpenDonation && (
+                            <Button
+                                variant="primary"
+                                onClick={onOpenDonation}
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffd700 0%, #ff8800 100%)',
+                                    color: '#000000',
+                                    border: 'none',
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {t('profile.buyCoffee')}
+                            </Button>
+                        )}
 
-                    {isPremium && (
-                        <Button
-                            variant="primary"
-                            onClick={onOpenCosmetics}
-                            style={{
-                                background: 'transparent',
-                                border: '1px solid #ffd700',
-                                color: '#ffd700',
-                                fontWeight: 600,
-                            }}
-                        >
-                            {t('profile.styleBtn')}
-                        </Button>
-                    )}
+                        {isPremium && onOpenCosmetics && (
+                            <Button
+                                variant="primary"
+                                onClick={onOpenCosmetics}
+                                style={{
+                                    background: 'transparent',
+                                    border: '1px solid #ffd700',
+                                    color: '#ffd700',
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {t('profile.styleBtn')}
+                            </Button>
+                        )}
 
-                    <Button variant="danger" onClick={onDelete}>
-                        {t('profile.deleteAccount')}
-                    </Button>
-                </div>
+                        {onDelete && (
+                            <Button variant="danger" onClick={onDelete}>
+                                {t('profile.deleteAccount')}
+                            </Button>
+                        )}
+                    </div>
+                )}
             </Col>
         </Row>
     );

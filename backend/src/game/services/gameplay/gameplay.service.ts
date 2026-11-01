@@ -41,7 +41,7 @@ export class GameplayService {
         if (room.state === GameRoomState.STARTED) return;
         
         const playableTracks = filterTracks(selectedTracks?.tracks || []);
-        if (playableTracks.length < 3) return;
+        if (playableTracks.length < 4) return;
 
         this.roundManager.cancelRoomGame(room.id);
 

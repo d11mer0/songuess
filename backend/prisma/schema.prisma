@@ -28,6 +28,8 @@ model User {
   gameScores     GameScore[]
   achievements   UserAchievement[]
   donations      Donation[]
+
+  @@index([record])
 }
 
 model Token {
@@ -38,6 +40,9 @@ model Token {
   type      String
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId, type])
+  @@index([expiresAt])
 }
 
 model Song {
@@ -59,6 +64,7 @@ model DailyResult {
   createdAt    DateTime @default(now())
 
   @@unique([userId, date])
+  @@index([date])
 }
 
 model GameScore {
@@ -75,6 +81,7 @@ model GameScore {
   @@index([genre])
   @@index([genre, createdAt])
   @@index([userId, createdAt])
+  @@index([gameMode])
 }
 
 model Achievement {

@@ -191,6 +191,7 @@ export const en: TranslationDictionary = {
         title: '🎵 Song of the Day',
         subtitle: 'One mystery track daily for everyone. Guess it in as few tries as possible!',
         attempt: 'Attempt',
+        attemptsTitle: 'Attempts',
         of: 'of',
         listenSnippet: 'Listen to Snippet',
         typeGuess: 'Type track title or artist name...',

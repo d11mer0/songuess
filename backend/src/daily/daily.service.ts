@@ -138,13 +138,26 @@ export class DailyService {
 
         const isCompleted = !!userResult;
 
+        let attemptsHistory: Array<{ text: string; isCorrect: boolean }> = [];
+        if (userId && !isCompleted && this.redisService) {
+            const cachedAttempts = await this.redisService.get(`songuess:daily_attempts:${userId}:${dateStr}`);
+            if (cachedAttempts) {
+                try {
+                    attemptsHistory = JSON.parse(cachedAttempts);
+                } catch {
+                    attemptsHistory = [];
+                }
+            }
+        }
+
         return {
             dayNumber,
             date: dateStr,
             preview: resolvedPreview,
             isCompleted,
             isSolved: userResult?.isSolved ?? false,
-            guessesCount: userResult?.guessesCount ?? 0,
+            guessesCount: isCompleted ? (userResult?.guessesCount ?? 0) : attemptsHistory.length,
+            attemptsHistory: attemptsHistory.length > 0 ? attemptsHistory : undefined,
             options: this.getOptions(track),
             streak,
             maxStreak,
@@ -204,9 +217,27 @@ export class DailyService {
         const fullExpected = `${track.artistName} - ${track.title}`;
         const matchResult = isFuzzyMatch(normalizedGuess, track.title, track.artistName);
         const matchFull = isFuzzyMatch(normalizedGuess, fullExpected);
-        const isCorrect = matchResult.isMatch || matchFull.isMatch;
+        const isCorrect = matchResult.isMatch || (matchFull.isMatch && !matchResult.isArtistMatch);
 
         const isGameOver = isCorrect || attempt >= 6;
+
+        if (userId && this.redisService) {
+            if (isGameOver) {
+                await this.redisService.del(`songuess:daily_attempts:${userId}:${dateStr}`);
+            } else {
+                let attemptsHistory: Array<{ text: string; isCorrect: boolean }> = [];
+                const cachedAttempts = await this.redisService.get(`songuess:daily_attempts:${userId}:${dateStr}`);
+                if (cachedAttempts) {
+                    try {
+                        attemptsHistory = JSON.parse(cachedAttempts);
+                    } catch {
+                        attemptsHistory = [];
+                    }
+                }
+                attemptsHistory.push({ text: normalizedGuess, isCorrect: false });
+                await this.redisService.set(`songuess:daily_attempts:${userId}:${dateStr}`, JSON.stringify(attemptsHistory), 86400);
+            }
+        }
 
         if (isGameOver) {
             let newStreak = isCorrect ? 1 : 0;

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 
 import { useGameplay } from '../../hooks/Gameplay/useGameplay';
 import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
@@ -8,6 +8,8 @@ import RoomPlayerList from '../../components/Game/Lobby/JoinedLobby/RoomPlayerLi
 import { FaFlagCheckered, FaDoorOpen } from 'react-icons/fa';
 import GameplayHeader from '../../components/Game/Gameplay/GameplayHeader';
 import GameContent from '../../components/Game/Gameplay/GameContent';
+import Loader from '../../components/UI/Loader/Loader/Loader';
+import { socketEmitter } from '../../services/socket/socketEmitter';
 
 import styles from './Gameplay.module.css';
 import FinishGameModal from '../../components/Game/Gameplay/FinishGameModal';
@@ -15,14 +17,34 @@ import { useTranslation } from '../../i18n/LanguageContext';
 
 const Gameplay = () => {
     const { t } = useTranslation();
+    const { id } = useParams<{ id: string }>();
     const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { kickMember, deleteRoom, launchGame, submitAnswer, leaveRoom, restartGame } = useGameplay();
     
     const [showPlayers, setShowPlayers] = useState(false); // 🔹
     const [showFinishModal, setShowFinishModal] = useState(false);
+    const [isReconnecting, setIsReconnecting] = useState(!currentRoom);
+
+    useEffect(() => {
+        if (!currentRoom) {
+            socketEmitter.emit('getCurrentRoom');
+            if (id) {
+                socketEmitter.emit('joinRoom', { id });
+            }
+            const timer = setTimeout(() => {
+                setIsReconnecting(false);
+            }, 3000);
+            return () => clearTimeout(timer);
+        } else {
+            setIsReconnecting(false);
+        }
+    }, [currentRoom, id]);
 
     if (!currentRoom) {
+        if (isReconnecting) {
+            return <Loader isFullScreen />;
+        }
         return <Navigate to="/game" replace />;
     }
 

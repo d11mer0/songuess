@@ -3,15 +3,7 @@ import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
 import { FaCrown, FaMedal, FaStar } from 'react-icons/fa';
-
-interface Player {
-    id: number;
-    login: string;
-    avatar: string | null;
-    totalScore?: number;
-    isPremium?: boolean;
-    nameColor?: string;
-}
+import { Player } from '../../../../../types/roomTypes';
 
 interface PodiumCardProps {
     player: Player;

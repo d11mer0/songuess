@@ -3,6 +3,7 @@ import { GameRoom } from '../../interfaces/game.interface';
 import { GameRoomState } from '../../interfaces/game.interface';
 import { RoomManagerService } from './room-manager.service';
 import { RedisService } from '../../../redis/redis.service';
+import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 
 @Injectable()
 export class RoomHelperService {
@@ -33,14 +34,15 @@ export class RoomHelperService {
                 this.assignNewLeader(roomId);
                 this.roomManagerService.syncRoom(room);
                 this.roomManagerService.broadcastRoomsList();
+                const safeRoom = sanitizeRoom(room);
                 this.roomManagerService.serverInfo?.to(roomId).emit(
                     'playerDisconnected',
-                    room,
+                    safeRoom,
                 );
                 if (room.shortCode) {
                     this.roomManagerService.serverInfo?.to(room.shortCode).emit(
                         'playerDisconnected',
-                        room,
+                        safeRoom,
                     );
                 }
             }
@@ -119,14 +121,12 @@ export class RoomHelperService {
         if (roomIndex === -1) return null;
 
         const room = rooms[roomIndex];
-
-        if (
-            room.state !== GameRoomState.ADDING &&
-            room.state !== GameRoomState.ENDED
-        )
-            return false;
-
         const hasOnlinePlayers = room.players.some((player) => player.isOnline);
+
+        if (hasOnlinePlayers && room.players.length > 0) {
+            this.cancelRoomCleanup(roomId);
+            return false;
+        }
 
         if (room.players.length === 0) {
             this.cancelRoomCleanup(roomId);
@@ -144,7 +144,8 @@ export class RoomHelperService {
                 this.roomManagerService.broadcastRoomsList();
                 return true;
             } else {
-                this.scheduleRoomCleanup(roomId, 10000);
+                const graceDelay = room.state === GameRoomState.STARTED ? 15000 : 10000;
+                this.scheduleRoomCleanup(roomId, graceDelay);
                 return false;
             }
         }

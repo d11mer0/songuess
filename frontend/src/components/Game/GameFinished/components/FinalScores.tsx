@@ -4,15 +4,7 @@ import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from '../GameFinished.module.css';
 import PodiumCard from './FinalScores/PodiumCard';
 import PlayerCard from './FinalScores/PlayerCard';
-
-interface Player {
-    id: number;
-    login: string;
-    avatar: string | null;
-    totalScore?: number;
-    isPremium?: boolean;
-    nameColor?: string;
-}
+import { Player } from '../../../../types/roomTypes';
 
 interface FinalScoresProps {
     players: Player[];

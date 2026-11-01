@@ -170,6 +170,21 @@ export class AuthService {
             );
         }
 
+        const storedToken = await this.prisma.token.findFirst({
+            where: {
+                token,
+                userId: decoded.id,
+                type: 'EMAIL_VERIFICATION',
+                expiresAt: { gt: new Date() },
+            },
+        });
+
+        if (!storedToken) {
+            throw new BadRequestException(
+                'Invalid or already used email verification token',
+            );
+        }
+
         await this.prisma.token.deleteMany({
             where: { userId: decoded.id, type: 'EMAIL_VERIFICATION' },
         });
@@ -182,6 +197,27 @@ export class AuthService {
 
     async resetPassword({ token, newPassword }: ResetPasswordDto) {
         const decoded = this.tokenService.verifyResetToken(token);
+        if (!decoded) {
+            throw new BadRequestException(
+                'Invalid or expired password reset token',
+            );
+        }
+
+        const storedToken = await this.prisma.token.findFirst({
+            where: {
+                token,
+                userId: decoded.id,
+                type: 'PASSWORD_RESET',
+                expiresAt: { gt: new Date() },
+            },
+        });
+
+        if (!storedToken) {
+            throw new BadRequestException(
+                'Invalid or already used password reset token',
+            );
+        }
+
         const hashedPassword = await this.hashService.hashPassword(newPassword);
 
         await this.prisma.user.update({

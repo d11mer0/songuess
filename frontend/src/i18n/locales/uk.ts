@@ -191,6 +191,7 @@ export const uk: TranslationDictionary = {
         title: '🎵 Пісня Дня',
         subtitle: 'Спільна загадка щодня для всіх меломанів. Вгадайте за найменшу кількість спроб!',
         attempt: 'Спроба',
+        attemptsTitle: 'Спроби',
         of: 'із',
         listenSnippet: 'Слухати уривок',
         typeGuess: 'Введіть назву треку або виконавця...',

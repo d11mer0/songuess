@@ -132,7 +132,7 @@ export class RoomControlGateway {
         if (!user) return;
 
         const room = this.roomHelperService.findRoomByPlayerId(user.id);
-        client.emit('currentRoom', room);
+        client.emit('currentRoom', room ? sanitizeRoom(room) : null);
     }
 
     @SubscribeMessage('getRooms')

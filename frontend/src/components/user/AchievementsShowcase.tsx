@@ -1,10 +1,16 @@
 import React from 'react';
-import { useGetMyAchievementsQuery, AchievementItem } from '../../store/api/achievementsApi';
+import { useGetMyAchievementsQuery, useGetUserAchievementsQuery, AchievementItem } from '../../store/api/achievementsApi';
 import { useTranslation } from '../../i18n/LanguageContext';
 
-export const AchievementsShowcase: React.FC = () => {
+interface AchievementsShowcaseProps {
+    userId?: number;
+}
+
+export const AchievementsShowcase: React.FC<AchievementsShowcaseProps> = ({ userId }) => {
     const { t, language } = useTranslation();
-    const { data, isLoading } = useGetMyAchievementsQuery();
+    const myQuery = useGetMyAchievementsQuery(undefined, { skip: Boolean(userId) });
+    const userQuery = useGetUserAchievementsQuery(userId!, { skip: !userId });
+    const { data, isLoading } = userId ? userQuery : myQuery;
 
     if (isLoading) {
         return <div className="text-secondary small">{t('common.loading')}</div>;

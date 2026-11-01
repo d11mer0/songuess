@@ -44,6 +44,13 @@ const RoundResult = memo(() => {
                 {text}
             </div>
 
+            {result.correctAnswer && (
+                <div className={styles.correctAnswerRevealed}>
+                    <span className={styles.correctAnswerLabel}>{t('daily.trackRevealed')} </span>
+                    <strong className={styles.correctAnswerTitle}>{result.correctAnswer}</strong>
+                </div>
+            )}
+
             {streak >= 3 && (
                 <div className={styles.streakAlert}>
                     <FaFire className={styles.streakFlameIcon} />

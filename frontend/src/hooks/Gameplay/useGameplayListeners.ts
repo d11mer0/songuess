@@ -113,7 +113,7 @@ export const useGameplayListeners = () => {
             const { correctAnswer, results, streaks } = data;
             const mappedResults = results.map(r => ({
                 ...r,
-                isCorrect: r.answer === correctAnswer
+                isCorrect: Boolean((r as any).isCorrect ?? (r.score > 0 || (r.answer && r.answer === correctAnswer)))
             }));
             const myResult = mappedResults.find(r => r.playerId === user?.id);
             if(!myResult) { return };
