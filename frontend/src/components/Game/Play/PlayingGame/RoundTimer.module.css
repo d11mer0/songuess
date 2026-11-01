@@ -1,7 +1,7 @@
 .timerContainer {
     width: 100%;
     max-width: 640px;
-    margin: 8px auto 14px;
+    margin: 4px auto 10px;
     display: flex;
     flex-direction: column;
     gap: 6px;

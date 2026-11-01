@@ -253,6 +253,30 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 
 ---
 
+### 3.7 Ukrainian Localization & Compact Gameplay Viewport Layout
+- **Problem:**
+  1. In the left column (`TotalScore.tsx`), `"🏆 Загальний рахунок"` wrapped into two lines due to `font-size: 24px` within a 310px column, awkwardly breaking the header and misaligning the badge.
+  2. In `AnswerOptions.tsx`, an unstyled `<h1>` with browser-default 42px margins blew up vertical spacing.
+  3. Combined with excessive container padding and margins (`28px` card padding, `32px` section bottom margin, `24px` audio control top margin, `40px` finish button top margin), the audio control pill was sliced in half at the bottom of the viewport on 1080p displays, pushing the "Покинути гру" button off-screen.
+  4. In `PlayerRoundResults.tsx`, the Ukrainian string `"Запізнився з відповіддю"` (23 characters) overflowed the 220px player card's time badge.
+- **Fix:**
+  1. Updated `TotalScore.module.css` to `font-size: 18px` with `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` so `"🏆 Загальний рахунок"` renders on a single balanced line.
+  2. Replaced unstyled `<h1>` with `<h2 className={styles.gameTitle}>` in `AnswerOptions.tsx`, eliminating browser-default margins.
+  3. Balanced vertical padding and margins in `PlayingGame.module.css` and `Gameplay.module.css` (`padding: 20px 22px; margin-bottom: 14px; margin-top: 14px; margin-top: 20px;`), ensuring the entire game board, audio player, and leave buttons fit within standard viewport bounds.
+  4. Shortened `lateWithAnswer` in `uk.ts` to `"Час вичерпано"` and added `white-space: nowrap; max-width: 100%` to `.timeBadgeLate`.
+  5. Added `flex-wrap: wrap; gap: 8px;` to `.heardleHeader` in `HeardleControls.module.css`.
+- **Files Modified:**
+  - `frontend/src/components/Game/Play/PlayingGame/TotalScore.module.css`
+  - `frontend/src/components/Game/Play/PlayingGame/AnswerOptions.tsx`
+  - `frontend/src/components/Game/Play/PlayingGame.module.css`
+  - `frontend/src/pages/Game/Gameplay.module.css`
+  - `frontend/src/components/Game/Play/PlayingGame/RoundTimer.module.css`
+  - `frontend/src/components/Game/Play/PlayingGame/PlayerRoundResults.module.css`
+  - `frontend/src/components/Game/Play/PlayingGame/HeardleControls.module.css`
+  - `frontend/src/i18n/locales/uk.ts`
+
+---
+
 ## 4. Verification & Build Status
 
 | Component | Check | Result |

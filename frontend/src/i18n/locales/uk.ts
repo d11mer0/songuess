@@ -272,7 +272,7 @@ export const uk: TranslationDictionary = {
         youUpper: 'ВИ',
         points: 'балів',
         incorrectAnswer: 'Неправильна відповідь',
-        lateWithAnswer: 'Запізнився з відповіддю',
+        lateWithAnswer: 'Час вичерпано',
         timeTaken: 'Час:',
         onFire: 'У ВОГНІ!',
         superStreakBonus: 'СУПЕР СТРІК x{streak}! (x2.0 ПОДВІЙНІ БАЛИ!)',

@@ -20,7 +20,7 @@
 .playingWrapper {
     max-width: 900px;
     margin: 0 auto;
-    padding: 28px 24px;
+    padding: 20px 22px;
     background: linear-gradient(145deg, rgba(28, 22, 44, 0.95), rgba(18, 14, 31, 0.95));
     border: 1px solid rgba(155, 93, 229, 0.35);
     border-radius: 24px;
@@ -32,28 +32,34 @@
 
 .roundTitle {
     font-family: var(--font-title);
-    font-size: 38px;
+    font-size: 30px;
     font-weight: 800;
     background: linear-gradient(135deg, #00f3ff 0%, #9b5de5 60%, #f15bb5 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 12px;
-    letter-spacing: 2px;
+    margin-bottom: 6px;
+    letter-spacing: 1.5px;
 }
 
 .gameTitle {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 700;
     color: var(--text-main);
-    margin-bottom: 24px;
+    margin: 10px 0 16px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
+}
+
+.musicIcon {
+    color: #9b5de5;
+    font-size: 18px;
 }
 
 .section {
-    margin-bottom: 32px;
+    margin-bottom: 14px;
 }
 
 @media (max-width: 960px) {
@@ -282,7 +288,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 24px;
+    margin-top: 14px;
     z-index: 50;
 }
 

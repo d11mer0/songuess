@@ -40,7 +40,10 @@ const AnswerOptions = memo(({ onSubmit }: Props) => {
 
     return (
         <>
-            <h1><FaMusic className={styles.icon} /> {t('gameplay.guessTrack')}</h1>
+            <h2 className={styles.gameTitle}>
+                <FaMusic className={styles.musicIcon} />
+                <span>{t('gameplay.guessTrack')}</span>
+            </h2>
             <div className={styles.optionsGrid}>
                 {trackInfo.options.map((value, index) => {
                     const isCorrect = result?.correctAnswer === value;
