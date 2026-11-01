@@ -76,21 +76,29 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 
 ---
 
-### 1.5 Audio Synchronization & Seek on Reload / Resume
-- **Architecture Note & Reversion:** Audio playback synchronization across multiplayer clients relies strictly on `calculateStartTime(startedAt)`, which computes the elapsed round seconds minus network delay:
-  ```ts
-  export const calculateStartTime = (startedAt: number): number => {
-      const now = Date.now();
-      const startedAtMs = new Date(startedAt).getTime();
-      let secondsPassed = (now - startedAtMs) / 1000;
-      if (secondsPassed > 1) secondsPassed -= 0.1;
-      return Math.max(0, Math.min(secondsPassed, 29.9));
-  };
-  ```
-- **Status:** Per project specification, any forced `0`-second seek override was completely reverted in `useAudioPlayer.ts`. The player continues to compute `calculateStartTime(startedAt)` on round start, autoplay resume, and page reload (F5), ensuring all players hear the exact same segment of the song in sync with the round clock.
-- **Files Maintained:**
+### 1.5 Audio Synchronization & Distinct Mode Architecture (Classic vs. Heardle)
+- **Problem & Root Cause Analysis:**
+  - **The Collision:** Previously, `useAudioPlayer` relied solely on `Boolean(maxPlayDuration)` to decide audio behavior. However, in `PlayingGame.tsx`, `effectiveMaxDuration` was passed as `roundDurationSec` (e.g. 25 seconds) even in `CLASSIC` and `DUEL` modes. Consequently, any generic attempt to treat `maxPlayDuration` as a snippet mode erroneously overrode standard real-time games, causing audio on F5 reload to restart at 0 seconds instead of the synchronized elapsed round time.
+  - **Heardle Mode Requirements:** In `HEARDLE` mode, audio playback is progressive and intro-focused (1s -> 2s -> 5s -> 10s -> 20s). The player must hear the song from the opening note (`0s`) up to the unlocked snippet threshold, rather than jumping to elapsed wall-clock seconds. When expanding to the next tier or replaying, playback must rewind to `0s` and play the full unlocked snippet before auto-pausing.
+- **Architectural Solution:**
+  1. **Explicit Mode Separation (`isHeardle`):**
+     - `PlayingGame.tsx` computes `const isHeardle = gameMode === 'HEARDLE';` and explicitly forwards `isHeardle` through `AudioPlayer.tsx` down to `useAudioPlayer.ts`.
+  2. **CLASSIC and DUEL Modes (`isHeardle === false`):**
+     - Full synchronization with the room's round clock is strictly preserved:
+       ```ts
+       const playbackStartTime = calculateStartTime(startedAt);
+       ```
+     - On page reload (F5) or autoplay gesture resume, the player seeks to the exact elapsed second minus network latency compensation (`calculateStartTime`), accompanied by post-start micro-correction. Audio continues playing in lockstep across all multiplayer clients without restarting.
+  3. **HEARDLE Mode (`isHeardle === true`):**
+     - Starts playback at second `0` up to `unlockedSeconds`.
+     - When `audio.currentTime >= maxPlayDuration`, the audio pauses and rewinds `audio.currentTime = 0`.
+     - When the player unlocks a higher tier (e.g., 1s -> 2s), `useAudioPlayer` resets `currentTime = 0` and auto-plays the full expanded snippet from the beginning.
+     - Added a `replayTrigger` pipeline and an interactive "↺ Слухати уривок" button in `HeardleControls.tsx` allowing players to re-listen to the unlocked snippet anytime before submitting an answer.
+- **Files Modified:**
   - `frontend/src/hooks/useAudioPlayer.ts`
-  - `frontend/src/utils/calculateStartTime.ts`
+  - `frontend/src/components/Game/Play/PlayingGame/AudioPlayer.tsx`
+  - `frontend/src/components/Game/Play/PlayingGame.tsx`
+  - `frontend/src/components/Game/Play/PlayingGame/HeardleControls.tsx`
 
 ---
 

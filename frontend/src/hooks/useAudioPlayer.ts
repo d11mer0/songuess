@@ -10,6 +10,8 @@ interface UseAudioPlayerArgs {
     startedAt: number | null;
     initialVolume?: number;
     maxPlayDuration?: number;
+    isHeardle?: boolean;
+    replayTrigger?: number;
 }
 
 const getSavedVolume = (fallback: number): number => {
@@ -29,6 +31,8 @@ export const useAudioPlayer = ({
     startedAt,
     initialVolume = 0.7,
     maxPlayDuration,
+    isHeardle = false,
+    replayTrigger = 0,
 }: UseAudioPlayerArgs) => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [volume, setVolumeState] = useState(() => getSavedVolume(initialVolume));
@@ -40,12 +44,14 @@ export const useAudioPlayer = ({
     const startedAtRef = useRef<number | null>(startedAt);
     const previewUrlRef = useRef<string | null>(previewUrl);
     const volumeRef = useRef<number>(volume);
+    const isHeardleRef = useRef<boolean>(isHeardle);
     // Захист від double-call (window capture + overlay onClick спрацьовують разом)
     const isResumingRef = useRef(false);
 
     startedAtRef.current = startedAt;
     previewUrlRef.current = previewUrl;
     volumeRef.current = volume;
+    isHeardleRef.current = isHeardle;
 
     const setVolume = useCallback((newVolume: number) => {
         setVolumeState(newVolume);
@@ -75,8 +81,8 @@ export const useAudioPlayer = ({
 
         isResumingRef.current = true;
 
-        // Рахуємо ПОТОЧНИЙ час — враховує час очікування на оверлеї
-        const seekTo = calculateStartTime(currentStartedAt);
+        const isHeardleMode = Boolean(isHeardleRef.current);
+        const seekTo = isHeardleMode ? 0 : calculateStartTime(currentStartedAt);
         if (Number.isFinite(seekTo)) {
             try {
                 audio.currentTime = seekTo;
@@ -88,10 +94,11 @@ export const useAudioPlayer = ({
         audio.volume = currentVolume;
         audio.play()
             .then(() => {
-                // Мікрокорекція після реального старту відтворення
-                const correctedSeek = calculateStartTime(currentStartedAt);
-                if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
-                    try { audio.currentTime = correctedSeek; } catch {}
+                if (!isHeardleMode) {
+                    const correctedSeek = calculateStartTime(currentStartedAt);
+                    if (Number.isFinite(correctedSeek) && Math.abs(audio.currentTime - correctedSeek) > 0.3) {
+                        try { audio.currentTime = correctedSeek; } catch {}
+                    }
                 }
                 setIsPlaying(true);
                 setIsAutoplayBlocked(false);
@@ -154,8 +161,8 @@ export const useAudioPlayer = ({
             if (hasStarted) return;
             hasStarted = true;
 
-            // Час рахується ЗАРАЗ — важливо якщо loadedmetadata затримався
-            const playbackStartTime = calculateStartTime(startedAt);
+            const isHeardleMode = Boolean(isHeardle);
+            const playbackStartTime = isHeardleMode ? 0 : calculateStartTime(startedAt);
             if (Number.isFinite(playbackStartTime)) {
                 try {
                     audio.currentTime = playbackStartTime;
@@ -168,10 +175,11 @@ export const useAudioPlayer = ({
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
-                        // Мікрокорекція після старту
-                        const correctedTime = calculateStartTime(startedAt);
-                        if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
-                            try { audio.currentTime = correctedTime; } catch {}
+                        if (!isHeardleMode) {
+                            const correctedTime = calculateStartTime(startedAt);
+                            if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
+                                try { audio.currentTime = correctedTime; } catch {}
+                            }
                         }
                         setIsPlaying(true);
                         setIsAutoplayBlocked(false);
@@ -242,6 +250,9 @@ export const useAudioPlayer = ({
             if (maxPlayDuration && audio.currentTime >= maxPlayDuration) {
                 audio.pause();
                 setIsPlaying(false);
+                if (isHeardle) {
+                    audio.currentTime = 0;
+                }
             }
         };
 
@@ -249,18 +260,19 @@ export const useAudioPlayer = ({
         return () => {
             audio.removeEventListener('timeupdate', handleTimeUpdate);
         };
-    }, [maxPlayDuration]);
+    }, [maxPlayDuration, isHeardle]);
 
     useEffect(() => {
-        if (audioRef.current && maxPlayDuration) {
+        if (audioRef.current && isHeardle && maxPlayDuration) {
             const audio = audioRef.current;
-            if (audio.paused && audio.currentTime < maxPlayDuration && !isAutoplayBlocked) {
+            audio.currentTime = 0;
+            if (!isAutoplayBlocked) {
                 audio.play()
                     .then(() => setIsPlaying(true))
                     .catch(() => {});
             }
         }
-    }, [maxPlayDuration, isAutoplayBlocked]);
+    }, [maxPlayDuration, isHeardle, isAutoplayBlocked, replayTrigger]);
 
     useEffect(() => {
         if (audioRef.current) {

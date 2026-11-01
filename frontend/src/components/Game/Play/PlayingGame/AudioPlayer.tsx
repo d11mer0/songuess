@@ -20,6 +20,8 @@ import { clearMediaSessionPlayback } from '../../../../utils/audio/blockMediaSes
 
 interface AudioPlayerProps {
     maxPlayDuration?: number;
+    isHeardle?: boolean;
+    replayTrigger?: number;
     onPlayingChange?: (isPlaying: boolean) => void;
 }
 
@@ -30,7 +32,12 @@ const PRESETS = [
     { label: '100%', value: 1.0 },
 ];
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingChange }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+    maxPlayDuration,
+    isHeardle,
+    replayTrigger,
+    onPlayingChange,
+}) => {
     const { t } = useTranslation();
     const trackInfo = useAppSelector(selectTrackInfo);
     const roundResult = useAppSelector(selectRoundResult);
@@ -43,6 +50,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ maxPlayDuration, onPlayingCha
         startedAt: trackInfo?.startedAt ?? null,
         initialVolume: 0.7,
         maxPlayDuration,
+        isHeardle,
+        replayTrigger,
     });
 
     const previousVolumeRef = useRef<number>(volume > 0 ? volume : 0.7);

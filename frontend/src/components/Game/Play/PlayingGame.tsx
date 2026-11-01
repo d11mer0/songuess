@@ -31,12 +31,15 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     const [unlockedSeconds, setUnlockedSeconds] = useState<number>(1);
     const [hasAnswered, setHasAnswered] = useState<boolean>(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+    const [replayTrigger, setReplayTrigger] = useState<number>(0);
+
+    const isHeardle = gameMode === 'HEARDLE';
 
     const roundDurationSec = trackInfo?.endsAt && trackInfo?.startedAt
         ? Math.max(1, Math.round((trackInfo.endsAt - trackInfo.startedAt) / 1000))
         : (currentRoom?.lobbyOptions?.roundDuration || 25);
 
-    const effectiveMaxDuration = gameMode === 'HEARDLE'
+    const effectiveMaxDuration = isHeardle
         ? unlockedSeconds
         : roundDurationSec;
 
@@ -97,6 +100,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                                 <HeardleControls
                                     unlockedSeconds={unlockedSeconds}
                                     onUnlockNext={handleUnlockNext}
+                                    onReplay={() => setReplayTrigger((prev) => prev + 1)}
                                     canUnlockMore={canUnlockMore}
                                     hasAnswered={hasAnswered}
                                 />
@@ -115,6 +119,8 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                                 <div className={styles.audioControl}>
                                     <AudioPlayer
                                         maxPlayDuration={effectiveMaxDuration}
+                                        isHeardle={isHeardle}
+                                        replayTrigger={replayTrigger}
                                         onPlayingChange={setIsPlayingAudio}
                                     />
                                 </div>

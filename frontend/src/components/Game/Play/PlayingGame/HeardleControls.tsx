@@ -5,6 +5,7 @@ import styles from './HeardleControls.module.css';
 interface Props {
     unlockedSeconds: number;
     onUnlockNext: () => void;
+    onReplay?: () => void;
     canUnlockMore: boolean;
     hasAnswered: boolean;
 }
@@ -14,6 +15,7 @@ export const HEARDLE_TIERS = [1, 2, 5, 10, 20];
 const HeardleControls: React.FC<Props> = ({
     unlockedSeconds,
     onUnlockNext,
+    onReplay,
     canUnlockMore,
     hasAnswered,
 }) => {
@@ -56,15 +58,28 @@ const HeardleControls: React.FC<Props> = ({
             </div>
 
             {!hasAnswered && (
-                <button
-                    className={styles.unlockButton}
-                    onClick={onUnlockNext}
-                    disabled={!canUnlockMore}
-                >
-                    {canUnlockMore
-                        ? t('gameplay.revealMoreAudio')
-                        : t('gameplay.allSnippetsRevealed')}
-                </button>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {onReplay && (
+                        <button
+                            type="button"
+                            className={styles.unlockButton}
+                            onClick={onReplay}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        >
+                            <span>↺</span> {t('daily.listenSnippet')}
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        className={styles.unlockButton}
+                        onClick={onUnlockNext}
+                        disabled={!canUnlockMore}
+                    >
+                        {canUnlockMore
+                            ? t('gameplay.revealMoreAudio')
+                            : t('gameplay.allSnippetsRevealed')}
+                    </button>
+                </div>
             )}
         </div>
     );
