@@ -21,7 +21,7 @@ export interface ServerToClientEvents {
   playerDisconnected: (room: Room) => void;
   roomDeleted: (data: { roomId?: string; error?: string }) => void;
   roundStarted: (payload: GameRoundPublicData) => void;
-  reconnectToRound: (payload: GameRoundPublicData & { answer: string | null }) => void;
+  reconnectToRound: (payload: GameRoundPublicData & { answer: string | null; heardleUnlockedTier?: number }) => void;
   roundResult: (payload: {
     correctAnswer: string;
     results: {

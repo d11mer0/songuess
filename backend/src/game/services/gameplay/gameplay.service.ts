@@ -98,11 +98,16 @@ export class GameplayService {
         const answerMode = room.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
         const gameMode = room.lobbyOptions?.gameMode || 'CLASSIC';
 
+        const recordedSnippet = room.gameProgress.heardleUnlockedTiers?.[playerId]?.[roundNumber] || 1;
+        const effectiveSnippetDuration = gameMode === 'HEARDLE'
+            ? Math.max(recordedSnippet, snippetDurationUsed || 1)
+            : snippetDurationUsed;
+
         playerResults[playerId][roundNumber] = createPlayerRoundResult(
             round,
             answer,
             answerMode,
-            snippetDurationUsed,
+            effectiveSnippetDuration,
         );
 
         this.roomManager.syncRoom(room);
@@ -121,6 +126,28 @@ export class GameplayService {
         if (allAnswered) {
             this.roundManager.finishRound(room.id, roundNumber);
         }
+    }
+
+    handleUnlockHeardleSnippet(
+        client: Socket,
+        roomId: string,
+        roundNumber: number,
+        snippetDuration: number,
+    ) {
+        const room = this.roomHelperService.findRoom(roomId);
+        if (!room?.gameProgress || room.state !== GameRoomState.STARTED) return;
+
+        const playerId = client.data.user?.id;
+        if (!playerId || typeof roundNumber !== 'number' || typeof snippetDuration !== 'number') return;
+
+        if (!room.gameProgress.heardleUnlockedTiers) {
+            room.gameProgress.heardleUnlockedTiers = {};
+        }
+        if (!room.gameProgress.heardleUnlockedTiers[playerId]) {
+            room.gameProgress.heardleUnlockedTiers[playerId] = {};
+        }
+        const currentMax = room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] || 1;
+        room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] = Math.max(currentMax, snippetDuration);
     }
 
     handleRestartGame(client: Socket, roomId: string) {

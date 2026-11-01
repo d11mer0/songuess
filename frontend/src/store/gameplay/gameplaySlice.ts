@@ -10,7 +10,8 @@ const initialState: GameplayState = {
     trackInfo: null,
     roundResult: null,
     initialAnswer: null,
-    gameEndedData: null
+    gameEndedData: null,
+    heardleUnlockedTier: 1,
 };
 
 const gameplaySlice = createSlice({
@@ -57,14 +58,21 @@ const gameplaySlice = createSlice({
             state.trackInfo = action.payload;
             state.initialAnswer = null;
             state.roundResult = null;
+            state.heardleUnlockedTier = 1;
             if (action.payload.roundNumber === 0 && state.currentRoom) {
                 state.currentRoom.state = RoomState.STARTED;
             }
         },
-        reconnectToRound(state, action: PayloadAction<GameRoundPublicData & { answer: string | null }>) {
+        reconnectToRound(state, action: PayloadAction<GameRoundPublicData & { answer: string | null; heardleUnlockedTier?: number }>) {
             state.trackInfo = action.payload;
             state.initialAnswer = action.payload.answer;
             state.roundResult = null;
+            if (action.payload.heardleUnlockedTier) {
+                state.heardleUnlockedTier = action.payload.heardleUnlockedTier;
+            }
+        },
+        setHeardleUnlockedTier(state, action: PayloadAction<number>) {
+            state.heardleUnlockedTier = action.payload;
         },
 
         setGameEndedData(state, action: PayloadAction<GameEndedPayload | null>) {
@@ -74,6 +82,7 @@ const gameplaySlice = createSlice({
             state.trackInfo = null;
             state.roundResult = null;
             state.initialAnswer = null;
+            state.heardleUnlockedTier = 1;
             if (state.currentRoom) {
                 state.currentRoom.state = RoomState.ENDED;
             }
@@ -94,6 +103,7 @@ export const {
     changeRoomState,
     startRound,
     reconnectToRound,
+    setHeardleUnlockedTier,
     setGameEndedData,
     endGame,
     setRooms

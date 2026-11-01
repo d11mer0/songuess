@@ -59,4 +59,17 @@ export class GameplayGateway {
     ) {
         this.gameplayService.handleRestartGame(client, data.roomId);
     }
+
+    @SubscribeMessage('unlockHeardleSnippet')
+    handleUnlockHeardleSnippet(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { roomId: string; roundNumber: number; snippetDuration: number },
+    ) {
+        this.gameplayService.handleUnlockHeardleSnippet(
+            client,
+            data?.roomId,
+            data?.roundNumber,
+            data?.snippetDuration,
+        );
+    }
 }

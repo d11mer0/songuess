@@ -4,6 +4,7 @@ export interface GameProgress {
     playerResults: Record<number, Record<number, PlayerRoundResult>>;
     totalScores: Record<number, number>;
     streaks?: Record<number, number>; // поточні серії правильних відповідей
+    heardleUnlockedTiers?: Record<number, Record<number, number>>; // [playerId][roundNumber]: maxSnippetDuration
 }
 
 export interface GameRound {

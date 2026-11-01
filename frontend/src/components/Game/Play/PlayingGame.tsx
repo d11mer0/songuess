@@ -9,8 +9,16 @@ import HeardleControls, { HEARDLE_TIERS } from './PlayingGame/HeardleControls';
 import NeonVisualizer from './PlayingGame/NeonVisualizer';
 import RoundTimer from './PlayingGame/RoundTimer';
 
-import { useAppSelector } from '../../../store/hooks';
-import { selectTrackInfo, selectCurrentRoom, selectRoundResult } from '../../../store/gameplay/gameplaySelectors';
+import { useAppSelector, useAppDispatch } from '../../../store/hooks';
+import {
+    selectTrackInfo,
+    selectCurrentRoom,
+    selectRoundResult,
+    selectHeardleUnlockedTier,
+    selectInitialAnswer
+} from '../../../store/gameplay/gameplaySelectors';
+import { setHeardleUnlockedTier } from '../../../store/gameplay/gameplaySlice';
+import { socketEmitter } from '../../../services/socket';
 import { useTranslation } from '../../../i18n/LanguageContext';
 import Loader from '../../UI/Loader/Loader/Loader';
 import styles from './PlayingGame.module.css';
@@ -28,12 +36,56 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
     const gameMode = currentRoom?.lobbyOptions?.gameMode || 'CLASSIC';
     const answerMode = currentRoom?.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
 
-    const [unlockedSeconds, setUnlockedSeconds] = useState<number>(1);
-    const [hasAnswered, setHasAnswered] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
+    const heardleUnlockedTier = useAppSelector(selectHeardleUnlockedTier);
+    const initialAnswer = useAppSelector(selectInitialAnswer);
+
+    const isHeardle = gameMode === 'HEARDLE';
+
+    const heardleStorageKey = currentRoom && trackInfo !== null
+        ? `songuess_heardle_${currentRoom.id}_${trackInfo.roundNumber}`
+        : null;
+    const answeredStorageKey = currentRoom && trackInfo !== null
+        ? `songuess_answered_${currentRoom.id}_${trackInfo.roundNumber}`
+        : null;
+
+    const [unlockedSeconds, setUnlockedSeconds] = useState<number>(() => {
+        if (heardleStorageKey) {
+            const saved = sessionStorage.getItem(heardleStorageKey);
+            const parsed = saved ? parseInt(saved, 10) : NaN;
+            if (HEARDLE_TIERS.includes(parsed)) return parsed;
+        }
+        return heardleUnlockedTier || 1;
+    });
+
+    const [hasAnswered, setHasAnswered] = useState<boolean>(() => {
+        if (initialAnswer) return true;
+        if (answeredStorageKey) return sessionStorage.getItem(answeredStorageKey) === 'true';
+        return false;
+    });
+
     const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
     const [replayTrigger, setReplayTrigger] = useState<number>(0);
 
-    const isHeardle = gameMode === 'HEARDLE';
+    // Синхронізація з Redux heardleUnlockedTier (наприклад, при отриманні reconnectToRound)
+    useEffect(() => {
+        if (heardleUnlockedTier && heardleUnlockedTier > unlockedSeconds) {
+            setUnlockedSeconds(heardleUnlockedTier);
+            if (heardleStorageKey) {
+                sessionStorage.setItem(heardleStorageKey, String(heardleUnlockedTier));
+            }
+        }
+    }, [heardleUnlockedTier, heardleStorageKey, unlockedSeconds]);
+
+    // Синхронізація з initialAnswer
+    useEffect(() => {
+        if (initialAnswer) {
+            setHasAnswered(true);
+            if (answeredStorageKey) {
+                sessionStorage.setItem(answeredStorageKey, 'true');
+            }
+        }
+    }, [initialAnswer, answeredStorageKey]);
 
     const roundDurationSec = trackInfo?.endsAt && trackInfo?.startedAt
         ? Math.max(1, Math.round((trackInfo.endsAt - trackInfo.startedAt) / 1000))
@@ -43,21 +95,58 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
         ? unlockedSeconds
         : roundDurationSec;
 
-    // Скидаємо стан при зміні раунду
+    // Скидаємо/відновлюємо стан при зміні раунду
     useEffect(() => {
-        setUnlockedSeconds(1);
-        setHasAnswered(false);
-    }, [trackInfo?.roundNumber]);
+        if (trackInfo?.roundNumber !== undefined) {
+            let tier = 1;
+            if (heardleStorageKey) {
+                const saved = sessionStorage.getItem(heardleStorageKey);
+                const parsed = saved ? parseInt(saved, 10) : NaN;
+                if (HEARDLE_TIERS.includes(parsed)) {
+                    tier = parsed;
+                }
+            } else if (heardleUnlockedTier) {
+                tier = heardleUnlockedTier;
+            }
+            setUnlockedSeconds(tier);
+
+            const answered = Boolean(initialAnswer) || (answeredStorageKey ? sessionStorage.getItem(answeredStorageKey) === 'true' : false);
+            setHasAnswered(answered);
+
+            // Чистимо ключі попередніх раундів цієї кімнати для збереження пам'яті
+            if (currentRoom?.id && trackInfo.roundNumber > 0) {
+                for (let r = 0; r < trackInfo.roundNumber; r++) {
+                    sessionStorage.removeItem(`songuess_heardle_${currentRoom.id}_${r}`);
+                    sessionStorage.removeItem(`songuess_answered_${currentRoom.id}_${r}`);
+                }
+            }
+        }
+    }, [trackInfo?.roundNumber, heardleStorageKey, answeredStorageKey, initialAnswer, heardleUnlockedTier, currentRoom?.id]);
 
     const handleUnlockNext = () => {
         const currentIndex = HEARDLE_TIERS.indexOf(unlockedSeconds);
         if (currentIndex !== -1 && currentIndex < HEARDLE_TIERS.length - 1) {
-            setUnlockedSeconds(HEARDLE_TIERS[currentIndex + 1]);
+            const nextTier = HEARDLE_TIERS[currentIndex + 1];
+            setUnlockedSeconds(nextTier);
+            dispatch(setHeardleUnlockedTier(nextTier));
+            if (heardleStorageKey) {
+                sessionStorage.setItem(heardleStorageKey, String(nextTier));
+            }
+            if (currentRoom?.id && trackInfo?.roundNumber !== undefined) {
+                socketEmitter.emit('unlockHeardleSnippet', {
+                    roomId: currentRoom.id,
+                    roundNumber: trackInfo.roundNumber,
+                    snippetDuration: nextTier,
+                });
+            }
         }
     };
 
     const handleSubmit = (answer: string) => {
         setHasAnswered(true);
+        if (answeredStorageKey) {
+            sessionStorage.setItem(answeredStorageKey, 'true');
+        }
         onSubmitAnswer(answer, gameMode === 'HEARDLE' ? unlockedSeconds : undefined);
     };
 

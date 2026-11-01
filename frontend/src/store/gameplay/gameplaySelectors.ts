@@ -6,3 +6,4 @@ export const selectRoundResult = (state: RootState) => state.gameplay.roundResul
 export const selectInitialAnswer = (state: RootState) => state.gameplay.initialAnswer;
 export const selectRooms = (state: RootState) => state.gameplay.rooms;
 export const selectGameEndedData = (state: RootState) => state.gameplay.gameEndedData;
+export const selectHeardleUnlockedTier = (state: RootState) => state.gameplay.heardleUnlockedTier;

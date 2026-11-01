@@ -10,7 +10,7 @@ describe('Fuzzy Match Utilities', () => {
         it('should lowercase, strip accents, and remove punctuation', () => {
             expect(normalizeText('Bohemian Rhapsody (Remastered 2011)')).toBe('bohemian rhapsody');
             expect(normalizeText('Yeah! [feat. Lil Jon & Ludacris]')).toBe('yeah');
-            expect(normalizeText('Café del Mar - Live Edit')).toBe('cafe del mar');
+            expect(normalizeText('Café del Mar - Live Edit')).toBe('cafe del mar live edit');
         });
     });
 

@@ -222,6 +222,37 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 
 ---
 
+### 3.6 Heardle Mode: Snippet Tier Round Persistence & F5 Anti-Cheat Verification
+- **Problem:**
+  1. In Heardle mode, `unlockedSeconds` was held solely in component local state (`useState(1)` in `PlayingGame.tsx`).
+  2. Clicking extra snippet tiers (1s -> 2s -> 5s -> 10s -> 20s) and refreshing the page (F5) reset the client's unlocked tier back to 1.
+  3. This was both a confusing UX regression and a severe cheating vulnerability: a player could unlock 20s, identify the track, reload with F5, and submit under tier 1 to receive 500 maximum points instead of 100.
+- **Fix:**
+  1. **Frontend Persistence (`sessionStorage` + Redux):**
+     - Initialized `unlockedSeconds` synchronously from `sessionStorage` (`songuess_heardle_${currentRoom.id}_${trackInfo.roundNumber}`) with fallback to Redux `heardleUnlockedTier`.
+     - Preserved `hasAnswered` status across reloads (`songuess_answered_${currentRoom.id}_${trackInfo.roundNumber}`).
+     - Cleaned up previous round keys on round transition.
+     - Emitted `unlockHeardleSnippet` WebSocket event when unlocking higher tiers.
+  2. **Backend Server-Side Tracking & Anti-Cheat Validation:**
+     - Added `heardleUnlockedTiers: Record<number, Record<number, number>>` to `GameProgress` in `game-progress.interface.ts`.
+     - Added `unlockHeardleSnippet` gateway subscriber in `gameplay.gateway.ts` and handler in `gameplay.service.ts`.
+     - In `handleAnswer` in `gameplay.service.ts`, enforced `effectiveSnippetDuration = Math.max(recordedSnippet, snippetDurationUsed || 1)`. Cheating points via F5 downgrade is completely prevented.
+     - In `round-sync.service.ts`, included `heardleUnlockedTier` in `reconnectToRound` event payload.
+- **Files Modified:**
+  - `backend/src/game/interfaces/game-progress.interface.ts`
+  - `backend/src/game/gateways/gameplay.gateway.ts`
+  - `backend/src/game/services/gameplay/gameplay.service.ts`
+  - `backend/src/game/services/game/round-sync.service.ts`
+  - `backend/src/utils/gameplay/fuzzy-match.spec.ts`
+  - `frontend/src/types/socketEvents.ts`
+  - `frontend/src/store/gameplay/types.ts`
+  - `frontend/src/store/gameplay/gameplaySlice.ts`
+  - `frontend/src/store/gameplay/gameplaySelectors.ts`
+  - `frontend/src/hooks/Gameplay/useGameplayListeners.ts`
+  - `frontend/src/components/Game/Play/PlayingGame.tsx`
+
+---
+
 ## 4. Verification & Build Status
 
 | Component | Check | Result |

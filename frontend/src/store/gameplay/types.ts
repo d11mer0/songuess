@@ -26,4 +26,5 @@ export interface GameplayState {
     roundResult: RoundResult | null;
     initialAnswer: string | null;
     gameEndedData: GameEndedPayload | null;
+    heardleUnlockedTier?: number;
 }

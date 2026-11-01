@@ -35,7 +35,7 @@ export const useGameplayListeners = () => {
     const currentRoom = useAppSelector(selectCurrentRoom);
 
     const handleReconnectToRound = useCallback(
-        (payload: GameRoundPublicData & { answer: string | null }) => {
+        (payload: GameRoundPublicData & { answer: string | null; heardleUnlockedTier?: number }) => {
             dispatch(reconnectToRound(payload));
         },
         [dispatch],
