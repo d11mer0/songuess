@@ -76,14 +76,21 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 
 ---
 
-### 1.5 Heardle Audio Seek / Pausing Bug
-- **Problem:** In Heardle mode, audio snippets (1s, 2s, 4s, etc.) would pause instantly upon playback.
-- **Root Cause:** `useAudioPlayer.ts` calculated audio start time based on elapsed round duration `(Date.now() - startedAt) / 1000`. If 5 seconds had elapsed since round start and the player was on tier 1 (1s snippet), `currentTime` was set to 5.0s, which immediately triggered `currentTime >= maxPlayDuration` and paused the track.
-- **Fix:**
-  - In `useAudioPlayer.ts`, when `maxPlayDuration` is active (Heardle mode), playback starts from `0` seconds rather than elapsed round duration.
-  - When unlocking or expanding tiers, the player resets `audio.currentTime = 0` to play the full unlocked snippet.
-- **Files Modified:**
+### 1.5 Audio Synchronization & Seek on Reload / Resume
+- **Architecture Note & Reversion:** Audio playback synchronization across multiplayer clients relies strictly on `calculateStartTime(startedAt)`, which computes the elapsed round seconds minus network delay:
+  ```ts
+  export const calculateStartTime = (startedAt: number): number => {
+      const now = Date.now();
+      const startedAtMs = new Date(startedAt).getTime();
+      let secondsPassed = (now - startedAtMs) / 1000;
+      if (secondsPassed > 1) secondsPassed -= 0.1;
+      return Math.max(0, Math.min(secondsPassed, 29.9));
+  };
+  ```
+- **Status:** Per project specification, any forced `0`-second seek override was completely reverted in `useAudioPlayer.ts`. The player continues to compute `calculateStartTime(startedAt)` on round start, autoplay resume, and page reload (F5), ensuring all players hear the exact same segment of the song in sync with the round clock.
+- **Files Maintained:**
   - `frontend/src/hooks/useAudioPlayer.ts`
+  - `frontend/src/utils/calculateStartTime.ts`
 
 ---
 
