@@ -151,6 +151,11 @@ const CreatingGame: FC<CreatingGameProps> = ({ startGame }) => {
                                     >
                                         🚀 {t('gameCreation.mixStartBtn', { count: deduplicatedMixTracks.length })}
                                     </button>
+                                    {deduplicatedMixTracks.length < 4 && (
+                                        <p className={styles.mixMinWarning}>
+                                            {t('gameCreation.minTracksWarning', { min: 4 })}
+                                        </p>
+                                    )}
                                 </>
                             )}
                         </div>
@@ -165,6 +170,7 @@ const CreatingGame: FC<CreatingGameProps> = ({ startGame }) => {
                         <TrackSelectionBlock
                             selectedGameType={selectedGameType}
                             onStart={handleSourceSubmit}
+                            isMixMode={isMixMode}
                         />
                     </div>
                 </>

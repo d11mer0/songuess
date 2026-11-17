@@ -503,6 +503,8 @@ export interface TranslationDictionary {
         mixBasketTitle: string;
         mixEmptyHint: string;
         mixStartBtn: string;
+        mixAddBtn: string;
+        mixMinSourceWarning: string;
         mixAddedToast: string;
         typeThemes: string;
         typeArtist: string;

@@ -282,3 +282,11 @@
     opacity: 0.45;
     cursor: not-allowed;
 }
+
+.mixMinWarning {
+    margin: 10px 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ff6f61;
+    text-align: center;
+}
