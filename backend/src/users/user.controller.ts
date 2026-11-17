@@ -8,6 +8,7 @@ import {
     UseInterceptors,
     UploadedFile,
     Req,
+    BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -73,7 +74,21 @@ export class UserController {
     }
 
     @Patch('update-avatar')
-    @UseInterceptors(FileInterceptor('avatar')) // Обробляємо файл у полі "avatar"
+    @UseInterceptors(
+        FileInterceptor('avatar', {
+            limits: { fileSize: 2 * 1024 * 1024 },
+            fileFilter: (_req, file, cb) => {
+                const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                if (!allowed.includes(file.mimetype)) {
+                    return cb(
+                        new BadRequestException('Дозволено лише зображення (JPEG, PNG, WEBP, GIF)'),
+                        false,
+                    );
+                }
+                cb(null, true);
+            },
+        }),
+    )
     @ApiOperation({ summary: 'Оновити аватар' })
     @ApiResponse({ status: 200, description: 'Аватар оновлено' })
     @ApiResponse({ status: 400, description: 'Файл не завантажено' })

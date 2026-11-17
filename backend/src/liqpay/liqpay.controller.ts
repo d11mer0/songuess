@@ -36,7 +36,7 @@ export class LiqPayController {
         if (process.env.NODE_ENV === 'production') {
             throw new ForbiddenException('Simulation is disabled in production environment');
         }
-        const userId = req.user?.id || (dto as any).userId;
+        const userId = req.user?.id;
         if (!userId) {
             throw new BadRequestException('User ID is required');
         }

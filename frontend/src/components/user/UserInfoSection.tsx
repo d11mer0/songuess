@@ -110,9 +110,11 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
                     )}
                 </div>
 
-                <p className={styles.email} style={{ marginTop: '6px' }}>
-                    📩 {user?.email || t('profile.notSpecified')}
-                </p>
+                {!isReadOnly && (
+                    <p className={styles.email} style={{ marginTop: '6px' }}>
+                        📩 {user?.email || t('profile.notSpecified')}
+                    </p>
+                )}
 
                 {/* Статистика */}
                 <div

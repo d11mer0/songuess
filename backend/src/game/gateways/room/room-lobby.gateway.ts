@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { wsCorsOptions } from '../../../common/config/cors.config';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
 import { RoomHelperService } from '../../services/room/room-helper.service';
@@ -16,10 +17,7 @@ import { RoundSyncService } from '../../services/game/round-sync.service';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 
 @WebSocketGateway({
-    cors: {
-        origin: true,
-        credentials: true,
-    },
+    cors: wsCorsOptions,
 })
 @Injectable()
 export class RoomLobbyGateway {

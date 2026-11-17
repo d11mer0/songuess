@@ -313,3 +313,17 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 
 ### 5.7 Real-Time Emoji Reactions
 - **Fix:** Added `sendReaction` WebSocket handler in `GameplayGateway` and `GameplayService.handleReaction` (whitelist `['🔥', '💀', '😭', '🎉', '🤔', '👏']`, 400ms cooldown) broadcasting `playerReaction`. Frontend renders a neon reaction bar in `PlayingGame.tsx` and floating animated emoji badges over player avatars in `TotalScore.tsx`.
+
+
+---
+
+## 6. Deep Security Audit Fixes — Critical Batch (Items 1–8)
+
+1. **Public Profile Email PII Leak (`GET /api/user/:id`):** Removed `email` from `UserService.getUserById` API payload (keeping an internal `isGuest` boolean for `RoomManagerService`) and hid the email row in `UserInfoSection.tsx` when `isReadOnly === true`.
+2. **Stored SVG/XSS via Preset Avatars (`UserService.setPresetAvatar`):** Enforced strict allowlist lookup against `PRESET_AVATARS`; raw `data:image/svg+xml` payloads are now rejected with `BadRequestException`.
+3. **Catalog Access Control (`SongsController`):** Added `AdminGuard` (`backend/src/common/guards/admin.guard.ts`) on `POST`, `PATCH`, and `DELETE /api/songs`, blocking guests and non-admin accounts.
+4. **Avatar Upload Hardening (`UserController.updateAvatar` & `ImageService.uploadImage`):** Enforced 2 MB file size limit, MIME allowlist (`jpeg`, `png`, `webp`, `gif`), and binary magic-byte verification.
+5. **LiqPay Callback Validation & IDOR (`LiqPayService` & `LiqPayController`):** Added idempotency guard (`donation.status === 'success'`), amount/currency/action verification in `processCallback`, minimum/maximum checkout validation, and removed `(dto as any).userId` fallback in `simulateTest`.
+6. **WebSockets & CORS & Swagger Hardening:** Created shared `backend/src/common/config/cors.config.ts` applied to HTTP CORS and all 4 WebSocket gateways (`GameGateway`, `GameplayGateway`, `RoomControlGateway`, `RoomLobbyGateway`). Added `ValidationPipe` + `class-validator` rules on `GameplayGateway` (`SubmitAnswerDto`, `LaunchGameDto`) and disabled Swagger `/api/docs` in `production`.
+7. **Auth Token & Enumeration Hardening (`AuthService`):** `refreshTokens` now verifies the user still exists in PostgreSQL; `sendTokenEmail` returns a generic success message for `PASSWORD_RESET` when the email does not exist.
+8. **Daily Challenge Server-Side Attempt Tracking (`DailyService.submitGuess`):** Attempt count and score are now calculated server-side from Redis (`attemptsHistory.length + 1`) rather than trusting client-supplied `attempt`, and missing/deleted users return `UnauthorizedException`.

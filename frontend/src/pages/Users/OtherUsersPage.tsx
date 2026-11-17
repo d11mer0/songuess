@@ -60,7 +60,6 @@ const OtherUsersPage: React.FC = () => {
                 user={{
                     avatar: user.avatar,
                     login: user.login,
-                    email: user.email,
                     record: user.record,
                     dailyStreak: user.dailyStreak,
                     maxDailyStreak: user.maxDailyStreak,

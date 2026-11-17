@@ -16,6 +16,7 @@ import { UpdateSongDto } from './dto/update-song.dto';
 import { SongResponseDto } from './dto/song-response.dto';
 
 import { Public } from '../common/decorators/public.decorator';
+import { AdminGuard } from '../common/guards/admin.guard';
 
 import { ApiCreateSong, ApiUpdateSong } from './songs.swagger';
 
@@ -49,6 +50,7 @@ export class SongsController {
         return this.songService.getSongById(Number(id));
     }
 
+    @UseGuards(AdminGuard)
     @Post()
     @ApiOperation({ summary: 'Створити нову пісню' })
     @ApiResponse({
@@ -61,6 +63,7 @@ export class SongsController {
         return this.songService.createSong(dto);
     }
 
+    @UseGuards(AdminGuard)
     @Patch(':id')
     @ApiOperation({ summary: 'Оновити пісню' })
     @ApiResponse({
@@ -74,6 +77,7 @@ export class SongsController {
         return this.songService.updateSong(Number(id), dto);
     }
 
+    @UseGuards(AdminGuard)
     @Delete(':id')
     @ApiOperation({ summary: 'Видалити пісню' })
     @ApiResponse({ status: 200, description: 'Пісня видалена' })

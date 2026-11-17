@@ -34,8 +34,11 @@ export class LiqPayService {
         description?: string,
         type: string = 'donation',
     ) {
-        if (!amount || amount <= 0) {
-            throw new BadRequestException('Amount must be greater than 0');
+        if (!amount || amount <= 0 || amount > 100000) {
+            throw new BadRequestException('Amount must be between 1 and 100000 UAH');
+        }
+        if (type === 'premium' && amount < 50) {
+            throw new BadRequestException('Minimum amount for VIP is 50 UAH');
         }
 
         const orderId = `SONGUESS_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
@@ -88,7 +91,7 @@ export class LiqPayService {
         }
 
         const decoded = JSON.parse(Buffer.from(data, 'base64').toString('utf-8'));
-        const { order_id, status } = decoded;
+        const { order_id, status, amount, currency, action } = decoded;
 
         const donation = await this.prisma.donation.findUnique({
             where: { orderId: order_id },
@@ -97,6 +100,22 @@ export class LiqPayService {
         if (!donation) {
             this.logger.warn(`LiqPay donation with orderId ${order_id} not found`);
             return { status: 'not_found' };
+        }
+
+        if (donation.status === 'success') {
+            return { status: 'already_processed', orderId: order_id };
+        }
+
+        if (action && action !== 'pay') {
+            throw new BadRequestException('Invalid payment action');
+        }
+        if (donation.amount !== undefined && amount !== undefined && Number(amount) < Number(donation.amount)) {
+            this.logger.warn(`LiqPay amount mismatch for ${order_id}: expected ${donation.amount}, got ${amount}`);
+            throw new BadRequestException('Payment amount mismatch');
+        }
+        if (donation.currency && currency && currency !== donation.currency) {
+            this.logger.warn(`LiqPay currency mismatch for ${order_id}: expected ${donation.currency}, got ${currency}`);
+            throw new BadRequestException('Payment currency mismatch');
         }
 
         const isSuccess = ['success', 'sandbox', 'wait_accept'].includes(status);

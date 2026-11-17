@@ -155,10 +155,17 @@ export class AuthService {
             throw new UnauthorizedException('Refresh token is missing');
         }
         const decoded = this.tokenService.verifyRefreshToken(refreshToken);
+        const user = await this.prisma.user.findUnique({
+            where: { id: decoded.id },
+            select: { id: true, login: true, email: true },
+        });
+        if (!user) {
+            throw new UnauthorizedException('User no longer exists');
+        }
         return this.tokenService.generateTokens(
-            decoded.id,
-            decoded.login,
-            decoded.email,
+            user.id,
+            user.login,
+            user.email,
         );
     }
 
@@ -236,10 +243,16 @@ export class AuthService {
     ) {
         const user = await this.prisma.user.findUnique({ where: { email } });
 
-        if (!user || (type === 'EMAIL_VERIFICATION' && user.isVerified)) {
-            throw new NotFoundException(
-                'User with this email does not exist or is already verified',
-            );
+        if (!user) {
+            if (type === 'PASSWORD_RESET') {
+                return {
+                    message: 'If an account with this email exists, a password reset email has been sent',
+                };
+            }
+            throw new NotFoundException('User with this email does not exist');
+        }
+        if (type === 'EMAIL_VERIFICATION' && user.isVerified) {
+            throw new NotFoundException('User is already verified');
         }
 
         const token =

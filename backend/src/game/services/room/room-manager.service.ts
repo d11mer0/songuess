@@ -151,9 +151,10 @@ export class RoomManagerService implements OnModuleInit {
             const userInfo = await this.userService.getUserById(playerId).catch(() => null);
             this.roomHelperService.removeUserFromOtherRooms(playerId);
             const isGuest = Boolean(
-                userInfo?.email?.includes('@guest.') ||
-                userInfo?.email?.endsWith('@guest.songuess.local') ||
-                (!userInfo?.email && (login?.startsWith('guest_') || login?.includes('_guest_')))
+                (userInfo as any)?.isGuest ||
+                (userInfo as any)?.email?.includes('@guest.') ||
+                (userInfo as any)?.email?.endsWith('@guest.songuess.local') ||
+                (!userInfo && (login?.startsWith('guest_') || login?.includes('_guest_')))
             );
             player = {
                 id: playerId,

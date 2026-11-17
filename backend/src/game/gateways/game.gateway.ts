@@ -9,13 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { wsCorsOptions } from '../../common/config/cors.config';
 import { GameService } from '../services/game/game.service';
 
 @WebSocketGateway({
-    cors: {
-        origin: true,
-        credentials: true,
-    },
+    cors: wsCorsOptions,
 })
 @Injectable()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Optional } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { DAILY_TRACKS_BANK, DailyTrack } from './daily-tracks.bank';
 import { isFuzzyMatch } from '../utils/gameplay/fuzzy-match.util';
@@ -305,23 +305,36 @@ export class DailyService {
         const matchFull = isFuzzyMatch(normalizedGuess, fullExpected);
         const isCorrect = matchResult.isMatch || (matchFull.isMatch && !matchResult.isArtistMatch);
 
-        const isGameOver = isCorrect || attempt >= 6;
+        let existingAttempts: Array<{ text: string; isCorrect: boolean }> = [];
+        if (userId && this.redisService) {
+            const cachedAttempts = await this.redisService.get(`songuess:daily_attempts:${userId}:${dateStr}`);
+            if (cachedAttempts) {
+                try {
+                    const parsed = JSON.parse(cachedAttempts);
+                    if (Array.isArray(parsed)) existingAttempts = parsed;
+                } catch {
+                    existingAttempts = [];
+                }
+            }
+        }
+
+        const effectiveAttempt =
+            userId && this.redisService
+                ? Math.min(6, existingAttempts.length + 1)
+                : Math.min(6, Math.max(1, Number(attempt) || 1));
+
+        const isGameOver = isCorrect || effectiveAttempt >= 6;
 
         if (userId && this.redisService) {
             if (isGameOver) {
                 await this.redisService.del(`songuess:daily_attempts:${userId}:${dateStr}`);
             } else {
-                let attemptsHistory: Array<{ text: string; isCorrect: boolean }> = [];
-                const cachedAttempts = await this.redisService.get(`songuess:daily_attempts:${userId}:${dateStr}`);
-                if (cachedAttempts) {
-                    try {
-                        attemptsHistory = JSON.parse(cachedAttempts);
-                    } catch {
-                        attemptsHistory = [];
-                    }
-                }
-                attemptsHistory.push({ text: normalizedGuess, isCorrect: false });
-                await this.redisService.set(`songuess:daily_attempts:${userId}:${dateStr}`, JSON.stringify(attemptsHistory), 86400);
+                existingAttempts.push({ text: normalizedGuess, isCorrect: false });
+                await this.redisService.set(
+                    `songuess:daily_attempts:${userId}:${dateStr}`,
+                    JSON.stringify(existingAttempts),
+                    86400,
+                );
             }
         }
 
@@ -331,6 +344,9 @@ export class DailyService {
 
             if (userId) {
                 const user = await this.prisma.user.findUnique({ where: { id: userId } });
+                if (!user) {
+                    throw new UnauthorizedException('User no longer exists');
+                }
 
                 if (isCorrect) {
                     // Обчислюємо збереження щоденного стріку
@@ -345,7 +361,7 @@ export class DailyService {
                 }
 
                 maxStreak = Math.max(user?.maxDailyStreak || 0, newStreak);
-                const score = isCorrect ? Math.max(100, 700 - attempt * 100) : 0;
+                const score = isCorrect ? Math.max(100, 700 - effectiveAttempt * 100) : 0;
 
                 if (typeof this.prisma.$transaction === 'function') {
                     await this.prisma.$transaction([
@@ -354,7 +370,7 @@ export class DailyService {
                                 userId,
                                 date: dateStr,
                                 dayNumber,
-                                guessesCount: attempt,
+                                guessesCount: effectiveAttempt,
                                 isSolved: isCorrect,
                                 score,
                             },
@@ -374,7 +390,7 @@ export class DailyService {
                             userId,
                             date: dateStr,
                             dayNumber,
-                            guessesCount: attempt,
+                            guessesCount: effectiveAttempt,
                             isSolved: isCorrect,
                             score,
                         },
@@ -394,12 +410,12 @@ export class DailyService {
                 }
             }
 
-            const shareText = this.generateShareText(dayNumber, attempt, isCorrect, newStreak);
+            const shareText = this.generateShareText(dayNumber, effectiveAttempt, isCorrect, newStreak);
 
             return {
                 isCorrect,
                 isGameOver: true,
-                attemptsUsed: attempt,
+                attemptsUsed: effectiveAttempt,
                 track: {
                     title: track.title,
                     artistName: track.artistName,
@@ -413,8 +429,8 @@ export class DailyService {
         return {
             isCorrect: false,
             isGameOver: false,
-            attemptsUsed: attempt,
-            attemptsLeft: 6 - attempt,
+            attemptsUsed: effectiveAttempt,
+            attemptsLeft: 6 - effectiveAttempt,
         };
     }
 }

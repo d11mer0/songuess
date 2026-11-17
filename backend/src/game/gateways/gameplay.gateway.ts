@@ -4,18 +4,25 @@ import {
     SubscribeMessage,
     MessageBody,
     ConnectedSocket,
+    WsException,
 } from '@nestjs/websockets';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { wsCorsOptions } from '../../common/config/cors.config';
 import { GameplayService } from '../services/gameplay/gameplay.service';
 import { SubmitAnswerDto } from '../dto/submit-answer.dto';
 import { LaunchGameDto } from '../dto/launch-game.dto';
 
 @WebSocketGateway({
-    cors: {
-        origin: true,
-        credentials: true,
-    },
+    cors: wsCorsOptions,
 })
+@UsePipes(
+    new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        exceptionFactory: (errors) => new WsException(errors),
+    }),
+)
 export class GameplayGateway {
     @WebSocketServer()
     server: Server;

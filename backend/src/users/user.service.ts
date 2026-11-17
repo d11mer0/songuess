@@ -68,9 +68,17 @@ export class UserService {
             isPremium: true,
             nameColor: true,
             customTitle: true,
+            dailyStreak: true,
+            maxDailyStreak: true,
         });
+        const isGuest = Boolean(
+            user.email?.includes('@guest.') ||
+            user.email?.endsWith('@guest.songuess.local'),
+        );
+        const { email: _omittedEmail, ...publicProfile } = user;
         return {
-            ...user,
+            ...publicProfile,
+            isGuest,
             avatar: user.avatar || DEFAULT_AVATAR_URL,
         };
     }
@@ -134,11 +142,10 @@ export class UserService {
 
     async setPresetAvatar(userId: number, presetId: string) {
         const preset = PRESET_AVATARS.find((p) => p.id === presetId);
-        const avatarUrl = preset ? preset.svgDataUri : presetId;
-
-        if (!avatarUrl.startsWith('data:image/svg+xml')) {
+        if (!preset) {
             throw new BadRequestException('Невалідний пресет аватара');
         }
+        const avatarUrl = preset.svgDataUri;
 
         await this.prisma.user.update({
             where: { id: userId },
