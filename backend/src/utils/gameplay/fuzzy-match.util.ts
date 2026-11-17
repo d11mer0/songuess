@@ -30,21 +30,26 @@ export function normalizeText(text: string): string {
     return cleaned.replace(/\s+/g, ' ').trim();
 }
 
+const MAX_LEVENSHTEIN_LEN = 200;
+
 export function levenshteinDistance(a: string, b: string): number {
-    if (a === b) return 0;
-    if (a.length === 0) return b.length;
-    if (b.length === 0) return a.length;
+    const strA = a.length > MAX_LEVENSHTEIN_LEN ? a.slice(0, MAX_LEVENSHTEIN_LEN) : a;
+    const strB = b.length > MAX_LEVENSHTEIN_LEN ? b.slice(0, MAX_LEVENSHTEIN_LEN) : b;
+
+    if (strA === strB) return 0;
+    if (strA.length === 0) return strB.length;
+    if (strB.length === 0) return strA.length;
 
     const row: number[] = [];
-    for (let j = 0; j <= b.length; j++) {
+    for (let j = 0; j <= strB.length; j++) {
         row[j] = j;
     }
 
-    for (let i = 1; i <= a.length; i++) {
+    for (let i = 1; i <= strA.length; i++) {
         let prev = i;
-        for (let j = 1; j <= b.length; j++) {
+        for (let j = 1; j <= strB.length; j++) {
             let val: number;
-            if (a[i - 1] === b[j - 1]) {
+            if (strA[i - 1] === strB[j - 1]) {
                 val = row[j - 1];
             } else {
                 val = Math.min(row[j - 1] + 1, prev + 1, row[j] + 1);
@@ -52,10 +57,10 @@ export function levenshteinDistance(a: string, b: string): number {
             row[j - 1] = prev;
             prev = val;
         }
-        row[b.length] = prev;
+        row[strB.length] = prev;
     }
 
-    return row[b.length];
+    return row[strB.length];
 }
 
 export function calculateSimilarity(a: string, b: string): number {

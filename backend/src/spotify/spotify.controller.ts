@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { SpotifyService } from './spotify.service';
 import { Public } from '../common/decorators/public.decorator';
 
@@ -9,13 +9,19 @@ export class SpotifyController {
     @Public()
     @Get('search')
     async searchArtist(@Query('query') query: string) {
-        return this.spotifyService.searchArtist(query);
+        if (!query || !query.trim()) {
+            throw new BadRequestException('Search query cannot be empty');
+        }
+        return this.spotifyService.searchArtist(query.trim());
     }
 
     @Public()
     @Get('track')
     async searchTrack(@Query('query') query: string) {
-        return this.spotifyService.searchTrack(query);
+        if (!query || !query.trim()) {
+            throw new BadRequestException('Search query cannot be empty');
+        }
+        return this.spotifyService.searchTrack(query.trim());
     }
 
     @Get('top-tracks')
@@ -35,7 +41,10 @@ export class SpotifyController {
 
     @Get('search-album')
     async searchAlbum(@Query('query') query: string) {
-        return await this.spotifyService.searchAlbum(query);
+        if (!query || !query.trim()) {
+            throw new BadRequestException('Search query cannot be empty');
+        }
+        return await this.spotifyService.searchAlbum(query.trim());
     }
 
     @Get('album-info')

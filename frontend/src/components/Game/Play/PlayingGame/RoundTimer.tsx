@@ -4,6 +4,7 @@ import { selectTrackInfo, selectRoundResult, selectCurrentRoom } from '../../../
 import { soundEffects } from '../../../../utils/audio/soundEffects';
 import { FaRegClock } from 'react-icons/fa';
 import { useTranslation } from '../../../../i18n/LanguageContext';
+import { getServerNow, updateServerClockOffset } from '../../../../utils/calculateStartTime';
 import styles from './RoundTimer.module.css';
 
 const RoundTimer: React.FC = memo(() => {
@@ -22,20 +23,25 @@ const RoundTimer: React.FC = memo(() => {
 
     useEffect(() => {
         lastTickedSecondRef.current = null;
+        if (trackInfo?.serverTime) {
+            updateServerClockOffset(trackInfo.serverTime);
+        }
         if (trackInfo?.startedAt) {
             const initialDeadline = trackInfo.endsAt ?? (trackInfo.startedAt + fallbackRoundMs);
-            setRemainingMs(Math.max(0, initialDeadline - Date.now()));
+            setRemainingMs(Math.max(0, initialDeadline - getServerNow()));
         }
-    }, [trackInfo?.roundNumber, trackInfo?.startedAt, trackInfo?.endsAt, fallbackRoundMs]);
+    }, [trackInfo?.roundNumber, trackInfo?.startedAt, trackInfo?.endsAt, trackInfo?.serverTime, fallbackRoundMs]);
 
     useEffect(() => {
         if (!trackInfo?.startedAt || roundResult) return;
 
-        // Якщо бекенд передає endsAt — використовуємо його (враховує clock skew між сервером і клієнтом).
+        if (trackInfo?.serverTime) {
+            updateServerClockOffset(trackInfo.serverTime);
+        }
         const deadline = trackInfo.endsAt ?? (trackInfo.startedAt + fallbackRoundMs);
 
         const updateTimer = () => {
-            const remaining = Math.max(0, deadline - Date.now());
+            const remaining = Math.max(0, deadline - getServerNow());
             setRemainingMs(remaining);
 
             const secondsLeft = Math.ceil(remaining / 1000);
@@ -53,7 +59,7 @@ const RoundTimer: React.FC = memo(() => {
         const interval = setInterval(updateTimer, 200);
 
         return () => clearInterval(interval);
-    }, [trackInfo?.startedAt, trackInfo?.endsAt, roundResult, fallbackRoundMs]);
+    }, [trackInfo?.startedAt, trackInfo?.endsAt, trackInfo?.serverTime, roundResult, fallbackRoundMs]);
 
     if (!trackInfo || roundResult) return null;
 

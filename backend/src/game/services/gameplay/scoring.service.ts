@@ -20,10 +20,12 @@ export class ScoringService {
             room.gameProgress!.streaks = {};
         }
 
-        const resultsArray = room.players.map((p) => ({
-            playerId: p.id,
-            ...playerResults[p.id][roundNumber],
-        }));
+        const resultsArray = room.players
+            .filter((p) => Boolean(playerResults[p.id]?.[roundNumber]))
+            .map((p) => ({
+                playerId: p.id,
+                ...playerResults[p.id][roundNumber],
+            }));
 
         const correctSorted = resultsArray
             .filter((r) => r.isCorrect && r.timeTaken !== null)
@@ -64,7 +66,8 @@ export class ScoringService {
             playerResults[playerId][roundNumber].score = score;
             playerResults[playerId][roundNumber].streak = currentStreak;
 
-            if (this.achievementService) {
+            const player = room.players.find((p) => p.id === playerId);
+            if (this.achievementService && room.players.length >= 2 && player && !player.isGuest) {
                 if (isCorrect && timeTaken !== null && timeTaken < 1000) {
                     this.achievementService.awardAchievement(playerId, 'SNIPER_1S').catch(() => {});
                 }

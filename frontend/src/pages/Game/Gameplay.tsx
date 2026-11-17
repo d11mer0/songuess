@@ -29,9 +29,6 @@ const Gameplay = () => {
     useEffect(() => {
         if (!currentRoom) {
             socketEmitter.emit('getCurrentRoom');
-            if (id) {
-                socketEmitter.emit('joinRoom', { id });
-            }
             const timer = setTimeout(() => {
                 setIsReconnecting(false);
             }, 3000);

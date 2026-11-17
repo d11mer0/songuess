@@ -10,6 +10,7 @@ export interface RoundTrackWithoutPreview {
 }
 
 export interface GameEndedPayload {
+    roomId?: string;
     myResults: {
         roundNumber: number;
         isCorrect: boolean;

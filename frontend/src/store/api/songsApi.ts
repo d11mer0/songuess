@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import customBaseQuery from './customBaseQuery';
 
-interface Song {
+export interface Song {
     id: string;
     title: string;
     author: string;
@@ -34,7 +34,7 @@ export const songsApi = createApi({
         updateSong: builder.mutation<Song, Partial<Song> & { id: string }>({
             query: ({ id, ...songData }) => ({
                 url: `/songs/${id}`,
-                method: 'PUT',
+                method: 'PATCH',
                 body: songData,
             }),
             invalidatesTags: (result, error, { id }) => [{ type: 'Songs', id }],

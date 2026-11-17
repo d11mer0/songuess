@@ -32,6 +32,7 @@ const ArtistTracks: React.FC<ArtistTracksProps> = ({
                 id: track.id,
                 title: track.title,
                 preview: track.preview,
+                artist: track.artist,
                 album: {
                     id: track.album?.id,
                     title: track.album?.title,

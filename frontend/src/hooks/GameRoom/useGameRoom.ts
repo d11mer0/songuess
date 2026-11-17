@@ -1,23 +1,19 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import {
-    socketEmitter,
-    socketHandlers,
-} from '../../services/socket';
+import { socketEmitter } from '../../services/socket';
 import { useGameRoomListeners } from './useGameRoomListeners';
-import { LobbyOptions} from '../../types/roomTypes';
+import { LobbyOptions } from '../../types/roomTypes';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createKickMember } from '../../utils/socketUtils/createKickMember';
 import { useSocketConnection } from '../common/useSocketConnection';
-import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
-import { selectCurrentRoom} from '../../store/gameplay/gameplaySelectors';
-import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
+import { selectCurrentRoom } from '../../store/gameplay/gameplaySelectors';
+import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 
 export const useGameRoom = () => {
     const dispatch = useAppDispatch();
     const roomInfo = useAppSelector(selectCurrentRoom);
     const kickMember = createKickMember(roomInfo?.id);
-    
+
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
@@ -29,13 +25,15 @@ export const useGameRoom = () => {
                 navigate(`/game?room=${id}`, { replace: true });
             }
         },
-        [navigate],
+        [navigate, searchParams],
     );
-    
+
     useSocketConnection();
     useGameRoomListeners();
-    useEffect(() => { socketEmitter.emit('getRooms') }, []);
-    
+    useEffect(() => {
+        socketEmitter.emit('getRooms');
+    }, []);
+
     const createRoom = useCallback((lobbyOptions: LobbyOptions) => {
         socketEmitter.emit('createRoom', lobbyOptions);
     }, []);
@@ -50,10 +48,9 @@ export const useGameRoom = () => {
             dispatch(setCurrentRoom(null));
             socketEmitter.emit('getRooms');
         }
-    }, [roomInfo]);
+    }, [dispatch, roomInfo]);
 
     const autoJoinRoom = useCallback(() => {
-        
         socketEmitter.emit('autoJoinRoom');
     }, []);
 
@@ -69,8 +66,7 @@ export const useGameRoom = () => {
             joinRoom(roomParam);
             updateSearchParams(null);
         }
-    }, [joinRoom, searchParams]);
-
+    }, [joinRoom, roomInfo, searchParams, updateSearchParams]);
 
     return {
         createRoom,

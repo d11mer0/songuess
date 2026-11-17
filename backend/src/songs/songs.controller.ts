@@ -6,6 +6,7 @@ import {
     Delete,
     Param,
     Body,
+    ParseIntPipe,
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -46,8 +47,8 @@ export class SongsController {
         type: SongResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Пісня не знайдена' })
-    getSongById(@Param('id') id: number) {
-        return this.songService.getSongById(Number(id));
+    getSongById(@Param('id', ParseIntPipe) id: number) {
+        return this.songService.getSongById(id);
     }
 
     @UseGuards(AdminGuard)
@@ -73,8 +74,8 @@ export class SongsController {
     })
     @ApiResponse({ status: 404, description: 'Пісня не знайдена' })
     @ApiUpdateSong
-    updateSong(@Param('id') id: number, @Body() dto: UpdateSongDto) {
-        return this.songService.updateSong(Number(id), dto);
+    updateSong(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateSongDto) {
+        return this.songService.updateSong(id, dto);
     }
 
     @UseGuards(AdminGuard)
@@ -82,7 +83,7 @@ export class SongsController {
     @ApiOperation({ summary: 'Видалити пісню' })
     @ApiResponse({ status: 200, description: 'Пісня видалена' })
     @ApiResponse({ status: 404, description: 'Пісня не знайдена' })
-    deleteSong(@Param('id') id: number) {
-        return this.songService.deleteSong(Number(id));
+    deleteSong(@Param('id', ParseIntPipe) id: number) {
+        return this.songService.deleteSong(id);
     }
 }

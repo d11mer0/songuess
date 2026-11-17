@@ -8,7 +8,7 @@ import UserInfoPage from '../../../pages/Users/UserInfoPage';
 const UserRoutes: React.FC = () => (
     <Routes>
         <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/me" replace />} />
+            <Route path="/" element={<Navigate to="/user/me" replace />} />
             <Route path="me" element={<UserPage />} />
             <Route path=":id" element={<OtherUsersPage />} />
             <Route path="edit/:id" element={<UserInfoPage />} />

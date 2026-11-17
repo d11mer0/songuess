@@ -65,7 +65,10 @@ export class DeezerController {
 
     @Get('artist-playlists')
     async searchPlaylistsByArtist(@Query('query') query: string) {
-        return this.deezerService.searchPlaylistsByArtist(query);
+        if (!query || !query.trim()) {
+            throw new BadRequestException('Search query cannot be empty');
+        }
+        return this.deezerService.searchPlaylistsByArtist(query.trim());
     }
 
     @Get('curated-themes')

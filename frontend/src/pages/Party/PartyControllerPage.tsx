@@ -12,6 +12,7 @@ import { useTranslation } from '../../i18n/LanguageContext';
 import { useToast } from '../../components/UI/Toast/ToastContext';
 import { LanguageSwitcher } from '../../i18n/LanguageSwitcher';
 import { RoomState } from '../../types/roomTypes';
+import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 import Loader from '../../components/UI/Loader/Loader/Loader';
 import confetti from 'canvas-confetti';
 import styles from './PartyControllerPage.module.css';
@@ -74,8 +75,6 @@ const PartyControllerPage: React.FC = () => {
         tRef.current = t;
     }, [t]);
 
-    const [partyModeDisabledData, setPartyModeDisabledData] = useState<any | null>(null);
-    const [autoLeaveSeconds, setAutoLeaveSeconds] = useState(20);
 
     const [guestLogin, { isLoading: isLoggingIn }] = useGuestLoginMutation();
     const [triggerCheckRoom, { isFetching: isCheckingRoom }] = useLazyCheckRoomQuery();
@@ -85,6 +84,10 @@ const PartyControllerPage: React.FC = () => {
     const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
     const [roundResult, setRoundResult] = useState<RoundResultPayload | null>(null);
     const [isGameFinished, setIsGameFinished] = useState(false);
+    const isGameFinishedRef = useRef(isGameFinished);
+    isGameFinishedRef.current = isGameFinished;
+    const currentRoomRef = useRef(currentRoom);
+    currentRoomRef.current = currentRoom;
 
     useSocketConnection();
 
@@ -154,7 +157,6 @@ const PartyControllerPage: React.FC = () => {
     // Safe leave handler when party mode ends or user leaves
     const handleLeaveParty = useCallback((messageOrEvent?: string | any) => {
         const message = typeof messageOrEvent === 'string' ? messageOrEvent : undefined;
-        setPartyModeDisabledData(null);
         setIsGameFinished(false);
         setCurrentRound(null);
         setRoundResult(null);
@@ -186,43 +188,15 @@ const PartyControllerPage: React.FC = () => {
         }
     }, [currentRoom?.id, dispatch, navigate, roomCode, showToast, user?.email]);
 
-    // Continue in regular mode when host switched off TV mode
-    const handleContinueRegularMode = useCallback(() => {
-        const targetRoom = partyModeDisabledData?.room || currentRoom;
-        const targetId = partyModeDisabledData?.roomId || currentRoom?.id || roomCode;
-        setPartyModeDisabledData(null);
+    const handleLeavePartyRef = useRef(handleLeaveParty);
+    handleLeavePartyRef.current = handleLeaveParty;
 
-        if (targetRoom?.state === RoomState.ADDING) {
-            navigate('/game');
-        } else {
-            navigate(`/game/${targetId}`);
-        }
-    }, [currentRoom, navigate, partyModeDisabledData, roomCode]);
-
-    // Auto-leave countdown timer when host disables party mode
-    useEffect(() => {
-        if (!partyModeDisabledData) return;
-
-        setAutoLeaveSeconds(20);
-        const interval = setInterval(() => {
-            setAutoLeaveSeconds((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    handleLeaveParty();
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [partyModeDisabledData, handleLeaveParty]);
 
     // Socket events for party controller
     useEffect(() => {
         const handleJoinedRoom = (room: any) => {
             if (room) {
-                dispatch(setCurrentRoom(room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
                 clearJoinError();
             } else {
                 setJoinErrorKey('party.roomNotFoundOrClosed');
@@ -230,12 +204,6 @@ const PartyControllerPage: React.FC = () => {
         };
 
         const handleGameStarted = (room: any) => {
-            if (partyModeDisabledData) {
-                // If game starts in regular mode and user has not chosen to continue,
-                // safely leave to avoid stalling the host's round
-                handleLeaveParty();
-                return;
-            }
             handleJoinedRoom(room);
         };
 
@@ -266,9 +234,22 @@ const PartyControllerPage: React.FC = () => {
 
         const handleRoundResult = (payload: RoundResultPayload) => {
             setRoundResult(payload);
+            const latestRoom = currentRoomRef.current;
+            if (latestRoom && Array.isArray(payload?.results)) {
+                const scoreMap = new Map(
+                    payload.results.map((r) => [String(r.playerId), r.totalScore]),
+                );
+                const updatedPlayers = latestRoom.players.map((p) => {
+                    const nextScore = scoreMap.get(String(p.id));
+                    return nextScore !== undefined ? { ...p, totalScore: nextScore } : p;
+                });
+                dispatch(setCurrentRoom({ ...latestRoom, players: updatedPlayers }));
+            }
         };
 
         const handleGameFinished = () => {
+            if (isGameFinishedRef.current) return;
+            isGameFinishedRef.current = true;
             setIsGameFinished(true);
             try {
                 confetti({
@@ -281,8 +262,9 @@ const PartyControllerPage: React.FC = () => {
 
         const handleGameRestarted = (room: any) => {
             if (room) {
-                dispatch(setCurrentRoom(room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
+            isGameFinishedRef.current = false;
             setIsGameFinished(false);
             setCurrentRound(null);
             setRoundResult(null);
@@ -293,7 +275,7 @@ const PartyControllerPage: React.FC = () => {
 
         const handlePartyModeSwitched = (data: any) => {
             if (data?.room) {
-                dispatch(setCurrentRoom(data.room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             }
             if (data?.isPartyMode === false) {
                 const isGuestUser = Boolean(
@@ -301,20 +283,18 @@ const PartyControllerPage: React.FC = () => {
                     user?.email?.includes('@guest.')
                 );
                 if (isGuestUser) {
-                    handleLeaveParty(tRef.current('party.guestKickedNotice'));
+                    handleLeavePartyRef.current(tRef.current('party.guestKickedNotice'));
                     return;
                 }
                 // Host turned off TV mode! For registered users: smoothly transition to regular lobby
-                const targetState = data?.room?.state || currentRoom?.state;
-                const targetId = data?.roomId || data?.room?.id || currentRoom?.id || roomCode;
+                const latestRoom = currentRoomRef.current;
+                const targetState = data?.room?.state || latestRoom?.state;
+                const targetId = data?.roomId || data?.room?.id || latestRoom?.id || roomCode;
                 if (targetState === RoomState.CREATING || targetState === RoomState.STARTED) {
                     navigate(`/game/${targetId}`);
                 } else {
                     navigate('/game');
                 }
-            } else if (data?.isPartyMode === true) {
-                // Host turned TV mode back on!
-                setPartyModeDisabledData(null);
             }
         };
 
@@ -340,7 +320,7 @@ const PartyControllerPage: React.FC = () => {
                     navigate('/game');
                 }
             } else {
-                dispatch(setCurrentRoom(room));
+                dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
         };
 
@@ -371,7 +351,7 @@ const PartyControllerPage: React.FC = () => {
             socketHandlers.off('roomDeleted', handleRoomDeleted);
             socketHandlers.off('playerLeft', handlePlayerLeft);
         };
-    }, [clearJoinError, currentRoom?.players, dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, showToast, user]);
+    }, [clearJoinError, dispatch, navigate, roomCode, showToast, user]);
 
     // Ensure finished state is preserved if refreshed when game is ended
     useEffect(() => {
@@ -566,43 +546,6 @@ const PartyControllerPage: React.FC = () => {
                             onClick={() => navigate('/')}
                         >
                             🏠 {t('party.backHome')}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // View 1.5: Party Mode Disabled by Host (Smart Transition Screen)
-    if (partyModeDisabledData) {
-        return (
-            <div className={styles.container}>
-                {renderLanguageBar()}
-                <div className={styles.authCard}>
-                    <div className={styles.authIcon}>📺</div>
-                    <h1 className={styles.authTitle}>{t('party.modeDisabledTitle')}</h1>
-                    <p className={styles.authSubtitle} style={{ lineHeight: 1.5, marginBottom: '16px' }}>
-                        {t('party.modeDisabledDesc')}
-                    </p>
-
-                    <div className={styles.countdownBadge}>
-                        ⏳ {t('party.autoLeaveCountdown', { seconds: autoLeaveSeconds })}
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-                        <button
-                            type="button"
-                            className={styles.submitBtn}
-                            onClick={handleContinueRegularMode}
-                        >
-                            {t('party.continueInRegularMode')}
-                        </button>
-                        <button
-                            type="button"
-                            className={`${styles.submitBtn} ${styles.leaveBtn}`}
-                            onClick={() => handleLeaveParty()}
-                        >
-                            {t('party.leavePartyGame')}
                         </button>
                     </div>
                 </div>

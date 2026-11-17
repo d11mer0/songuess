@@ -2,13 +2,14 @@ import { HttpService } from '@nestjs/axios';
 import {
     BadRequestException,
     Injectable,
-    InternalServerErrorException,
+    Logger,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import * as qs from 'qs';
 
 @Injectable()
 export class SpotifyService {
+    private readonly logger = new Logger(SpotifyService.name);
     private readonly clientId: string;
     private readonly clientSecret: string;
     private readonly tokenUrl = 'https://accounts.spotify.com/api/token';
@@ -27,13 +28,14 @@ export class SpotifyService {
         this.clientSecret = process.env.SPOTIFY_CLIENT_SECRET ?? '';
 
         if (!this.clientId || !this.clientSecret) {
-            throw new InternalServerErrorException(
-                'Spotify credentials are missing in environment variables.',
-            );
+            this.logger.warn('Spotify credentials are missing; Spotify endpoints will be unavailable.');
         }
     }
 
     async getAccessToken(): Promise<string> {
+        if (!this.clientId || !this.clientSecret) {
+            throw new BadRequestException('Spotify credentials are not configured.');
+        }
         if (
             this.accessToken &&
             this.tokenExpiresAt &&
@@ -80,6 +82,7 @@ export class SpotifyService {
     }
 
     async searchArtist(query: string) {
+        if (!query || !query.trim()) throw new BadRequestException('Search query cannot be empty');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(
@@ -111,6 +114,7 @@ export class SpotifyService {
     }
 
     async searchTrack(query: string) {
+        if (!query || !query.trim()) throw new BadRequestException('Search query cannot be empty');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(
@@ -219,6 +223,7 @@ export class SpotifyService {
         }
     }
     async searchAlbum(query: string) {
+        if (!query || !query.trim()) throw new BadRequestException('Search query cannot be empty');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(

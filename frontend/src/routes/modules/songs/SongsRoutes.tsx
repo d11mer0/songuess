@@ -9,7 +9,6 @@ const ArtistPage = lazy(() => import('../../../pages/Songs/ArtistPage'));
 const AlbumPage = lazy(() => import('../../../pages/Songs/AlbumPage'));
 const TrackPage = lazy(() => import('../../../pages/Songs/TrackPage'));
 const PlaylistPage = lazy(() => import('../../../pages/Songs/PlaylistPage'));
-const EditSongPage = lazy(() => import('../../../pages/Songs/EditSongPage'));
 
 const SongsRoutes: React.FC = () => (
     <Suspense fallback={<Loader />}>
@@ -21,7 +20,6 @@ const SongsRoutes: React.FC = () => (
             <Route path="/track" element={<TrackPage />} />
             <Route element={<ProtectedRoute />}>
                 <Route path="/create" element={<CreateSongPage />} />
-                <Route path="/edit/:id" element={<EditSongPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/error" replace />} />
         </Routes>

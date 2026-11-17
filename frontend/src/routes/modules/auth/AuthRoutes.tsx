@@ -9,7 +9,7 @@ import ResetPasswordPage from '../../../pages/Auth/ResetPasswordPage';
 const AuthRoutes: React.FC = () => (
     <Routes>
         <Route element={<GuestRoute />}>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/auth/login" replace />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />

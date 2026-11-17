@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, UnauthorizedException, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { DAILY_TRACKS_BANK, DailyTrack } from './daily-tracks.bank';
-import { isFuzzyMatch } from '../utils/gameplay/fuzzy-match.util';
+import { calculateSimilarity, isFuzzyMatch, normalizeText } from '../utils/gameplay/fuzzy-match.util';
 import { AchievementService } from '../achievements/achievement.service';
 import { DeezerService } from '../deezer/deezer.service';
 import { RedisService } from '../redis/redis.service';
@@ -9,6 +9,8 @@ import { shuffleArray } from '../utils/array';
 
 @Injectable()
 export class DailyService {
+    private readonly submitLocks = new Map<string, Promise<unknown>>();
+
     constructor(
         private readonly prisma: PrismaService,
         @Optional()
@@ -82,14 +84,25 @@ export class DailyService {
         let previewUrl = track.preview;
         if (this.deezerService) {
             try {
-                const query = `${track.artistName} ${track.title}`;
-                const searchRes = await this.deezerService.search(query, 'track');
-                if (searchRes?.data && searchRes.data.length > 0) {
-                    const match = searchRes.data.find(
-                        (t: any) => t.preview && t.preview.length > 0,
-                    );
-                    if (match?.preview) {
-                        previewUrl = match.preview;
+                let resolvedFromId = false;
+                const numericId = Number(track.id);
+                if (Number.isInteger(numericId) && numericId > 0) {
+                    const byId = await this.deezerService.getTrackById(numericId).catch(() => null);
+                    if (byId?.preview && byId.preview.length > 0) {
+                        previewUrl = byId.preview;
+                        resolvedFromId = true;
+                    }
+                }
+                if (!resolvedFromId) {
+                    const query = `${track.artistName} ${track.title}`;
+                    const searchRes = await this.deezerService.search(query, 'track');
+                    if (searchRes?.data && searchRes.data.length > 0) {
+                        const match = searchRes.data.find(
+                            (t: any) => t.preview && t.preview.length > 0,
+                        );
+                        if (match?.preview) {
+                            previewUrl = match.preview;
+                        }
                     }
                 }
             } catch (err) {
@@ -261,9 +274,39 @@ export class DailyService {
             throw new BadRequestException('Guess must be a non-empty string');
         }
 
-        const dayNumber = this.getDayNumber();
         const dateStr = this.getTodayDateString();
-        const { track } = await this.resolveTodayChallengePool(dayNumber, dateStr);
+        if (!userId) {
+            return this.executeSubmitGuess(undefined, guess, attempt, dateStr);
+        }
+
+        const lockKey = `${userId}:${dateStr}`;
+        const prev = this.submitLocks.get(lockKey) ?? Promise.resolve();
+        const current = prev
+            .catch(() => undefined)
+            .then(() => this.executeSubmitGuess(userId, guess, attempt, dateStr));
+        this.submitLocks.set(lockKey, current);
+        try {
+            return await current;
+        } finally {
+            if (this.submitLocks.get(lockKey) === current) {
+                this.submitLocks.delete(lockKey);
+            }
+        }
+    }
+
+    private async executeSubmitGuess(
+        userId: number | undefined,
+        guess: string,
+        attempt: number,
+        dateStr: string,
+    ) {
+        const dayNumber = this.getDayNumber();
+        const normalizedGuess = guess.trim();
+        if (!normalizedGuess) {
+            throw new BadRequestException('Guess must be a non-empty string');
+        }
+
+        const { track, options } = await this.resolveTodayChallengePool(dayNumber, dateStr);
 
         if (userId) {
             // Перевіряємо, чи користувач вже завершив челендж на сьогодні
@@ -299,11 +342,28 @@ export class DailyService {
             }
         }
 
-        const normalizedGuess = guess.trim();
         const fullExpected = `${track.artistName} - ${track.title}`;
+        const normGuess = normalizeText(normalizedGuess);
+        const normFullExpected = normalizeText(fullExpected);
+        const normArtist = normalizeText(track.artistName);
+        const normTitle = normalizeText(track.title);
+
+        const isSelectedOption = options.some(
+            (opt) => opt.trim().toLowerCase() === normalizedGuess.toLowerCase(),
+        );
         const matchResult = isFuzzyMatch(normalizedGuess, track.title, track.artistName);
         const matchFull = isFuzzyMatch(normalizedGuess, fullExpected);
-        const isCorrect = matchResult.isMatch || (matchFull.isMatch && !matchResult.isArtistMatch);
+        const fullNormalizedMatch = Boolean(normFullExpected) && normGuess === normFullExpected;
+        const containsTitle = Boolean(normTitle) && normGuess.includes(normTitle);
+        const artistSimilarity = normArtist ? calculateSimilarity(normalizedGuess, track.artistName) : 0;
+        const hasTitleBeyondArtist =
+            normGuess.length > normArtist.length + 1 && matchFull.similarity > artistSimilarity;
+
+        const isCorrect =
+            fullNormalizedMatch ||
+            (isSelectedOption && (matchFull.isMatch || matchResult.isMatch)) ||
+            matchResult.isMatch ||
+            (matchFull.isMatch && (containsTitle || hasTitleBeyondArtist || !matchResult.isArtistMatch));
 
         let existingAttempts: Array<{ text: string; isCorrect: boolean }> = [];
         if (userId && this.redisService) {
@@ -363,9 +423,30 @@ export class DailyService {
                 maxStreak = Math.max(user?.maxDailyStreak || 0, newStreak);
                 const score = isCorrect ? Math.max(100, 700 - effectiveAttempt * 100) : 0;
 
-                if (typeof this.prisma.$transaction === 'function') {
-                    await this.prisma.$transaction([
-                        this.prisma.dailyResult.create({
+                try {
+                    if (typeof this.prisma.$transaction === 'function') {
+                        await this.prisma.$transaction([
+                            this.prisma.dailyResult.create({
+                                data: {
+                                    userId,
+                                    date: dateStr,
+                                    dayNumber,
+                                    guessesCount: effectiveAttempt,
+                                    isSolved: isCorrect,
+                                    score,
+                                },
+                            }),
+                            this.prisma.user.update({
+                                where: { id: userId },
+                                data: {
+                                    dailyStreak: newStreak,
+                                    maxDailyStreak: maxStreak,
+                                    lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
+                                },
+                            }),
+                        ]);
+                    } else {
+                        await this.prisma.dailyResult.create({
                             data: {
                                 userId,
                                 date: dateStr,
@@ -374,35 +455,46 @@ export class DailyService {
                                 isSolved: isCorrect,
                                 score,
                             },
-                        }),
-                        this.prisma.user.update({
+                        });
+                        await this.prisma.user.update({
                             where: { id: userId },
                             data: {
                                 dailyStreak: newStreak,
                                 maxDailyStreak: maxStreak,
                                 lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
                             },
-                        }),
-                    ]);
-                } else {
-                    await this.prisma.dailyResult.create({
-                        data: {
-                            userId,
-                            date: dateStr,
-                            dayNumber,
-                            guessesCount: effectiveAttempt,
-                            isSolved: isCorrect,
-                            score,
-                        },
-                    });
-                    await this.prisma.user.update({
-                        where: { id: userId },
-                        data: {
-                            dailyStreak: newStreak,
-                            maxDailyStreak: maxStreak,
-                            lastDailyDate: isCorrect ? dateStr : user?.lastDailyDate,
-                        },
-                    });
+                        });
+                    }
+                } catch (err: any) {
+                    if (err?.code === 'P2002') {
+                        const saved = await this.prisma.dailyResult.findUnique({
+                            where: { userId_date: { userId, date: dateStr } },
+                        });
+                        if (saved) {
+                            const updatedUser = await this.prisma.user.findUnique({
+                                where: { id: userId },
+                                select: { dailyStreak: true, maxDailyStreak: true },
+                            });
+                            return {
+                                isCorrect: saved.isSolved,
+                                isGameOver: true,
+                                attemptsUsed: saved.guessesCount,
+                                track: {
+                                    title: track.title,
+                                    artistName: track.artistName,
+                                },
+                                streak: updatedUser?.dailyStreak ?? user?.dailyStreak ?? 0,
+                                maxStreak: updatedUser?.maxDailyStreak ?? user?.maxDailyStreak ?? 0,
+                                shareText: this.generateShareText(
+                                    dayNumber,
+                                    saved.guessesCount,
+                                    saved.isSolved,
+                                    updatedUser?.dailyStreak ?? 0,
+                                ),
+                            };
+                        }
+                    }
+                    throw err;
                 }
 
                 if (this.achievementService && newStreak >= 7) {

@@ -4,21 +4,35 @@ import {
     SubscribeMessage,
     ConnectedSocket,
     MessageBody,
+    WsException,
 } from '@nestjs/websockets';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { wsCorsOptions } from '../../../common/config/cors.config';
 import { RoomManagerService } from '../../services/room/room-manager.service';
 import { RoomQueryService } from '../../services/room/room-query.service';
 import { RoomHelperService } from '../../services/room/room-helper.service';
 import { MatchmakingService } from '../../services/room/matchmaking.service';
-import { LobbyOptions, GameRoomState } from '../../interfaces/game.interface';
+import { GameRoomState } from '../../interfaces/game.interface';
 import { RoundSyncService } from '../../services/game/round-sync.service';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
+import {
+    CreateRoomDto,
+    JoinRoomByCodeDto,
+    JoinRoomDto,
+    RoomIdOptionalDto,
+} from '../../dto/room-actions.dto';
 
 @WebSocketGateway({
     cors: wsCorsOptions,
 })
+@UsePipes(
+    new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        exceptionFactory: (errors) => new WsException(errors),
+    }),
+)
 @Injectable()
 export class RoomLobbyGateway {
     @WebSocketServer()
@@ -36,31 +50,36 @@ export class RoomLobbyGateway {
         this.roomManagerService.setServer(this.server);
         this.matchmakingService.setServer(this.server);
     }
+
     @SubscribeMessage('createRoom')
     async handleCreateRoom(
         @ConnectedSocket() client: Socket,
-        @MessageBody() lobbyOptions: LobbyOptions,
+        @MessageBody() lobbyOptions: CreateRoomDto,
     ) {
         const user = client.data.user;
         if (!user) return;
 
-        const roomId = await this.roomManagerService.createRoom(
-            user.id,
-            user.login,
-            lobbyOptions,
-        );
-        client.join(roomId);
-        const room = this.roomQueryService.getRoomInfo(
-            roomId,
-            this.roomManagerService.allRooms,
-        );
-        this.server.to(roomId).emit('roomCreated', room);
+        try {
+            const roomId = await this.roomManagerService.createRoom(
+                user.id,
+                user.login,
+                lobbyOptions,
+            );
+            client.join(roomId);
+            const room = this.roomQueryService.getRoomInfo(
+                roomId,
+                this.roomManagerService.allRooms,
+            );
+            this.server.to(roomId).emit('roomCreated', room);
+        } catch (err) {
+            throw new WsException((err as Error)?.message || 'Failed to create room');
+        }
     }
 
     @SubscribeMessage('joinRoom')
     async handleJoinRoom(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { id: string },
+        @MessageBody() data: JoinRoomDto,
     ) {
         const user = client.data.user;
         if (!user) return;
@@ -83,7 +102,7 @@ export class RoomLobbyGateway {
     @SubscribeMessage('joinRoomByCode')
     async handleJoinRoomByCode(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { code: string },
+        @MessageBody() data: JoinRoomByCodeDto,
     ) {
         return this.handleJoinRoom(client, { id: data.code });
     }
@@ -101,35 +120,42 @@ export class RoomLobbyGateway {
             if (updatedRoom) {
                 await client.join(updatedRoom.id);
                 this.server.to(updatedRoom.id).emit('joinedRoom', sanitizeRoom(updatedRoom));
+                if (updatedRoom.state === GameRoomState.STARTED && updatedRoom.gameProgress) {
+                    this.roundSyncService.syncOngoingRound(client, updatedRoom);
+                }
             }
         } else {
-            const newRoomId = await this.roomManagerService.createRoom(
-                user.id,
-                user.login,
-                {
-                    allowAutoJoin: true,
-                    publicLobby: true,
-                    maxPlayers: 9,
-                },
-            );
-            client.join(newRoomId);
-            const newRoom = this.roomQueryService.getRoomInfo(
-                newRoomId,
-                this.roomManagerService.allRooms,
-            );
-            this.server.to(newRoomId).emit('roomCreated', newRoom);
+            try {
+                const newRoomId = await this.roomManagerService.createRoom(
+                    user.id,
+                    user.login,
+                    {
+                        allowAutoJoin: true,
+                        publicLobby: true,
+                        maxPlayers: 9,
+                    },
+                );
+                client.join(newRoomId);
+                const newRoom = this.roomQueryService.getRoomInfo(
+                    newRoomId,
+                    this.roomManagerService.allRooms,
+                );
+                this.server.to(newRoomId).emit('roomCreated', newRoom);
+            } catch (err) {
+                throw new WsException((err as Error)?.message || 'Failed to create room');
+            }
         }
     }
 
     @SubscribeMessage('deleteRoom')
     handleDeleteRoom(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { id: string },
+        @MessageBody() data?: RoomIdOptionalDto,
     ) {
         const user = client.data.user;
         if (!user) return;
 
-        const room = this.roomHelperService.findRoom(data?.id)
+        const room = (data?.id ? this.roomHelperService.findRoom(data.id) : undefined)
             || this.roomHelperService.findRoomByPlayerId(user.id);
         if (!room) return;
 
@@ -146,8 +172,7 @@ export class RoomLobbyGateway {
             if (shortCode) {
                 this.server.to(shortCode).emit('roomDeleted', { roomId: canonicalId });
             }
-            // Вихід усіх сокетів з кімнати
-            for (const [socketId, socket] of this.server.sockets.sockets) {
+            for (const [, socket] of this.server.sockets.sockets) {
                 if (socket.rooms.has(canonicalId)) {
                     socket.leave(canonicalId);
                 }

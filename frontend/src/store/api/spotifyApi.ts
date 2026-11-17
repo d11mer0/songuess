@@ -6,24 +6,24 @@ export const spotifyApi = createApi({
     baseQuery: customBaseQuery,
     endpoints: (builder) => ({
         searchArtist: builder.query({
-            query: (artistName) => `/spotify/search?query=${artistName}`,
+            query: (artistName) => `/spotify/search?query=${encodeURIComponent(artistName)}`,
         }),
         getTopTracks: builder.query({
-            query: (artistId) => `/spotify/top-tracks?artistId=${artistId}`,
+            query: (artistId) => `/spotify/top-tracks?artistId=${encodeURIComponent(artistId)}`,
         }),
         getArtistAlbums: builder.query({
-            query: (artistId) => `/spotify/albums?artistId=${artistId}`,
+            query: (artistId) => `/spotify/albums?artistId=${encodeURIComponent(artistId)}`,
         }),
         getAlbumTracks: builder.query({
-            query: (albumId) => `/spotify/album-tracks?albumId=${albumId}`,
+            query: (albumId) => `/spotify/album-tracks?albumId=${encodeURIComponent(albumId)}`,
         }),
 
         // 🔹 Нові запити:
         searchAlbum: builder.query({
-            query: (albumName) => `/spotify/search-album?query=${albumName}`,
+            query: (albumName) => `/spotify/search-album?query=${encodeURIComponent(albumName)}`,
         }),
         getAlbumInfo: builder.query({
-            query: (albumId) => `/spotify/album-info?albumId=${albumId}`,
+            query: (albumId) => `/spotify/album-info?albumId=${encodeURIComponent(albumId)}`,
         }),
     }),
 });

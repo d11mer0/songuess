@@ -40,11 +40,11 @@ const DragAndDropZone: React.FC<DragAndDropZoneProps> = ({
                 return;
             }
 
-            if (file.size > 5 * 1024 * 1024) {
+            if (file.size > 2 * 1024 * 1024) {
                 setErrorMessage(
                     language === 'uk'
-                        ? 'Розмір файлу не повинен перевищувати 5MB!'
-                        : 'File size must not exceed 5MB!'
+                        ? 'Розмір файлу не повинен перевищувати 2MB!'
+                        : 'File size must not exceed 2MB!'
                 );
                 return;
             }
@@ -67,7 +67,7 @@ const DragAndDropZone: React.FC<DragAndDropZoneProps> = ({
                     : 'Or drag and drop your file here'}
             </div>
             <div className={styles.dropZoneSubText}>
-                PNG, JPG, WebP або GIF (макс. 5MB)
+                PNG, JPG, WebP або GIF (макс. 2MB)
             </div>
         </div>
     );

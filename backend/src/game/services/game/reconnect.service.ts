@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UserService } from '../../../users/user.service';
 import { RoomHelperService } from '../room/room-helper.service';
@@ -25,7 +25,11 @@ export class ReconnectService {
     }
 
     async reconnectRoom(client: Socket) {
-        await this.ensureClientHasUserData(client);
+        const ok = await this.ensureClientHasUserData(client);
+        if (!ok) {
+            client.emit('reconnectFailed');
+            return;
+        }
 
         const room = this.restorePlayerToRoom(client);
         if (!room) return;
@@ -33,17 +37,21 @@ export class ReconnectService {
         this.roundSyncService.syncOngoingRound(client, room);
     }
 
-    private async ensureClientHasUserData(client: Socket) {
-        if (!client.data.user) {
-            const userId = this.connectionService.getClientsMap().get(client.id);
-            if (!userId) throw new UnauthorizedException('No user with this id');
- 
-            const user = await this.userService.getUserById(userId);
-            if (!user) throw new UnauthorizedException('No user with this id');
-
-            client.data.user = { id: user.id, login: user.login };
+    private async ensureClientHasUserData(client: Socket): Promise<boolean> {
+        if (client.data.user?.id) {
+            return true;
         }
-        
+        const userId = this.connectionService.getClientsMap().get(client.id);
+        if (!userId) return false;
+
+        try {
+            const user = await this.userService.getUserById(userId);
+            if (!user) return false;
+            client.data.user = { id: user.id, login: user.login };
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     private restorePlayerToRoom(client: Socket): GameRoom | null {

@@ -6,6 +6,7 @@ export interface GameRoundPublicData {
     roundNumber: number; // номер раунду
     startedAt: number; // таймстемп старту раунду (у мілісекундах)
     endsAt?: number; // таймстемп завершення раунду — використовується для точного таймера
+    serverTime?: number;
 }
 
 export interface ArtistInfo {
@@ -40,6 +41,8 @@ export interface TrackItem {
 }
 
 export interface SelectedTracks {
+    genre?: string;
+    theme?: string;
     type?: GameType;
     artist?: ArtistInfo;
     playlist?: PlaylistInfo;

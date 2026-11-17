@@ -1,7 +1,8 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, Optional } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from './room-manager.service';
 import { RoomQueryService } from './room-query.service';
+import { RoomHelperService } from './room-helper.service';
 import { GameplayService } from '../gameplay/gameplay.service';
 import { DeezerService } from '../../../deezer/deezer.service';
 import { SelectedTracks, TrackItem } from '../../interfaces/tracks.interface';
@@ -17,6 +18,8 @@ interface QueuedPlayer {
 export class MatchmakingService {
     private server: Server | null = null;
     private duelQueue: QueuedPlayer[] = [];
+    private cancelledUsers = new Set<number>();
+    private pendingDuelTimers = new Map<string, NodeJS.Timeout>();
 
     constructor(
         private readonly roomManager: RoomManagerService,
@@ -24,15 +27,28 @@ export class MatchmakingService {
         @Inject(forwardRef(() => GameplayService))
         private readonly gameplayService: GameplayService,
         private readonly deezerService: DeezerService,
-    ) {}
+        @Optional()
+        @Inject(forwardRef(() => RoomHelperService))
+        private readonly roomHelperService?: RoomHelperService,
+    ) {
+        this.roomHelperService?.onRoomDisposed?.((roomId) => this.clearPendingDuelTimer(roomId));
+    }
 
     setServer(server: Server) {
         this.server = server;
     }
 
+    clearPendingDuelTimer(roomId: string) {
+        const timer = this.pendingDuelTimers.get(roomId);
+        if (timer) {
+            clearTimeout(timer);
+            this.pendingDuelTimers.delete(roomId);
+        }
+    }
+
     addToDuelQueue(socket: Socket, user: { id: number; login: string }) {
-        // Якщо гравець уже в черзі, оновлюємо сокет
-        this.removeFromDuelQueue(user.id);
+        this.cancelledUsers.delete(user.id);
+        this.duelQueue = this.duelQueue.filter((p) => p.userId !== user.id);
 
         this.duelQueue.push({
             userId: user.id,
@@ -50,24 +66,32 @@ export class MatchmakingService {
     }
 
     removeFromDuelQueue(userId: number) {
+        this.cancelledUsers.add(userId);
         this.duelQueue = this.duelQueue.filter((p) => p.userId !== userId);
     }
 
     removeBySocket(socketId: string) {
+        const target = this.duelQueue.find((p) => p.socket.id === socketId);
+        if (target) {
+            this.cancelledUsers.add(target.userId);
+        }
         this.duelQueue = this.duelQueue.filter((p) => p.socket.id !== socketId);
     }
 
+    private isPlayerAvailable(player: QueuedPlayer): boolean {
+        return !this.cancelledUsers.has(player.userId) && !player.socket.disconnected;
+    }
+
     private async checkAndStartMatch() {
-        // Очищуємо відключені сокети, щоб черга не зупинялася при застряглому першому гравці
         this.duelQueue = this.duelQueue.filter((p) => !p.socket.disconnected);
         if (this.duelQueue.length < 2) return;
 
         const player1 = this.duelQueue.shift()!;
         const player2 = this.duelQueue.shift()!;
+        let roomId: string | null = null;
 
         try {
-            // Створюємо кімнату для дуелі 1v1
-            const roomId = await this.roomManager.createRoom(
+            roomId = await this.roomManager.createRoom(
                 player1.userId,
                 player1.login,
                 {
@@ -80,11 +104,18 @@ export class MatchmakingService {
                 },
             );
 
-            // Підключаємо обох до кімнати на рівні Socket.IO
+            // Якщо player1 відмінив пошук або вийшов під час створення кімнати
+            if (!this.isPlayerAvailable(player1)) {
+                this.roomManager.deleteRoomBySystem(roomId);
+                if (this.isPlayerAvailable(player2)) {
+                    player2.socket.emit('duelError', 'Opponent cancelled matchmaking');
+                }
+                return;
+            }
+
             player1.socket.join(roomId);
             player2.socket.join(roomId);
 
-            // Другий гравець приєднується до кімнати
             const room = await this.roomManager.joinRoom(
                 roomId,
                 player2.userId,
@@ -92,12 +123,12 @@ export class MatchmakingService {
             );
 
             if (!room) {
+                this.roomManager.deleteRoomBySystem(roomId);
                 player1.socket.emit('duelError', 'Failed to create match room');
                 player2.socket.emit('duelError', 'Failed to create match room');
                 return;
             }
 
-            // Отримуємо треки з популярного світового чарту для дуелі (Deezer Top Worldwide 3155776842)
             let tracks: TrackItem[] = [];
             try {
                 const playlistData = await this.deezerService.getPlaylistById(3155776842);
@@ -105,19 +136,36 @@ export class MatchmakingService {
                     tracks = playlistData.tracks.data;
                 }
             } catch (err) {
-                console.warn('Не вдалося отримати чарт Deezer, шукаємо топ-треки:', err.message);
+                console.warn('Не вдалося отримати чарт Deezer, шукаємо топ-треки:', (err as Error).message);
             }
 
-            // Якщо не вдалося отримати чарт, шукаємо "top hits"
             if (tracks.length < 5) {
                 const searchRes = await this.deezerService.search('top hits', 'track');
                 if (searchRes?.data) {
-                    tracks = searchRes.data.filter((t: any) => t.preview);
+                    tracks = searchRes.data.filter((t: TrackItem) => Boolean(t.preview));
                 }
             }
 
+            const currentRoom = this.roomManager.allRooms.find((r) => r.id === roomId);
+            const bothInRoom = Boolean(
+                currentRoom &&
+                currentRoom.players.some((p) => p.id === player1.userId && p.isOnline) &&
+                currentRoom.players.some((p) => p.id === player2.userId && p.isOnline),
+            );
+
+            if (!this.isPlayerAvailable(player1) || !this.isPlayerAvailable(player2) || !bothInRoom) {
+                this.roomManager.deleteRoomBySystem(roomId);
+                if (this.isPlayerAvailable(player1)) {
+                    player1.socket.emit('duelError', 'Opponent cancelled or disconnected before match start');
+                }
+                if (this.isPlayerAvailable(player2)) {
+                    player2.socket.emit('duelError', 'Opponent cancelled or disconnected before match start');
+                }
+                return;
+            }
+
             if (tracks.length < 4) {
-                this.roomManager.deleteRoomIfLeader(roomId, player1.userId);
+                this.roomManager.deleteRoomBySystem(roomId);
                 player1.socket.emit('duelError', 'Not enough playable tracks available right now');
                 player2.socket.emit('duelError', 'Not enough playable tracks available right now');
                 return;
@@ -134,7 +182,6 @@ export class MatchmakingService {
 
             const roomInfo = this.roomQuery.getRoomInfo(roomId, this.roomManager.allRooms);
 
-            // Сповіщаємо обох гравців про знайденого суперника
             this.server?.to(roomId).emit('duelMatchFound', {
                 roomId,
                 room: roomInfo,
@@ -142,24 +189,37 @@ export class MatchmakingService {
                 opponent2: player2.login,
             });
 
-            // Автоматичний старт гри через 2 секунди
-            setTimeout(() => {
-                const currentRoom = this.roomManager.allRooms.find((r) => r.id === roomId);
-                const onlinePlayers = currentRoom?.players.filter((p) => p.isOnline) || [];
-                if (!currentRoom || onlinePlayers.length < 2) {
-                    this.server?.to(roomId).emit('duelError', 'Opponent disconnected before match start');
-                    this.roomManager.deleteRoomIfLeader(roomId, player1.userId);
+            const activeRoomId = roomId;
+            const timer = setTimeout(() => {
+                this.pendingDuelTimers.delete(activeRoomId);
+                const targetRoom = this.roomManager.allRooms.find((r) => r.id === activeRoomId);
+                const onlinePlayers = targetRoom?.players.filter((p) => p.isOnline) || [];
+                if (
+                    !targetRoom ||
+                    onlinePlayers.length < 2 ||
+                    !this.isPlayerAvailable(player1) ||
+                    !this.isPlayerAvailable(player2)
+                ) {
+                    this.server?.to(activeRoomId).emit('duelError', 'Opponent disconnected before match start');
+                    this.roomManager.deleteRoomBySystem(activeRoomId);
                     return;
                 }
 
+                const starterSocket = targetRoom.leaderId === player2.userId ? player2.socket : player1.socket;
                 this.gameplayService.handleLaunchGame(
-                    player1.socket,
-                    roomId,
+                    starterSocket,
+                    activeRoomId,
                     selectedTracks,
                 );
             }, 2000);
+
+            this.clearPendingDuelTimer(activeRoomId);
+            this.pendingDuelTimers.set(activeRoomId, timer);
         } catch (error) {
             console.error('Помилка запуску дуелі:', error);
+            if (roomId) {
+                this.roomManager.deleteRoomBySystem(roomId);
+            }
             player1.socket.emit('duelError', 'Matchmaking error');
             player2.socket.emit('duelError', 'Matchmaking error');
         }

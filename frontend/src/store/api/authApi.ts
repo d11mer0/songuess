@@ -8,14 +8,17 @@ export const authApi = createApi({
     baseQuery: customBaseQuery,
     tagTypes: ['Auth'],
     endpoints: (builder) => ({
-        register: builder.mutation<void, { email: string; password: string }>({
+        register: builder.mutation<
+            { message?: string; requiresVerification?: boolean },
+            { login: string; email: string; password: string }
+        >({
             query: (userData) => ({
                 url: '/auth/register',
                 method: 'POST',
                 body: userData,
             }),
         }),
-        login: builder.mutation<void, { email: string; password: string }>({
+        login: builder.mutation<{ accessToken: string }, { login: string; password: string }>({
             query: (credentials) => ({
                 url: '/auth/login',
                 method: 'POST',

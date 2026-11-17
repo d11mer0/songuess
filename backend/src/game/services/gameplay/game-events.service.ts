@@ -39,6 +39,7 @@ export class GameEventsService {
             return {
                 playerId: p.id,
                 answer: res.answer,
+                isCorrect: res.isCorrect,
                 timeTaken: res.timeTaken,
                 score: res.score,
                 streak: res.streak ?? gameProgress.streaks?.[p.id] ?? 0,

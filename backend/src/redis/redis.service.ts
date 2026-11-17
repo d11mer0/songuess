@@ -186,11 +186,37 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     private readonly genericCache = new Map<string, { value: string; expiresAt?: number }>();
+    private readonly maxGenericCacheSize = 1000;
+
+    private setGenericCacheEntry(key: string, value: string, expiresAt?: number) {
+        const now = Date.now();
+        // Прибираємо протерміновані записи перед вставкою при наближенні до ліміту
+        if (this.genericCache.size >= this.maxGenericCacheSize) {
+            for (const [k, entry] of this.genericCache) {
+                if (entry.expiresAt && entry.expiresAt <= now) {
+                    this.genericCache.delete(k);
+                }
+            }
+        }
+        // Перезапис для оновлення позиції LRU
+        if (this.genericCache.has(key)) {
+            this.genericCache.delete(key);
+        }
+        while (this.genericCache.size >= this.maxGenericCacheSize) {
+            const oldestKey = this.genericCache.keys().next().value;
+            if (oldestKey === undefined) break;
+            this.genericCache.delete(oldestKey);
+        }
+        this.genericCache.set(key, { value, expiresAt });
+    }
 
     async get(key: string): Promise<string | null> {
         const item = this.genericCache.get(key);
         if (item) {
             if (!item.expiresAt || item.expiresAt > Date.now()) {
+                // Оновлюємо LRU порядок
+                this.genericCache.delete(key);
+                this.genericCache.set(key, item);
                 return item.value;
             }
             this.genericCache.delete(key);
@@ -204,10 +230,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             const val = await this.client.get(key);
             if (val !== null) {
                 const ttl = await this.client.ttl(key);
-                this.genericCache.set(key, {
-                    value: val,
-                    expiresAt: ttl > 0 ? Date.now() + ttl * 1000 : undefined,
-                });
+                this.setGenericCacheEntry(
+                    key,
+                    val,
+                    ttl > 0 ? Date.now() + ttl * 1000 : undefined,
+                );
             }
             return val;
         } catch (err: any) {
@@ -228,10 +255,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
-        this.genericCache.set(key, {
+        this.setGenericCacheEntry(
+            key,
             value,
-            expiresAt: ttlSeconds ? Date.now() + ttlSeconds * 1000 : undefined,
-        });
+            ttlSeconds ? Date.now() + ttlSeconds * 1000 : undefined,
+        );
 
         if (!this.isRedisActive || !this.client) {
             return;

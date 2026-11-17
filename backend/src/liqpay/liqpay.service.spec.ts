@@ -90,4 +90,10 @@ describe('LiqPayService', () => {
         });
         expect(achievementService.awardAchievement).toHaveBeenCalledWith(10, 'PATRON_DONOR');
     });
+
+    it('should throw BadRequestException on malformed JSON payload in processCallback (BUG-15)', async () => {
+        const badData = Buffer.from('{not-json', 'utf-8').toString('base64');
+        const sig = service.createSignature(badData);
+        await expect(service.processCallback(badData, sig)).rejects.toThrow('Invalid LiqPay payload format');
+    });
 });

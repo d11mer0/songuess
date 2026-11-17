@@ -1,8 +1,9 @@
-import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class SubmitAnswerDto {
     @IsString()
     @IsNotEmpty()
+    @MaxLength(64)
     roomId: string;
 
     @IsInt()
@@ -11,6 +12,7 @@ export class SubmitAnswerDto {
     roundNumber: number;
 
     @IsString()
+    @MaxLength(200)
     answer: string;
 
     @IsOptional()

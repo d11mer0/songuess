@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useUpdateAvatarMutation } from '../../store/api/userApi';
 import { updateUser } from '../../store/users/userSlice';
@@ -31,9 +31,22 @@ const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
     const [previewAvatar, setPreviewAvatar] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
 
+    useEffect(() => {
+        return () => {
+            if (previewAvatar && previewAvatar.startsWith('blob:')) {
+                URL.revokeObjectURL(previewAvatar);
+            }
+        };
+    }, [previewAvatar]);
+
     const handleAvatarChange = (file: File) => {
         setNewAvatar(file);
-        setPreviewAvatar(URL.createObjectURL(file));
+        setPreviewAvatar((prev) => {
+            if (prev && prev.startsWith('blob:')) {
+                URL.revokeObjectURL(prev);
+            }
+            return URL.createObjectURL(file);
+        });
         setErrorMessage('');
     };
 
@@ -58,6 +71,9 @@ const EditAvatar: React.FC<EditAvatarProps> = ({ user, show, onClose }) => {
     };
 
     const handleClose = () => {
+        if (previewAvatar && previewAvatar.startsWith('blob:')) {
+            URL.revokeObjectURL(previewAvatar);
+        }
         onClose(false);
         setPreviewAvatar('');
         setNewAvatar(null);

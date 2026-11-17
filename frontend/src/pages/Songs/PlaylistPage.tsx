@@ -29,7 +29,7 @@ const PlaylistPage: React.FC = () => {
                 <div>
                     <PlaylistDetails details={playlistDetails} />
                     <PlaylistTracks
-                        tracks={playlistDetails.tracks.data}
+                        tracks={playlistDetails?.tracks?.data || []}
                         isLoading={isLoadingTracks}
                     />
                 </div>

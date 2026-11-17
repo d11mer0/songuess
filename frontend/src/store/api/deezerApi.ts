@@ -42,21 +42,21 @@ export const deezerApi = createApi({
         }),
 
         searchPlaylistsByArtist: builder.query({
-            query: (query) => `/deezer/artist-playlists?query=${query}`,
+            query: (query) => `/deezer/artist-playlists?query=${encodeURIComponent(query)}`,
         }),
 
         // 🔹 Пошук (треки, альбоми, артисти, плейлісти)
         searchDeezer: builder.query({
             query: ({ query, type }) =>
-                `/deezer/search?query=${query}&type=${type}`,
+                `/deezer/search?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}`,
         }),
 
         getCuratedThemes: builder.query<any[], string | void>({
-            query: (lang) => (lang ? `/deezer/curated-themes?lang=${lang}` : `/deezer/curated-themes`),
+            query: (lang) => (lang ? `/deezer/curated-themes?lang=${encodeURIComponent(lang)}` : `/deezer/curated-themes`),
         }),
 
         getThemeTracks: builder.query<any, string>({
-            query: (themeId) => `/deezer/theme/${themeId}`,
+            query: (themeId) => `/deezer/theme/${encodeURIComponent(themeId)}`,
         }),
 
         parsePlaylistUrl: builder.query<any, string>({

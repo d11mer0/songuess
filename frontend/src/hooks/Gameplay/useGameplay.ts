@@ -7,7 +7,6 @@ import { selectCurrentRoom, selectTrackInfo } from '../../store/gameplay/gamepla
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useSocketConnection } from '../common/useSocketConnection';
 import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
-import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 import { clearRoomSessionStorage } from '../../utils/storage/clearRoomSessionStorage';
 
 export const useGameplay = () => {
@@ -18,7 +17,7 @@ export const useGameplay = () => {
     const trackInfo = useAppSelector(selectTrackInfo);
     
     useSocketConnection();
-    useGameplayListeners();
+    useGameplayListeners(roomId);
 
     const kickMember = useCallback((memberId: number) => {
         if (currentRoom?.id) {
@@ -35,20 +34,6 @@ export const useGameplay = () => {
             clearRoomSessionStorage(targetId);
             socketEmitter.emit('deleteRoom', { id: targetId });
             dispatch(setCurrentRoom(null));
-            socketOffMany([
-                'playerDisconnected',
-                'playerLeft',
-                'message',
-                'roomDeleted',
-                'roundStarted',
-                'roundResult',
-                'gameEnded',
-                'gameRestarted',
-                'partyModeSwitched',
-                'joinedRoom',
-                'reconnectToRound',
-                'reconnectFailed',
-            ]);
             navigate('/game');
             socketEmitter.emit('getRooms');
         }
@@ -86,20 +71,6 @@ export const useGameplay = () => {
             clearRoomSessionStorage(targetId);
             socketEmitter.emit('leaveRoom', { id: targetId });
             dispatch(setCurrentRoom(null));
-            socketOffMany([
-                'playerDisconnected', 
-                'playerLeft',
-                'message', 
-                'roomDeleted', 
-                'roundStarted', 
-                'roundResult', 
-                'gameEnded',
-                'gameRestarted',
-                'partyModeSwitched',
-                'joinedRoom',
-                'reconnectToRound',
-                'reconnectFailed',
-            ]);
             navigate('/game');
             socketEmitter.emit('getRooms');
         }

@@ -57,4 +57,30 @@ describe('LeaderboardService - Leaderboards', () => {
             }),
         );
     });
+
+    it('should compute accurate currentUserRank for filtered period/genre when outside top 100 (BUG-24)', async () => {
+        mockPrisma.gameScore.groupBy
+            .mockResolvedValueOnce([{ userId: 1, _sum: { score: 900 }, _max: { score: 500 }, _count: { id: 3 } }])
+            .mockResolvedValueOnce([{ userId: 1 }, { userId: 2 }]);
+        mockPrisma.gameScore.aggregate = jest.fn().mockResolvedValue({
+            _sum: { score: 120 },
+            _max: { score: 120 },
+            _count: { id: 1 },
+        });
+        mockPrisma.user.findMany.mockResolvedValue([
+            { id: 1, login: 'Top', avatar: null, record: 500, dailyStreak: 1 },
+        ]);
+        mockPrisma.user.findUnique.mockResolvedValue({
+            id: 99,
+            login: 'OutsideTop',
+            avatar: null,
+            dailyStreak: 0,
+        });
+
+        const res = await service.getLeaderboard('weekly', 'rock', 99);
+        expect(res.currentUserRank).not.toBeNull();
+        expect(res.currentUserRank?.rank).toBe(3);
+        expect(res.currentUserRank?.totalScore).toBe(120);
+        expect(res.currentUserRank?.gamesPlayed).toBe(1);
+    });
 });

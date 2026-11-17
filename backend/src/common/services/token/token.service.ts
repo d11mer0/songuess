@@ -57,31 +57,27 @@ export class TokenService {
         }
     }
 
+    private getRequiredSecret(envKey: string): string {
+        const secret = this.configService.get<string>(envKey);
+        if (!secret) {
+            throw new UnauthorizedException(`Missing JWT secret configuration (${envKey})`);
+        }
+        return secret;
+    }
+
     verifyAccessToken(token: string) {
-        return this.verifyToken(
-            token,
-            this.configService.get<string>('JWT_ACCESS_SECRET', 'acess'),
-        );
+        return this.verifyToken(token, this.getRequiredSecret('JWT_ACCESS_SECRET'));
     }
 
     verifyRefreshToken(token: string) {
-        return this.verifyToken(
-            token,
-            this.configService.get<string>('JWT_REFRESH_SECRET', 'verify'),
-        );
+        return this.verifyToken(token, this.getRequiredSecret('JWT_REFRESH_SECRET'));
     }
 
     verifyEmailToken(token: string) {
-        return this.verifyToken(
-            token,
-            this.configService.get<string>('JWT_EMAIL_SECRET', 'email'),
-        );
+        return this.verifyToken(token, this.getRequiredSecret('JWT_EMAIL_SECRET'));
     }
 
     verifyResetToken(token: string) {
-        return this.verifyToken(
-            token,
-            this.configService.get<string>('JWT_RESET_SECRET', 'reset'),
-        );
+        return this.verifyToken(token, this.getRequiredSecret('JWT_RESET_SECRET'));
     }
 }

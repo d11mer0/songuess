@@ -84,7 +84,7 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
             {(onSendTracks && selectedPlaylistId && !isLoadingPlaylists && !isLoadingTracks) && (
                 <>
                     <StartGameButtonBlock
-                        trackCount={playlistData?.tracks?.data.length}
+                        trackCount={playlistData?.tracks?.data?.length || 0}
                         onClick={() => {
                             onSendTracks({
                                 playlist: {
@@ -92,7 +92,7 @@ export const ArtistPlaylists: React.FC<ArtistPlaylistsProps> = ({
                                     title: playlistData.title,
                                     picture: playlistData.picture_big,
                                 },
-                                tracks: playlistData?.tracks?.data,
+                                tracks: playlistData?.tracks?.data || [],
                             })
                         }}
                     />

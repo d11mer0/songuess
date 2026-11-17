@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AnswerOptions from './PlayingGame/AnswerOptions';
 import AudioPlayer from './PlayingGame/AudioPlayer';
 import RoundResult from './PlayingGame/RoundResult';
@@ -114,6 +114,9 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
         ? unlockedSeconds
         : roundDurationSec;
 
+    const heardleUnlockedTierRef = useRef(heardleUnlockedTier);
+    heardleUnlockedTierRef.current = heardleUnlockedTier;
+
     // Скидаємо/відновлюємо стан при зміні раунду
     useEffect(() => {
         if (trackInfo?.roundNumber !== undefined) {
@@ -124,8 +127,8 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                 if (HEARDLE_TIERS.includes(parsed)) {
                     tier = parsed;
                 }
-            } else if (heardleUnlockedTier) {
-                tier = heardleUnlockedTier;
+            } else if (heardleUnlockedTierRef.current) {
+                tier = heardleUnlockedTierRef.current;
             }
             setUnlockedSeconds(tier);
 
@@ -141,7 +144,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                 }
             }
         }
-    }, [trackInfo?.roundNumber, heardleStorageKey, answeredStorageKey, initialAnswer, heardleUnlockedTier, currentRoom?.id]);
+    }, [trackInfo?.roundNumber, heardleStorageKey, answeredStorageKey, initialAnswer, currentRoom?.id]);
 
     const handleUnlockNext = () => {
         const currentIndex = HEARDLE_TIERS.indexOf(unlockedSeconds);

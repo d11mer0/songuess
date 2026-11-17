@@ -58,7 +58,10 @@ export function assignMissedAnswers(
     roundNumber: number,
 ): void {
     for (const player of players) {
-        if (!playerResults[player.id]?.[roundNumber]) {
+        if (!playerResults[player.id]) {
+            playerResults[player.id] = {};
+        }
+        if (!playerResults[player.id][roundNumber]) {
             playerResults[player.id][roundNumber] = {
                 answer: null,
                 isCorrect: false,

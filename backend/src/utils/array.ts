@@ -13,11 +13,26 @@ export function pickRandomWrongOptions(
     tracks: TrackItem[],
     correctTrackId: string,
     count: number = 3,
+    correctTrackTitle?: string,
 ): string[] {
-    const available = tracks.filter((t) => t.id !== correctTrackId);
+    const normalizedCorrect = correctTrackTitle?.trim().toLowerCase();
+    const seenTitles = new Set<string>(normalizedCorrect ? [normalizedCorrect] : []);
+
+    const available = tracks.filter((t) => {
+        if (t.id === correctTrackId) return false;
+        const norm = t.title?.trim().toLowerCase();
+        return Boolean(norm) && !seenTitles.has(norm);
+    });
     if (available.length === 0) return [];
 
-    const actualCount = Math.min(count, available.length);
     const shuffled = shuffleArray(available);
-    return shuffled.slice(0, actualCount).map((t) => t.title);
+    const picked: string[] = [];
+    for (const track of shuffled) {
+        const norm = track.title.trim().toLowerCase();
+        if (seenTitles.has(norm)) continue;
+        seenTitles.add(norm);
+        picked.push(track.title);
+        if (picked.length >= count) break;
+    }
+    return picked;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { socketEmitter, socketHandlers } from '../../services/socket';
 import { Room, RoomState } from '../../types/roomTypes';
 import { useNavigate } from 'react-router-dom';
@@ -15,10 +15,9 @@ import {
     startRound,
     reconnectToRound,
     setGameEndedData,
-    changeRoomState
 } from '../../store/gameplay/gameplaySlice';
-import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 import { clearRoomSessionStorage } from '../../utils/storage/clearRoomSessionStorage';
+import { updateServerClockOffset } from '../../utils/calculateStartTime';
 import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 
 interface RoundTrackWithoutPreview {
@@ -28,15 +27,49 @@ interface RoundTrackWithoutPreview {
     albumName?: string;
 }
 
-export const useGameplayListeners = () => {
+const matchesRouteRoom = (room: Room, targetId?: string): boolean => {
+    if (!targetId) return true;
+    const norm = targetId.trim();
+    if (!norm) return true;
+    if (room.id.toLowerCase() === norm.toLowerCase()) return true;
+    if (room.shortCode && room.shortCode.toUpperCase() === norm.toUpperCase()) return true;
+    return false;
+};
+
+export const useGameplayListeners = (routeRoomId?: string) => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { user } = useAppSelector((state) => state.user);
     const currentRoom = useAppSelector(selectCurrentRoom);
 
+    const currentRoomRef = useRef(currentRoom);
+    currentRoomRef.current = currentRoom;
+    const routeRoomIdRef = useRef(routeRoomId);
+    routeRoomIdRef.current = routeRoomId;
+    const joinAttemptedForIdRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        joinAttemptedForIdRef.current = null;
+    }, [routeRoomId]);
+
+    const attemptJoinRouteRoom = useCallback((): boolean => {
+        const targetId = routeRoomIdRef.current?.trim();
+        if (!targetId) return false;
+        if (currentRoomRef.current && matchesRouteRoom(currentRoomRef.current, targetId)) {
+            return false;
+        }
+        if (joinAttemptedForIdRef.current === targetId) {
+            return false;
+        }
+        joinAttemptedForIdRef.current = targetId;
+        socketEmitter.emit('joinRoom', { id: targetId });
+        return true;
+    }, []);
+
     const handleReconnectToRound = useCallback(
         (payload: GameRoundPublicData & { answer: string | null; heardleUnlockedTier?: number }) => {
+            updateServerClockOffset(payload?.serverTime);
             dispatch(reconnectToRound(payload));
         },
         [dispatch, currentRoom?.id],
@@ -44,6 +77,7 @@ export const useGameplayListeners = () => {
 
     const handleSetTrackInfo = useCallback (
         (payload: GameRoundPublicData) => {
+            updateServerClockOffset(payload?.serverTime);
             if (currentRoom?.lobbyOptions?.isPartyMode && user?.id && currentRoom?.leaderId && String(user.id) !== String(currentRoom.leaderId)) {
                 const code = currentRoom.shortCode || currentRoom.id;
                 navigate(`/play/${code}`);
@@ -77,20 +111,6 @@ export const useGameplayListeners = () => {
         (data: { roomId?: string; error?: string }) => {
             if (data?.roomId) {
                 dispatch(setCurrentRoom(null));
-                socketOffMany([
-                    'playerDisconnected',
-                    'playerLeft',
-                    'message',
-                    'roomDeleted',
-                    'roundStarted',
-                    'roundResult',
-                    'gameEnded',
-                    'gameRestarted',
-                    'partyModeSwitched',
-                    'joinedRoom',
-                    'reconnectToRound',
-                    'reconnectFailed',
-                ]);
                 navigate('/game');
                 socketEmitter.emit('getRooms');
             }
@@ -130,11 +150,11 @@ export const useGameplayListeners = () => {
 
     const handleGameEnded = useCallback(
         (resultPayload: GameEndedPayload) => {
-            clearRoomSessionStorage(currentRoom?.id);
-            dispatch(setGameEndedData(resultPayload)); // ✅ зберігаємо в стейт
-            dispatch(endGame()); // змінюємо статус кімнати
+            clearRoomSessionStorage(resultPayload.roomId || currentRoom?.id);
+            dispatch(setGameEndedData(resultPayload));
+            dispatch(endGame());
         },
-        [dispatch],
+        [dispatch, currentRoom?.id],
     );
 
     const handlePlayerLeft = useCallback(
@@ -146,20 +166,6 @@ export const useGameplayListeners = () => {
             if (wasKicked) {
                 clearRoomSessionStorage(room.id);
                 dispatch(setCurrentRoom(null));
-                socketOffMany([
-                    'playerDisconnected', 
-                    'playerLeft', 
-                    'message', 
-                    'roomDeleted', 
-                    'roundStarted', 
-                    'roundResult',
-                    'gameEnded',
-                    'gameRestarted',
-                    'partyModeSwitched',
-                    'joinedRoom',
-                    'reconnectToRound',
-                    'reconnectFailed',
-                ]);
                 navigate('/game');
                 socketEmitter.emit('getRooms');
             } else {
@@ -179,24 +185,55 @@ export const useGameplayListeners = () => {
     );
 
     const handleJoinedRoom = useCallback(
-        (room: Room) => {
-            if (room && room.state !== RoomState.ADDING) {
+        (room: Room | null) => {
+            if (!room) {
+                dispatch(setCurrentRoom(null));
+                navigate('/game');
+                return;
+            }
+            dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+            if (room.lobbyOptions?.isPartyMode) {
+                const leaderId = room.leaderId || currentRoomRef.current?.leaderId;
+                const isLeader = Boolean(user?.id && leaderId && String(user.id) === String(leaderId));
+                if (isLeader) {
+                    navigate(`/party/host/${room.id}`);
+                } else {
+                    const code = room.shortCode || room.id;
+                    navigate(`/play/${code}`);
+                }
+                return;
+            }
+            if (room.state === RoomState.ADDING) {
+                navigate('/game');
+            }
+        },
+        [navigate, dispatch, user?.id],
+    );
+
+    const handleCurrentRoom = useCallback(
+        (room: Room | null) => {
+            const targetId = routeRoomIdRef.current?.trim();
+            if (room && matchesRouteRoom(room, targetId)) {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
                 if (room.lobbyOptions?.isPartyMode) {
-                    const leaderId = room.leaderId || currentRoom?.leaderId;
+                    const leaderId = room.leaderId || currentRoomRef.current?.leaderId;
                     const isLeader = Boolean(user?.id && leaderId && String(user.id) === String(leaderId));
-                    if (isLeader) {
-                        navigate(`/party/host/${room.id}`);
-                    } else {
-                        const code = room.shortCode || room.id;
-                        navigate(`/play/${code}`);
-                    }
+                    navigate(isLeader ? `/party/host/${room.id}` : `/play/${room.shortCode || room.id}`);
+                    return;
                 }
+                if (room.state === RoomState.ADDING) {
+                    navigate('/game');
+                }
+                return;
+            }
+
+            if (targetId) {
+                attemptJoinRouteRoom();
             } else {
                 navigate('/game');
             }
         },
-        [navigate, dispatch, user?.id, currentRoom?.leaderId],
+        [attemptJoinRouteRoom, dispatch, navigate, user?.id],
     );
 
     // If room is in TV / party mode, automatically route host to TV and player to gamepad
@@ -214,16 +251,24 @@ export const useGameplayListeners = () => {
 
     const handleGameRestarted = useCallback((room: Room) => {
         clearRoomSessionStorage(room?.id);
-        dispatch(setGameEndedData(null));          // ✅ очистка результатів
-        dispatch(changeRoomState(RoomState.CREATING)); // ✅ оновлюємо стан кімнати
-        dispatch(setCurrentRoom(room));            // оновлюємо інформацію про кімнату (гравці ті самі)
+        dispatch(setGameEndedData(null));
+        if (room) {
+            dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
+        }
     }, [dispatch]);
 
     useEffect(() => {
-        const handleReconnectFailed = () => navigate('/game');
+        const handleReconnectFailed = () => {
+            if (routeRoomIdRef.current?.trim()) {
+                attemptJoinRouteRoom();
+            } else {
+                navigate('/game');
+            }
+        };
 
         socketHandlers.on('roundStarted', handleSetTrackInfo);
         socketHandlers.on('joinedRoom', handleJoinedRoom);
+        socketHandlers.on('currentRoom', handleCurrentRoom);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('gameRestarted', handleGameRestarted);
         socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
@@ -237,6 +282,7 @@ export const useGameplayListeners = () => {
         return () => {
             socketHandlers.off('roundStarted', handleSetTrackInfo);
             socketHandlers.off('joinedRoom', handleJoinedRoom);
+            socketHandlers.off('currentRoom', handleCurrentRoom);
             socketHandlers.off('reconnectToRound', handleReconnectToRound);
             socketHandlers.off('gameRestarted', handleGameRestarted);
             socketHandlers.off('partyModeSwitched', handlePartyModeSwitched);
@@ -248,6 +294,8 @@ export const useGameplayListeners = () => {
             socketHandlers.off('roomDeleted', handleRoomDeleted);
         };
     }, [
+        attemptJoinRouteRoom,
+        handleCurrentRoom,
         handleSetTrackInfo,
         handleJoinedRoom,
         handleReconnectToRound,

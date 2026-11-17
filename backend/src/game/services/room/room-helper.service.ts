@@ -10,14 +10,25 @@ export class RoomHelperService {
     private disconnectGraceTimers = new Map<string, NodeJS.Timeout>();
     private leaderReassignTimers = new Map<string, NodeJS.Timeout>();
     private disposeCallbacks: Array<(roomId: string) => void> = [];
+    private rosterChangedCallbacks: Array<(room: GameRoom) => void> = [];
 
     onRoomDisposed(cb: (roomId: string) => void) {
         this.disposeCallbacks.push(cb);
     }
 
-    private notifyDisposed(roomId: string) {
+    notifyDisposed(roomId: string) {
         for (const cb of this.disposeCallbacks) {
             try { cb(roomId); } catch {}
+        }
+    }
+
+    onRosterChanged(cb: (room: GameRoom) => void) {
+        this.rosterChangedCallbacks.push(cb);
+    }
+
+    notifyRosterChanged(room: GameRoom) {
+        for (const cb of this.rosterChangedCallbacks) {
+            try { cb(room); } catch {}
         }
     }
 
@@ -65,19 +76,49 @@ export class RoomHelperService {
         const room = this.findRoom(roomId);
         if (!room) return;
 
+        const currentLeader = room.players.find((p) => p.id === room.leaderId);
+        if (currentLeader && currentLeader.isOnline) return;
+
         const newLeader = room.players.find((player) => player.isOnline);
         if (newLeader) room.leaderId = newLeader.id;
     }
 
-    removeUserFromOtherRooms(playerId: number) {
-        for (const room of this.roomManagerService.allRooms) {
+    removeUserFromOtherRooms(playerId: number): Array<{
+        roomId: string;
+        shortCode?: string;
+        isDeleted: boolean;
+        room?: GameRoom;
+    }> {
+        const affectedRooms: Array<{
+            roomId: string;
+            shortCode?: string;
+            isDeleted: boolean;
+            room?: GameRoom;
+        }> = [];
+
+        for (const room of [...this.roomManagerService.allRooms]) {
             const isInRoom = room.players.some((p) => p.id === playerId);
             if (isInRoom) {
                 room.players = room.players.filter((p) => p.id !== playerId);
-                const isClear = this.cleanUpRoomById(room.id, true);
-                if (!isClear) this.assignNewLeader(room.id);
+                const isClear = Boolean(this.cleanUpRoomById(room.id, true));
+                if (!isClear) {
+                    this.assignNewLeader(room.id);
+                    this.roomManagerService.syncRoom(room);
+                    this.notifyRosterChanged(room);
+                }
+                affectedRooms.push({
+                    roomId: room.id,
+                    shortCode: room.shortCode,
+                    isDeleted: isClear,
+                    room: isClear ? undefined : room,
+                });
             }
         }
+
+        if (affectedRooms.length > 0) {
+            this.roomManagerService.broadcastRoomsList();
+        }
+        return affectedRooms;
     }
 
     removePlayerFromRoomById(roomId: string, playerId: number) {
@@ -86,7 +127,10 @@ export class RoomHelperService {
 
         room.players = room.players.filter((player) => player.id !== playerId);
         const isClear = this.cleanUpRoomById(roomId, true);
-        if (!isClear) this.assignNewLeader(roomId);
+        if (!isClear) {
+            this.assignNewLeader(roomId);
+            this.notifyRosterChanged(room);
+        }
         this.roomManagerService.broadcastRoomsList();
     }
 

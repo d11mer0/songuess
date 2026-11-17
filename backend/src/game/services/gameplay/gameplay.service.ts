@@ -29,6 +29,17 @@ export class GameplayService {
         private readonly roomManager: RoomManagerService,
     ) {
         this.roomHelperService?.onRoomDisposed?.((roomId) => this.roundManager.cancelRoomGame(roomId));
+        this.roomHelperService?.onRosterChanged?.((room) => this.checkRoundCompletion(room));
+    }
+
+    checkRoundCompletion(room: GameRoom) {
+        if (room.state !== GameRoomState.STARTED || !room.gameProgress) return;
+        const { currentRound, rounds, playerResults } = room.gameProgress;
+        const round = rounds[currentRound];
+        if (!round || (round as { isFinished?: boolean }).isFinished) return;
+        if (checkAllPlayersAnswered(playerResults, currentRound, room.players)) {
+            this.roundManager.finishRound(room.id, currentRound);
+        }
     }
 
     setServer(server: Server) {
@@ -90,10 +101,13 @@ export class GameplayService {
         const playerId = client.data.user?.id;
         if (!playerId) return;
 
+        const isMember = room.players.some((p) => p.id === playerId);
+        if (!isMember) return;
+
         const { rounds, playerResults } = room.gameProgress;
 
         if (typeof roundNumber !== 'number' || roundNumber !== room.gameProgress.currentRound) return;
-        if (!rounds[roundNumber]) return;
+        if (!rounds[roundNumber] || (rounds[roundNumber] as { isFinished?: boolean }).isFinished) return;
 
         if (!playerResults[playerId]) {
             playerResults[playerId] = {};
@@ -130,18 +144,16 @@ export class GameplayService {
         );
 
         this.roomManager.syncRoom(room);
-        this.server?.to(roomId).emit('playerAnswered', { playerId, roundNumber });
+        this.server?.to(room.id).emit('playerAnswered', { playerId, roundNumber });
 
         // У режимі DUEL, якщо гравець дав правильну відповідь — раунд фінішує негайно!
         const result = playerResults[playerId][roundNumber];
         if (gameMode === 'DUEL' && result.isCorrect) {
-            this.roundManager.finishRound(roomId, roundNumber);
+            this.roundManager.finishRound(room.id, roundNumber);
             return;
         }
 
-        const onlineCount = room.players.filter((p) => p.isOnline).length;
-        const targetCount = Math.max(1, onlineCount);
-        const allAnswered = checkAllPlayersAnswered(playerResults, roundNumber, targetCount);
+        const allAnswered = checkAllPlayersAnswered(playerResults, roundNumber, room.players);
         if (allAnswered) {
             this.roundManager.finishRound(room.id, roundNumber);
         }
@@ -158,6 +170,14 @@ export class GameplayService {
 
         const playerId = client.data.user?.id;
         if (!playerId || typeof roundNumber !== 'number' || typeof snippetDuration !== 'number') return;
+        if (!Number.isFinite(snippetDuration) || ![1, 2, 5, 10, 20].includes(snippetDuration)) return;
+
+        const isMember = room.players.some((p) => p.id === playerId);
+        if (!isMember) return;
+        if (roundNumber !== room.gameProgress.currentRound) return;
+
+        const round = room.gameProgress.rounds[roundNumber];
+        if (!round || (round as { isFinished?: boolean }).isFinished) return;
 
         if (!room.gameProgress.heardleUnlockedTiers) {
             room.gameProgress.heardleUnlockedTiers = {};
@@ -167,6 +187,7 @@ export class GameplayService {
         }
         const currentMax = room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] || 1;
         room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] = Math.max(currentMax, snippetDuration);
+        this.roomManager.syncRoom(room);
     }
 
 
@@ -185,9 +206,16 @@ export class GameplayService {
         const now = Date.now();
         const lastAt = this.reactionCooldowns.get(playerId) || 0;
         if (now - lastAt < 400) return;
+        if (this.reactionCooldowns.size > 500) {
+            for (const [uid, ts] of this.reactionCooldowns) {
+                if (now - ts > 60000) {
+                    this.reactionCooldowns.delete(uid);
+                }
+            }
+        }
         this.reactionCooldowns.set(playerId, now);
 
-        this.server?.to(roomId).emit('playerReaction', {
+        this.server?.to(room.id).emit('playerReaction', {
             playerId,
             emoji,
             timestamp: now,

@@ -24,7 +24,8 @@ export class RoomQueryService {
             .filter(
                 (room) =>
                     room.lobbyOptions.publicLobby &&
-                    room.state === GameRoomState.ADDING,
+                    room.state === GameRoomState.ADDING &&
+                    room.players.some((p) => p.isOnline),
             )
             .map((room) => ({
                 id: room.id,
@@ -33,16 +34,6 @@ export class RoomQueryService {
                 state: room.state,
                 leaderId: room.leaderId,
             }));
-    }
-
-    getAllRooms_EVEN_PRIVATE_TO_DELETE(rooms: GameRoom[]): GameRoom[] {
-        return rooms.map((room) => ({
-            id: room.id,
-            players: room.players,
-            lobbyOptions: room.lobbyOptions,
-            state: room.state,
-            leaderId: room.leaderId,
-        }));
     }
 
     findAvailableRoom(rooms: GameRoom[]): GameRoom | undefined {

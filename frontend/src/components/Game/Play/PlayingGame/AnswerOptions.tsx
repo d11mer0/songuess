@@ -34,7 +34,7 @@ const AnswerOptions = memo(({ onSubmit }: Props) => {
         if (trackInfo?.preview) {
             setSelectedOption(initialAnswer ?? null);
         }
-    }, [trackInfo, initialAnswer]);
+    }, [trackInfo?.roundNumber, trackInfo?.preview, initialAnswer]);
 
     if (!currentRoom || !trackInfo) return null;
 

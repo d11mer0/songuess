@@ -34,6 +34,7 @@ export class ConnectionService {
 
         client.data.user = user;
         this.clients.add(client, user.id);
+        client.join(`user:${user.id}`);
         return user.id;
     }
 
@@ -43,21 +44,33 @@ export class ConnectionService {
         this.matchmakingService.removeBySocket(client.id);
         if (!user) return;
 
-        // Якщо користувач досі підключений з іншої вкладки — не скидаємо статус онлайн і не видаляємо кімнату
-        if (this.clients.getClientId(user.id)) {
-            return;
-        }
-
         this.matchmakingService.removeFromDuelQueue(user.id);
 
         const room = this.roomHelperService.findRoomByPlayerId(user.id);
         if (room) {
-        const player = room.players.find((p) => p.id === user.id);
+            // Перевіряємо, чи в користувача залишився інший активний сокет САМЕ в цій кімнаті
+            const roomSocketIds = this.server?.sockets?.adapter?.rooms?.get(room.id);
+            let hasAnotherSocketInRoom = false;
+            if (roomSocketIds && this.server?.sockets?.sockets) {
+                for (const sid of roomSocketIds) {
+                    if (sid === client.id) continue;
+                    const s = this.server.sockets.sockets.get(sid);
+                    if (s && s.data?.user?.id === user.id && !s.disconnected) {
+                        hasAnotherSocketInRoom = true;
+                        break;
+                    }
+                }
+            }
+            if (hasAnotherSocketInRoom) {
+                return;
+            }
+            const player = room.players.find((p) => p.id === user.id);
             if (player) {
                 player.isOnline = false;
                 const isClear = this.roomHelperService.cleanUpRoomById(room.id);
 
                 if (!isClear) {
+                    this.roomHelperService.notifyRosterChanged(room);
                     if (room.leaderId === user.id) {
                         this.roomHelperService.scheduleLeaderReassignment(room.id, 7000);
                     }

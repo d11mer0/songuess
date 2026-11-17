@@ -6,6 +6,7 @@ export function formatRoundPayload(round: GameRound, durationMs: number = 25000)
         options: round.options,
         startedAt: round.startedAt,
         endsAt: round.startedAt + durationMs,
+        serverTime: Date.now(),
         preview: round.track.preview,
     };
 }

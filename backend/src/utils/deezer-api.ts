@@ -21,7 +21,7 @@ export class DeezerApi {
 
     private async rawFetch(endpoint: string) {
         const response = await firstValueFrom(
-            this.httpService.get(`${this.BASE_URL}${endpoint}`),
+            this.httpService.get(`${this.BASE_URL}${endpoint}`, { timeout: 10000 }),
         );
         return response.data;
     }

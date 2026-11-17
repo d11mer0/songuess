@@ -9,9 +9,10 @@ export const ApiCreateSong = ApiBody({
         example1: {
             summary: 'Приклад створення пісні',
             value: {
+                title: 'Hey Jude',
                 author: 'The Beatles',
-                length: 210,
-                link: 'https://example.com/song.mp3',
+                duration: 210,
+                url: 'https://example.com/song.mp3',
             },
         },
     },
@@ -25,7 +26,7 @@ export const ApiUpdateSong = ApiBody({
             summary: 'Приклад оновлення пісні',
             value: {
                 author: 'Queen',
-                length: 240,
+                duration: 240,
             },
         },
     },

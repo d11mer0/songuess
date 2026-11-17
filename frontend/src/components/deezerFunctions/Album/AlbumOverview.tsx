@@ -74,7 +74,7 @@ const AlbumOverview: React.FC<AlbumOverviewProps> = ({
                     <div className={styles.albumDetails}>
                         <h3 className={styles.albumTitle}>{albumData.title}</h3>
                         <p className={styles.artistName}>
-                            <span>{t('gameplay.singer')}</span> {albumData.artist.name}
+                            <span>{t('gameplay.singer')}</span> {albumData.artist?.name || ''}
                         </p>
                     </div>
                 </div>

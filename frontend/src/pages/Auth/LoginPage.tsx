@@ -10,10 +10,10 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [loginUser, { isLoading, error }] = useLoginMutation();
     const { formData, handleChange } = useForm<{
-        email: string;
+        login: string;
         password: string;
     }>({
-        email: '',
+        login: '',
         password: '',
     });
 

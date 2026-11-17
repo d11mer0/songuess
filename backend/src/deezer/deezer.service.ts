@@ -322,7 +322,7 @@ export class DeezerService {
     async searchPlaylistsByArtist(query: string) {
         // 1️⃣ Шукаємо артиста
         const artistResponse = await this.search(query, 'artist');
-        if (!artistResponse || !artistResponse.data.length) {
+        if (!artistResponse || !Array.isArray(artistResponse.data) || artistResponse.data.length === 0) {
             return { message: 'Артист не знайдений' };
         }
 
@@ -332,7 +332,7 @@ export class DeezerService {
 
         // 2️⃣ Шукаємо плейлісти, що містять ім'я виконавця
         const playlistsResponse = await this.search(artistName, 'playlist');
-        if (!playlistsResponse || !playlistsResponse.data.length) {
+        if (!playlistsResponse || !Array.isArray(playlistsResponse.data) || playlistsResponse.data.length === 0) {
             return { message: 'Плейлісти не знайдені' };
         }
 

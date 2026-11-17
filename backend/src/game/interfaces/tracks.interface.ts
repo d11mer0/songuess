@@ -33,6 +33,8 @@ export interface TrackItem {
 }
 
 export interface SelectedTracks {
+    genre?: string;
+    theme?: string;
     type?: GameType;
     artist?: ArtistInfo;
     playlist?: PlaylistInfo;

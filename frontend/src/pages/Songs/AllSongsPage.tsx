@@ -9,7 +9,7 @@ import { FaPlay, FaPause, FaTrash, FaMusic, FaPlus, FaSearch } from 'react-icons
 import Loader from '../../components/UI/Loader/Loader/Loader';
 
 const AllSongsPage: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { isAuthenticated } = useSelector((state: RootState) => state.user);
     const { data: songs, isLoading, refetch } = useGetSongsQuery();
     const [deleteSong] = useDeleteSongMutation();
@@ -46,8 +46,15 @@ const AllSongsPage: React.FC = () => {
             try {
                 await deleteSong(id).unwrap();
                 refetch();
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Failed to delete song', err);
+                const msg =
+                    err?.status === 403
+                        ? (language === 'uk'
+                              ? 'Лише адміністратори можуть видаляти пісні з каталогу.'
+                              : 'Only administrators can delete catalog songs.')
+                        : (err?.data?.message || t('common.error'));
+                window.alert(Array.isArray(msg) ? msg.join(', ') : msg);
             }
         }
     };

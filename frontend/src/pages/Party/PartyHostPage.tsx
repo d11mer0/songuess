@@ -19,7 +19,7 @@ import {
     clearMediaSessionPlayback,
 } from '../../utils/audio/blockMediaSessionHardwareKeys';
 import { FaVolumeUp } from 'react-icons/fa';
-import { calculateStartTime } from '../../utils/calculateStartTime';
+import { calculateStartTime, getServerNow, updateServerClockOffset } from '../../utils/calculateStartTime';
 import styles from './PartyHostPage.module.css';
 
 interface RoundPayload {
@@ -28,6 +28,7 @@ interface RoundPayload {
     preview: string;
     startedAt?: number;
     endsAt?: number;
+    serverTime?: number;
 }
 
 interface RoundResultItem {
@@ -59,6 +60,9 @@ const PartyHostPage: React.FC = () => {
     const roundStartedAtRef = useRef<number | null>(null);
     const isResumingRef = useRef<boolean>(false);
     const roundDurationRef = useRef<number>(25);
+    const currentRoomIdRef = useRef<string | undefined>(currentRoom?.id);
+    currentRoomIdRef.current = currentRoom?.id;
+    const isGameFinishedRef = useRef<boolean>(false);
 
     const [currentRound, setCurrentRound] = useState<RoundPayload | null>(null);
     const [timeLeft, setTimeLeft] = useState(25);
@@ -67,6 +71,7 @@ const PartyHostPage: React.FC = () => {
     const [isGameFinished, setIsGameFinished] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
+    const [isAudioError, setIsAudioError] = useState(false);
     const [isMuted, setIsMuted] = useState(() => {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('songuess_tv_muted') === 'true';
@@ -80,6 +85,8 @@ const PartyHostPage: React.FC = () => {
 
     const isMutedRef = useRef<boolean>(isMuted);
     isMutedRef.current = isMuted;
+    roundDurationRef.current = currentRoom?.lobbyOptions?.roundDuration || roundDurationRef.current;
+    const launchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const toggleMute = useCallback(() => {
         if (audioRef.current) {
@@ -113,14 +120,34 @@ const PartyHostPage: React.FC = () => {
 
     useSocketConnection();
 
-    // Prevent headphone / hardware media keys from playing audio
+    // Prevent headphone / hardware media keys from playing audio and handle <audio> errors cleanly
     useEffect(() => {
-        blockMediaSessionHardwareKeys(audioRef.current);
+        const audio = audioRef.current;
+        if (!audio) return;
+        blockMediaSessionHardwareKeys(audio);
+
+        const handleAudioError = () => {
+            if (!audio.getAttribute('src')) return;
+            console.warn('TV audio snippet failed to load:', audio.src);
+            setIsAudioBlocked(false);
+            setIsAudioError(true);
+        };
+        const handleAudioPlaying = () => {
+            setIsAudioError(false);
+        };
+
+        audio.addEventListener('error', handleAudioError);
+        audio.addEventListener('playing', handleAudioPlaying);
+
+        return () => {
+            audio.removeEventListener('error', handleAudioError);
+            audio.removeEventListener('playing', handleAudioPlaying);
+        };
     }, []);
 
     // Sync room on mount or route param change
     useEffect(() => {
-        const targetId = routeRoomId || currentRoom?.id;
+        const targetId = routeRoomId || currentRoomIdRef.current;
         if (targetId) {
             socketEmitter.emit('joinRoom', { id: targetId });
             socketEmitter.emit('getCurrentRoom');
@@ -136,6 +163,8 @@ const PartyHostPage: React.FC = () => {
             if (room) {
                 dispatch(setCurrentRoom(mapBackendRoomToFrontend(room)));
             }
+            isGameFinishedRef.current = false;
+            setIsAudioError(false);
             setIsGameFinished(false);
             setCurrentRound(null);
             setRoundResult(null);
@@ -157,15 +186,15 @@ const PartyHostPage: React.FC = () => {
         socketHandlers.on('roomDeleted', handleRoomDeleted);
 
         return () => {
-            socketHandlers.off('joinedRoom');
-            socketHandlers.off('currentRoom');
-            socketHandlers.off('gameStarted');
-            socketHandlers.off('playerLeft');
-            socketHandlers.off('playerDisconnected');
-            socketHandlers.off('gameRestarted');
-            socketHandlers.off('roomDeleted');
+            socketHandlers.off('joinedRoom', handleRoomSync);
+            socketHandlers.off('currentRoom', handleRoomSync);
+            socketHandlers.off('gameStarted', handleRoomSync);
+            socketHandlers.off('playerLeft', handleRoomSync);
+            socketHandlers.off('playerDisconnected', handleRoomSync);
+            socketHandlers.off('gameRestarted', handleGameRestarted);
+            socketHandlers.off('roomDeleted', handleRoomDeleted);
         };
-    }, [routeRoomId, currentRoom?.id, dispatch, navigate]);
+    }, [routeRoomId, dispatch, navigate]);
 
     // Only the leader can host the TV page; redirect non-host players to the party controller
     useEffect(() => {
@@ -225,6 +254,7 @@ const PartyHostPage: React.FC = () => {
                     }
                 }
                 setIsAudioBlocked(false);
+                setIsAudioError(false);
                 isResumingRef.current = false;
                 if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
                     try {
@@ -232,9 +262,17 @@ const PartyHostPage: React.FC = () => {
                     } catch {}
                 }
             })
-            .catch((err) => {
-                console.warn('Playback still prevented on TV unlock', err);
+            .catch((err: DOMException | Error) => {
                 isResumingRef.current = false;
+                if (err?.name === 'AbortError') return;
+                if (err?.name === 'NotAllowedError') {
+                    console.warn('Playback still prevented on TV unlock', err);
+                    setIsAudioBlocked(true);
+                } else {
+                    console.warn('TV audio error on unlock', err);
+                    setIsAudioBlocked(false);
+                    setIsAudioError(true);
+                }
             });
     }, []);
 
@@ -253,12 +291,93 @@ const PartyHostPage: React.FC = () => {
 
     // Listen to gameplay events
     useEffect(() => {
+        let cleanupPendingAudio: (() => void) | null = null;
+
+        const playHostRoundAudio = (previewUrl: string, startedAt: number) => {
+            cleanupPendingAudio?.();
+            cleanupPendingAudio = null;
+            const audio = audioRef.current;
+            if (!audio || !previewUrl) return;
+
+            setIsAudioError(false);
+            audio.pause();
+            audio.src = previewUrl;
+            audio.volume = 0.8;
+            audio.muted = isMutedRef.current;
+
+            let settled = false;
+            const seekAndPlay = () => {
+                if (settled) return;
+                settled = true;
+                cleanupPendingAudio?.();
+                cleanupPendingAudio = null;
+
+                const seekTo = calculateStartTime(startedAt);
+                if (Number.isFinite(seekTo)) {
+                    try {
+                        audio.currentTime = seekTo;
+                    } catch {}
+                }
+                audio.play().then(() => {
+                    const corrected = calculateStartTime(startedAt);
+                    if (Number.isFinite(corrected) && Math.abs(audio.currentTime - corrected) > 0.3) {
+                        try { audio.currentTime = corrected; } catch {}
+                    }
+                    setIsAudioBlocked(false);
+                    setIsAudioError(false);
+                    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+                        try {
+                            navigator.mediaSession.playbackState = 'playing';
+                        } catch {}
+                    }
+                }).catch((err: DOMException | Error) => {
+                    if (err?.name === 'AbortError') return;
+                    if (err?.name === 'NotAllowedError') {
+                        setIsAudioBlocked(true);
+                    } else {
+                        console.warn('TV audio playback error:', err);
+                        setIsAudioBlocked(false);
+                        setIsAudioError(true);
+                    }
+                });
+            };
+
+            const onLoadError = () => {
+                if (settled) return;
+                settled = true;
+                cleanupPendingAudio?.();
+                cleanupPendingAudio = null;
+                console.warn('TV audio source failed to load:', previewUrl);
+                setIsAudioBlocked(false);
+                setIsAudioError(true);
+            };
+
+            if (audio.readyState >= 1) {
+                seekAndPlay();
+            } else {
+                audio.addEventListener('loadedmetadata', seekAndPlay, { once: true });
+                audio.addEventListener('canplay', seekAndPlay, { once: true });
+                audio.addEventListener('error', onLoadError, { once: true });
+                cleanupPendingAudio = () => {
+                    audio.removeEventListener('loadedmetadata', seekAndPlay);
+                    audio.removeEventListener('canplay', seekAndPlay);
+                    audio.removeEventListener('error', onLoadError);
+                };
+            }
+        };
+
         const handleRoundStarted = (payload: RoundPayload) => {
-            const startedAt = payload.startedAt || Date.now();
+            updateServerClockOffset(payload.serverTime);
+            if (launchTimerRef.current) {
+                clearTimeout(launchTimerRef.current);
+                launchTimerRef.current = null;
+            }
+            setIsLaunching(false);
+            const startedAt = payload.startedAt || getServerNow();
             const roundSec =
                 payload.endsAt && startedAt
                     ? Math.max(1, Math.round((payload.endsAt - startedAt) / 1000))
-                    : currentRoom?.lobbyOptions?.roundDuration || 25;
+                    : roundDurationRef.current;
             roundDurationRef.current = roundSec;
             roundStartedAtRef.current = startedAt;
             setCurrentRound(payload);
@@ -268,24 +387,8 @@ const PartyHostPage: React.FC = () => {
             setHostSelectedOptionIndex(null);
             setIsHostAnswerSubmitted(false);
 
-            if (audioRef.current && payload.preview) {
-                audioRef.current.src = payload.preview;
-                const seekTo = payload.startedAt ? calculateStartTime(startedAt) : 0;
-                try {
-                    audioRef.current.currentTime = seekTo;
-                } catch {}
-                audioRef.current.volume = 0.8;
-                audioRef.current.muted = isMutedRef.current;
-                audioRef.current.play().then(() => {
-                    setIsAudioBlocked(false);
-                    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-                        try {
-                            navigator.mediaSession.playbackState = 'playing';
-                        } catch {}
-                    }
-                }).catch(() => {
-                    setIsAudioBlocked(true);
-                });
+            if (payload.preview) {
+                playHostRoundAudio(payload.preview, startedAt);
             }
         };
 
@@ -294,12 +397,12 @@ const PartyHostPage: React.FC = () => {
         };
 
         const handleRoundResult = (payload: RoundResultPayload) => {
+            cleanupPendingAudio?.();
+            cleanupPendingAudio = null;
             roundStartedAtRef.current = null;
             setIsAudioBlocked(false);
+            setIsAudioError(false);
             setRoundResult(payload);
-            if (audioRef.current) {
-                audioRef.current.pause();
-            }
             if (audioRef.current) {
                 audioRef.current.pause();
             }
@@ -307,8 +410,13 @@ const PartyHostPage: React.FC = () => {
         };
 
         const handleGameFinished = () => {
+            if (isGameFinishedRef.current) return;
+            isGameFinishedRef.current = true;
+            cleanupPendingAudio?.();
+            cleanupPendingAudio = null;
             roundStartedAtRef.current = null;
             setIsAudioBlocked(false);
+            setIsAudioError(false);
             setIsGameFinished(true);
             if (audioRef.current) {
                 audioRef.current.pause();
@@ -325,7 +433,9 @@ const PartyHostPage: React.FC = () => {
 
         const handleReconnectToRound = (payload: any) => {
             if (!payload) return;
-            const startedAt = payload.startedAt || Date.now();
+            updateServerClockOffset(payload.serverTime);
+            setIsLaunching(false);
+            const startedAt = payload.startedAt || getServerNow();
             roundStartedAtRef.current = startedAt;
             setCurrentRound({
                 roundNumber: payload.roundNumber,
@@ -333,36 +443,23 @@ const PartyHostPage: React.FC = () => {
                 preview: payload.preview,
                 startedAt: payload.startedAt,
                 endsAt: payload.endsAt,
+                serverTime: payload.serverTime,
             });
             setRoundResult(null);
             const roundSec =
                 payload.endsAt && startedAt
                     ? Math.max(1, Math.round((payload.endsAt - startedAt) / 1000))
-                    : currentRoom?.lobbyOptions?.roundDuration || 25;
+                    : roundDurationRef.current;
             roundDurationRef.current = roundSec;
-            const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+            const elapsed = Math.floor((getServerNow() - startedAt) / 1000);
             setTimeLeft(Math.max(0, roundSec - elapsed));
             if (payload.answer) {
                 setIsHostAnswerSubmitted(true);
                 const idx = payload.options.indexOf(payload.answer);
                 setHostSelectedOptionIndex(idx >= 0 ? idx : null);
             }
-            if (audioRef.current && payload.preview) {
-                audioRef.current.src = payload.preview;
-                audioRef.current.volume = 0.8;
-                audioRef.current.muted = isMutedRef.current;
-                const seekTo = calculateStartTime(startedAt);
-                try {
-                    audioRef.current.currentTime = seekTo;
-                } catch {}
-                audioRef.current.play().then(() => {
-                    setIsAudioBlocked(false);
-                    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-                        try {
-                            navigator.mediaSession.playbackState = 'playing';
-                        } catch {}
-                    }
-                }).catch(() => setIsAudioBlocked(true));
+            if (payload.preview) {
+                playHostRoundAudio(payload.preview, startedAt);
             }
         };
 
@@ -380,6 +477,8 @@ const PartyHostPage: React.FC = () => {
             socketHandlers.off('gameFinished', handleGameFinished);
             socketHandlers.off('gameEnded', handleGameFinished);
             socketHandlers.off('reconnectToRound', handleReconnectToRound);
+            cleanupPendingAudio?.();
+            if (launchTimerRef.current) clearTimeout(launchTimerRef.current);
             clearMediaSessionPlayback(audioRef.current);
         };
     }, []);
@@ -389,7 +488,7 @@ const PartyHostPage: React.FC = () => {
         if (!currentRound || roundResult) return;
         const timer = setInterval(() => {
             if (roundStartedAtRef.current) {
-                const elapsed = (Date.now() - roundStartedAtRef.current) / 1000;
+                const elapsed = (getServerNow() - roundStartedAtRef.current) / 1000;
                 setTimeLeft(Math.max(0, Math.ceil(roundDurationRef.current - elapsed)));
             } else {
                 setTimeLeft((prev) => {
@@ -460,14 +559,15 @@ const PartyHostPage: React.FC = () => {
 
             console.log('🚀 Launching party game with tracks count:', tracks.length);
 
-            if (tracks.length >= 3) {
+            const playableTracks = tracks.filter((tr: any) => Boolean(tr?.preview));
+            if (playableTracks.length >= 4) {
                 setLaunchError(null);
                 socketEmitter.emit('launchGame', {
                     roomId: currentRoom.id,
                     selectedTracks: {
                         type: 'THEME',
                         id: themeToLoad,
-                        tracks: tracks,
+                        tracks: playableTracks,
                     },
                 });
             } else {
@@ -484,14 +584,19 @@ const PartyHostPage: React.FC = () => {
 
     const handleStartWithSelectedTracks = (selectedTracks: SelectedTracks) => {
         if (!currentRoom) return;
-        if (!selectedTracks?.tracks || selectedTracks.tracks.length < 3) {
-            console.warn('Not enough tracks returned to start party');
+        const playableCount = selectedTracks?.tracks?.filter((tr) => Boolean(tr?.preview)).length ?? 0;
+        if (playableCount < 4) {
+            console.warn('Not enough playable tracks returned to start party');
             setLaunchError(t('party.notEnoughTracks'));
             return;
         }
 
         setIsLaunching(true);
         setLaunchError(null);
+        if (launchTimerRef.current) clearTimeout(launchTimerRef.current);
+        launchTimerRef.current = setTimeout(() => {
+            setIsLaunching(false);
+        }, 6000);
         socketEmitter.emit('launchGame', {
             roomId: currentRoom.id,
             selectedTracks,
@@ -574,7 +679,28 @@ const PartyHostPage: React.FC = () => {
             <audio ref={audioRef} />
 
             {/* Fullscreen TV Mode Autoplay Overlay — on top of everything */}
-            {isAudioBlocked && (
+            {isAudioError && !roundResult && currentRound && (
+                <div
+                    role="status"
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        zIndex: 90,
+                        background: 'rgba(230, 57, 70, 0.92)',
+                        color: '#fff',
+                        padding: '10px 16px',
+                        borderRadius: '12px',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                    }}
+                    onClick={unlockAudio}
+                >
+                    ⚠️ {t('daily.audioError')}
+                </div>
+            )}
+
+            {isAudioBlocked && !isAudioError && !roundResult && (
                 <div
                     className={styles.tvAutoplayOverlay}
                     onClick={unlockAudio}

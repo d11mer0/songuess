@@ -166,7 +166,7 @@ TimelineGrid.displayName = 'TimelineGrid';
 
 const DailyChallengePage: React.FC = () => {
     const { t } = useTranslation();
-    const { data, isLoading, refetch } = useGetDailyChallengeQuery();
+    const { data, isLoading, refetch } = useGetDailyChallengeQuery(undefined, { refetchOnMountOrArgChange: true });
     const [submitGuess, { isLoading: isSubmitting }] = useSubmitDailyGuessMutation();
 
     const [guessMode, setGuessMode] = useState<'options' | 'manual'>('options');
@@ -188,6 +188,14 @@ const DailyChallengePage: React.FC = () => {
 
     const nextTierIndex = Math.min(TIERS.length - 1, attempts.length + 1);
     const diffSec = TIERS[nextTierIndex] - maxDuration;
+
+    useEffect(() => {
+        setIsPlaying(false);
+        setAudioError(false);
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+    }, [data?.preview]);
 
     useEffect(() => {
         if (data?.isCompleted) {

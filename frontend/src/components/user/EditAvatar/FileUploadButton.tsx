@@ -28,11 +28,11 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
                 );
                 return;
             }
-            if (file.size > 5 * 1024 * 1024) {
+            if (file.size > 2 * 1024 * 1024) {
                 setErrorMessage(
                     language === 'uk'
-                        ? 'Розмір файлу не повинен перевищувати 5MB!'
-                        : 'File size must not exceed 5MB!'
+                        ? 'Розмір файлу не повинен перевищувати 2MB!'
+                        : 'File size must not exceed 2MB!'
                 );
                 return;
             }

@@ -4,6 +4,7 @@ import {
     Patch,
     Delete,
     Param,
+    ParseIntPipe,
     Body,
     UseInterceptors,
     UploadedFile,
@@ -69,8 +70,8 @@ export class UserController {
         type: UserResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Користувач не знайдений' })
-    getUserById(@Param('id') id: number) {
-        return this.userService.getUserById(Number(id));
+    getUserById(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.getUserById(id);
     }
 
     @Patch('update-avatar')

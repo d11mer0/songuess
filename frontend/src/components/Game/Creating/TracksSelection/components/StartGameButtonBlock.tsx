@@ -2,7 +2,7 @@ import Button from '../../../../UI/Button/Button';
 import styles from '../TrackSelection.module.css';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
 
-const MIN_TRACKS = 10;
+const MIN_TRACKS = 4;
 
 interface Props {
     trackCount: number;

@@ -23,12 +23,32 @@ export class LeaderboardService {
         @Optional() private readonly redisService?: RedisService,
     ) {}
 
+    private buildWhereClause(period: 'all_time' | 'weekly' | 'monthly', genre: string) {
+        const whereClause: Record<string, any> = {};
+
+        if (period === 'weekly') {
+            whereClause.createdAt = { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) };
+        } else if (period === 'monthly') {
+            whereClause.createdAt = { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
+        }
+
+        if (genre && genre !== 'all') {
+            whereClause.genre = {
+                contains: genre.toLowerCase(),
+                mode: 'insensitive',
+            };
+        }
+
+        return whereClause;
+    }
+
     async getLeaderboard(
         period: 'all_time' | 'weekly' | 'monthly' = 'all_time',
         genre: string = 'all',
         currentUserId?: number,
     ) {
         const cacheKey = `leaderboard:${period}:${genre.toLowerCase()}`;
+        const whereClause = this.buildWhereClause(period, genre);
         let entries: LeaderboardEntry[] = [];
         let fromCache = false;
 
@@ -39,32 +59,12 @@ export class LeaderboardService {
                     entries = JSON.parse(cached);
                     fromCache = true;
                 }
-            } catch (err) {
+            } catch {
                 // ignore cache read error
             }
         }
 
         if (!fromCache) {
-            const whereClause: any = {};
-
-            // Фільтр за часом
-            if (period === 'weekly') {
-                const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-                whereClause.createdAt = { gte: sevenDaysAgo };
-            } else if (period === 'monthly') {
-                const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                whereClause.createdAt = { gte: thirtyDaysAgo };
-            }
-
-            // Фільтр за жанром
-            if (genre && genre !== 'all') {
-                whereClause.genre = {
-                    contains: genre.toLowerCase(),
-                    mode: 'insensitive',
-                };
-            }
-
-            // Агрегація балів з GameScore
             const scoreGroups = await this.prisma.gameScore.groupBy({
                 by: ['userId'],
                 where: whereClause,
@@ -113,8 +113,7 @@ export class LeaderboardService {
                         };
                     })
                     .filter((e): e is LeaderboardEntry => e !== null);
-            } else {
-                // Якщо ще немає записів GameScore, формуємо рейтинг з користувачів за record
+            } else if (period === 'all_time' && (!genre || genre === 'all')) {
                 const topUsers = await this.prisma.user.findMany({
                     orderBy: { record: 'desc' },
                     take: 50,
@@ -160,34 +159,56 @@ export class LeaderboardService {
             const found = entries.find((e) => e.userId === currentUserId);
             if (found) {
                 currentUserRank = found;
-            } else {
-                const user = await this.prisma.user.findUnique({
-                    where: { id: currentUserId },
-                    select: {
-                        id: true,
-                        login: true,
-                        avatar: true,
-                        record: true,
-                        dailyStreak: true,
-                        isPremium: true,
-                        customTitle: true,
-                        nameColor: true,
-                    },
+            } else if (typeof this.prisma.gameScore.aggregate === 'function') {
+                const agg = await this.prisma.gameScore.aggregate({
+                    where: { ...whereClause, userId: currentUserId },
+                    _sum: { score: true },
+                    _max: { score: true },
+                    _count: { id: true },
                 });
-                if (user) {
-                    currentUserRank = {
-                        rank: entries.length + 1,
-                        userId: user.id,
-                        login: user.login,
-                        avatar: user.avatar,
-                        totalScore: user.record,
-                        highScore: user.record,
-                        gamesPlayed: 0,
-                        dailyStreak: user.dailyStreak || 0,
-                        isPremium: user.isPremium || false,
-                        customTitle: user.customTitle || null,
-                        nameColor: user.nameColor || null,
-                    };
+                const gamesPlayed = agg?._count?.id || 0;
+                if (gamesPlayed > 0) {
+                    const userTotal = Math.round((agg._sum.score || 0) * 100) / 100;
+                    const userHigh = Math.round((agg._max.score || 0) * 100) / 100;
+                    const user = await this.prisma.user.findUnique({
+                        where: { id: currentUserId },
+                        select: {
+                            id: true,
+                            login: true,
+                            avatar: true,
+                            dailyStreak: true,
+                            isPremium: true,
+                            customTitle: true,
+                            nameColor: true,
+                        },
+                    });
+                    if (user) {
+                        const higherGroups = await this.prisma.gameScore.groupBy({
+                            by: ['userId'],
+                            where: whereClause,
+                            _sum: { score: true },
+                            having: {
+                                score: {
+                                    _sum: {
+                                        gt: userTotal,
+                                    },
+                                },
+                            },
+                        });
+                        currentUserRank = {
+                            rank: higherGroups.length + 1,
+                            userId: user.id,
+                            login: user.login,
+                            avatar: user.avatar,
+                            totalScore: userTotal,
+                            highScore: userHigh,
+                            gamesPlayed,
+                            dailyStreak: user.dailyStreak || 0,
+                            isPremium: user.isPremium || false,
+                            customTitle: user.customTitle || null,
+                            nameColor: user.nameColor || null,
+                        };
+                    }
                 }
             }
         }

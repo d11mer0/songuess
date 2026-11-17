@@ -34,7 +34,7 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit, artistHintTrigger = 0 }) => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
-    }, [trackInfo, initialAnswer]);
+    }, [trackInfo?.roundNumber, trackInfo?.preview, initialAnswer]);
 
     useEffect(() => {
         if (artistHintTrigger > 0) {

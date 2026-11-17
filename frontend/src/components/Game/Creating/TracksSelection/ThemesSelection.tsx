@@ -54,8 +54,16 @@ const ThemesSelection: FC<Props> = ({ handleStart }) => {
     const handleSendTracks = () => {
         if (!themeDetails) return;
 
+        const genreByTheme: Record<string, string> = {
+            'rock-ballads': 'rock',
+            'hits-2000s': 'pop',
+            'legendary-80s': 'pop',
+            'ukrainian-hits': 'pop',
+        };
         handleStart({
             type: 'THEME',
+            theme: selectedThemeId || undefined,
+            genre: selectedThemeId ? (genreByTheme[selectedThemeId] || 'all') : 'all',
             playlist: {
                 id: themeDetails.id?.toString() || 'theme',
                 title: selectedTheme ? getThemeTitle(selectedTheme) : themeDetails.title,

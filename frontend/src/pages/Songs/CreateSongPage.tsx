@@ -7,7 +7,7 @@ import styles from './CreateSongPage.module.css';
 import { FaPlay, FaPause, FaSearch, FaArrowLeft, FaCheck } from 'react-icons/fa';
 
 const CreateSongPage: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const navigate = useNavigate();
     const [createSong, { isLoading: isCreating }] = useCreateSongMutation();
 
@@ -66,7 +66,16 @@ const CreateSongPage: React.FC = () => {
             navigate('/songs');
         } catch (err: any) {
             console.error('Failed to create song', err);
-            setErrorMsg(err?.data?.message || t('createSongPage.errorMsg'));
+            if (err?.status === 403) {
+                setErrorMsg(
+                    language === 'uk'
+                        ? 'Лише адміністратори можуть додавати пісні до каталогу.'
+                        : 'Only administrators can add songs to the catalog.',
+                );
+            } else {
+                const msg = err?.data?.message;
+                setErrorMsg(Array.isArray(msg) ? msg.join(', ') : (msg || t('createSongPage.errorMsg')));
+            }
         }
     };
 

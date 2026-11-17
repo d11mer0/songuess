@@ -45,7 +45,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const [sfxMuted, setSfxMuted] = useState(() => soundEffects.isMuted());
 
-    const { audioRef, volume, setVolume, isPlaying, isAutoplayBlocked, resumeAudio } = useAudioPlayer({
+    const { audioRef, volume, setVolume, isPlaying, isAutoplayBlocked, audioError, resumeAudio } = useAudioPlayer({
         previewUrl: trackInfo?.preview ?? null,
         startedAt: trackInfo?.startedAt ?? null,
         initialVolume: 0.7,
@@ -156,7 +156,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return (
         <>
             {/* Fullscreen overlay — з'являється коли браузер блокує autoplay */}
-            {isAutoplayBlocked && (
+            {isAutoplayBlocked && !roundResult && !audioError && (
                 <div
                     className={styles.autoplayOverlay}
                     onClick={resumeAudio}
@@ -174,6 +174,26 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
             <div className={styles.widgetWrapper}>
                 <audio ref={audioRef} style={{ display: 'none' }} />
+                {audioError && !roundResult && (
+                    <div
+                        role="status"
+                        onClick={resumeAudio}
+                        title={t('daily.audioError')}
+                        style={{
+                            background: 'rgba(230, 57, 70, 0.92)',
+                            color: '#fff',
+                            fontSize: '12px',
+                            padding: '6px 10px',
+                            borderRadius: '10px',
+                            marginBottom: '6px',
+                            maxWidth: '240px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        ⚠️ {t('daily.audioError')}
+                    </div>
+                )}
 
                 {/* Main Interactive Trigger Pill */}
                 <div className={`${styles.triggerPill} ${isOpen ? styles.triggerOpen : ''}`}>

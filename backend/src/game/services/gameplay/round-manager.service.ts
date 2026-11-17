@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, Optional } from '@nestjs/common';
 import { Server } from 'socket.io';
-import { GameRoom, Player, GameRoomState } from '../../interfaces/game.interface';
-import { GameRound, PlayerRoundResult, GameProgress } from '../../interfaces/game-progress.interface';
+import { GameRoom, GameRoomState } from '../../interfaces/game.interface';
+import { GameRound } from '../../interfaces/game-progress.interface';
 import { shuffleArray } from '../../../utils/array';
 import { assignMissedAnswers } from '../../../utils/gameplay/player-results.utils';
 import { isGameFinished, prepareNextRound, buildGameRound } from '../../../utils/gameplay/round.util';
@@ -9,8 +9,8 @@ import { filterTracks } from '../../../utils/track-utils';
 import { ScoringService } from './scoring.service';
 import { GameResultService } from './game-result.service';
 import { GameEventsService } from './game-events.service';
+import { RoomManagerService } from '../room/room-manager.service';
 
-const ROUND_DURATION_MS = 25000;
 const ROUND_PAUSE_MS = 5000;
 const ROUNDS_NUMBER = 10;
 
@@ -24,10 +24,18 @@ export class RoundManagerService {
         private readonly scoring: ScoringService,
         private readonly gameResult: GameResultService,
         private readonly gameEvents: GameEventsService,
+        @Optional()
+        @Inject(forwardRef(() => RoomManagerService))
+        private readonly roomManager?: RoomManagerService,
     ) {}
 
     setServer(server: Server) {
         this.server = server;
+    }
+
+    private resolveCanonicalId(roomId: string): string {
+        const room = this.gameEvents.getRoom(roomId);
+        return room ? room.id : roomId;
     }
 
     generateGameRounds(tracks: any[], roundsCount: number = ROUNDS_NUMBER): GameRound[] {
@@ -36,66 +44,87 @@ export class RoundManagerService {
         if (count < 3) {
             throw new Error('Not enough tracks to generate round options');
         }
-        
+
         const selectedTracks = shuffleArray(playableTracks).slice(0, count);
         return selectedTracks.map((track, index) => buildGameRound(track, playableTracks, index));
     }
 
     startRound(roomId: string, roundNumber: number, round: GameRound) {
+        const canonicalId = this.resolveCanonicalId(roomId);
         round.startedAt = Date.now();
-        this.startRoundTimeout(roomId, roundNumber);
-        this.gameEvents.emitRoundEvent(roomId, round);
+        this.startRoundTimeout(canonicalId, roundNumber);
+        this.gameEvents.emitRoundEvent(canonicalId, round);
     }
 
     finishRound(roomId: string, roundNumber: number) {
         const room = this.gameEvents.getRoom(roomId);
         if (!room?.gameProgress) return;
+        const canonicalId = room.id;
         if (room.gameProgress.currentRound !== roundNumber) return;
 
         const { rounds, playerResults } = room.gameProgress;
         const round = rounds[roundNumber];
-        if (!round || (round as any).isFinished) return;
-        (round as any).isFinished = true;
+        if (!round || (round as { isFinished?: boolean }).isFinished) return;
+        (round as { isFinished?: boolean }).isFinished = true;
 
-        this.clearExistingTimeout(roomId);
-        this.clearPauseTimeout(roomId);
+        this.clearExistingTimeout(canonicalId);
+        this.clearPauseTimeout(canonicalId);
+        if (roomId !== canonicalId) {
+            this.clearExistingTimeout(roomId);
+            this.clearPauseTimeout(roomId);
+        }
 
         assignMissedAnswers(playerResults, room.players, roundNumber);
 
         this.scoring.calculateRoundScores(room, roundNumber);
-        this.gameEvents.emitRoundResults(round, roundNumber, playerResults, room.players, room.gameProgress, roomId);
+        this.roomManager?.syncRoom(room)?.catch((err) => {
+            console.error('Failed to sync room after finishRound:', err);
+        });
+        this.gameEvents.emitRoundResults(round, roundNumber, playerResults, room.players, room.gameProgress, canonicalId);
 
         const timer = setTimeout(() => {
-            this.pauseTimeouts.delete(roomId);
-            this.startNextRound(roomId);
+            this.pauseTimeouts.delete(canonicalId);
+            this.startNextRound(canonicalId);
         }, ROUND_PAUSE_MS);
-        this.pauseTimeouts.set(roomId, timer);
+        this.pauseTimeouts.set(canonicalId, timer);
     }
 
     cancelRoomGame(roomId: string) {
-        this.clearExistingTimeout(roomId);
-        this.clearPauseTimeout(roomId);
+        const canonicalId = this.resolveCanonicalId(roomId);
+        this.clearExistingTimeout(canonicalId);
+        this.clearPauseTimeout(canonicalId);
+        if (roomId !== canonicalId) {
+            this.clearExistingTimeout(roomId);
+            this.clearPauseTimeout(roomId);
+        }
     }
 
     private startNextRound(roomId: string) {
         const room = this.gameEvents.getRoom(roomId);
         if (!room?.gameProgress || room.state !== GameRoomState.STARTED) return;
+        const canonicalId = room.id;
 
         if (isGameFinished(room)) {
-            this.gameResult.finishGame(room);
+            this.gameResult.finishGame(room).catch((err) => {
+                console.error('finishGame error:', err);
+            });
             return;
         }
 
         const nextRound = prepareNextRound(room);
-        this.startRound(roomId, nextRound.roundNumber, nextRound);
+        this.startRound(canonicalId, nextRound.roundNumber, nextRound);
+        this.roomManager?.syncRoom(room)?.catch((err) => {
+            console.error('Failed to sync room after startNextRound:', err);
+        });
     }
 
     private startRoundTimeout(roomId: string, roundNumber: number) {
-        this.clearExistingTimeout(roomId);
         const room = this.gameEvents.getRoom(roomId);
+        const canonicalId = room ? room.id : roomId;
+        this.clearExistingTimeout(canonicalId);
         const durationSec = Math.min(25, Math.max(5, room?.lobbyOptions?.roundDuration || 25));
-        const timeout = setTimeout(() => this.finishRound(roomId, roundNumber), durationSec * 1000);
-        this.roundTimeouts.set(roomId, timeout);
+        const timeout = setTimeout(() => this.finishRound(canonicalId, roundNumber), durationSec * 1000);
+        this.roundTimeouts.set(canonicalId, timeout);
     }
 
     private clearExistingTimeout(roomId: string): boolean {

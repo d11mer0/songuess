@@ -23,7 +23,7 @@ export class RoundSyncService {
         }
 
         const round = room.gameProgress.rounds[room.gameProgress.currentRound];
-        if (!round?.startedAt) return;
+        if (!round?.startedAt || (round as { isFinished?: boolean }).isFinished) return;
 
         const playerResults = room.gameProgress.playerResults[userId];
         const roundResult = playerResults?.[round.roundNumber];

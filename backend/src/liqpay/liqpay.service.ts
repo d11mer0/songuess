@@ -10,6 +10,7 @@ export class LiqPayService {
     private readonly publicKey: string;
     private readonly privateKey: string;
     private readonly clientUrl: string;
+    private readonly backendUrl: string;
 
     constructor(
         private readonly configService: ConfigService,
@@ -19,6 +20,10 @@ export class LiqPayService {
         this.publicKey = this.configService.get<string>('LIQPAY_PUBLIC_KEY') || 'sandbox_i00000000000';
         this.privateKey = this.configService.get<string>('LIQPAY_PRIVATE_KEY') || 'sandbox_key';
         this.clientUrl = this.configService.get<string>('CLIENT_URL') || 'http://localhost:3001';
+        this.backendUrl =
+            this.configService.get<string>('BACKEND_URL') ||
+            this.configService.get<string>('API_URL') ||
+            this.clientUrl.replace(':3001', ':3000');
     }
 
     createSignature(data: string): string {
@@ -65,7 +70,7 @@ export class LiqPayService {
             description: desc,
             order_id: orderId,
             result_url: `${this.clientUrl}/user/me?payment=success&orderId=${orderId}`,
-            server_url: `${this.clientUrl.replace(':3001', ':3000')}/api/liqpay/callback`,
+            server_url: `${this.backendUrl.replace(/\/+$/, '')}/api/liqpay/callback`,
         };
 
         const jsonStr = JSON.stringify(payload);
@@ -90,7 +95,16 @@ export class LiqPayService {
             throw new BadRequestException('Invalid LiqPay signature');
         }
 
-        const decoded = JSON.parse(Buffer.from(data, 'base64').toString('utf-8'));
+        let decoded: any;
+        try {
+            decoded = JSON.parse(Buffer.from(data, 'base64').toString('utf-8'));
+        } catch {
+            this.logger.warn('Failed to parse LiqPay callback payload');
+            throw new BadRequestException('Invalid LiqPay payload format');
+        }
+        if (!decoded || typeof decoded !== 'object' || !decoded.order_id) {
+            throw new BadRequestException('Invalid LiqPay payload fields');
+        }
         const { order_id, status, amount, currency, action } = decoded;
 
         const donation = await this.prisma.donation.findUnique({

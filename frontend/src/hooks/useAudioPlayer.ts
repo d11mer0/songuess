@@ -38,6 +38,7 @@ export const useAudioPlayer = ({
     const [volume, setVolumeState] = useState(() => getSavedVolume(initialVolume));
     const [isPlaying, setIsPlaying] = useState(false);
     const [isAutoplayBlocked, setIsAutoplayBlocked] = useState(false);
+    const [audioError, setAudioError] = useState(false);
 
     // Refs — завжди містять актуальні значення без залежності від useCallback deps.
     // Це ключово для resumeAudio: час рахується ЗАРАЗ, а не в момент створення closure.
@@ -102,11 +103,20 @@ export const useAudioPlayer = ({
                 }
                 setIsPlaying(true);
                 setIsAutoplayBlocked(false);
+                setAudioError(false);
                 isResumingRef.current = false;
             })
-            .catch((err) => {
-                console.warn('Playback still prevented on resume', err);
+            .catch((err: DOMException | Error) => {
                 isResumingRef.current = false;
+                if (err?.name === 'AbortError') return;
+                if (err?.name === 'NotAllowedError') {
+                    console.warn('Playback still prevented on resume', err);
+                    setIsAutoplayBlocked(true);
+                } else {
+                    console.warn('Audio playback error on resume', err);
+                    setAudioError(true);
+                    setIsAutoplayBlocked(false);
+                }
             });
     }, []); // Порожній deps — всі значення беруться з refs
 
@@ -116,7 +126,10 @@ export const useAudioPlayer = ({
 
         blockMediaSessionHardwareKeys(audio);
 
-        const onPlay = () => setIsPlaying(true);
+        const onPlay = () => {
+            setIsPlaying(true);
+            setAudioError(false);
+        };
         const onPause = () => setIsPlaying(false);
         const onEnded = () => setIsPlaying(false);
         const onWaiting = () => {
@@ -124,17 +137,25 @@ export const useAudioPlayer = ({
                 setIsPlaying(false);
             }
         };
+        const onError = () => {
+            if (!previewUrlRef.current) return;
+            setIsPlaying(false);
+            setIsAutoplayBlocked(false);
+            setAudioError(true);
+        };
 
         audio.addEventListener('play', onPlay);
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
         audio.addEventListener('waiting', onWaiting);
+        audio.addEventListener('error', onError);
 
         return () => {
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
             audio.removeEventListener('waiting', onWaiting);
+            audio.removeEventListener('error', onError);
             clearMediaSessionPlayback(audio);
         };
     }, []);
@@ -147,6 +168,7 @@ export const useAudioPlayer = ({
             clearMediaSessionPlayback(audio);
             setIsPlaying(false);
             setIsAutoplayBlocked(false);
+            setAudioError(false);
             return;
         }
 
@@ -154,14 +176,16 @@ export const useAudioPlayer = ({
         audio.src = previewUrl;
         audio.volume = volume;
         setIsPlaying(false);
+        setAudioError(false);
 
         let hasStarted = false;
+        let cancelled = false;
 
         const applySeekAndPlay = () => {
-            if (hasStarted) return;
+            if (hasStarted || cancelled) return;
             hasStarted = true;
 
-            const isHeardleMode = Boolean(isHeardle);
+            const isHeardleMode = Boolean(isHeardleRef.current);
             const playbackStartTime = isHeardleMode ? 0 : calculateStartTime(startedAt);
             if (Number.isFinite(playbackStartTime)) {
                 try {
@@ -175,6 +199,7 @@ export const useAudioPlayer = ({
             if (playPromise !== undefined) {
                 playPromise
                     .then(() => {
+                        if (cancelled) return;
                         if (!isHeardleMode) {
                             const correctedTime = calculateStartTime(startedAt);
                             if (Number.isFinite(correctedTime) && Math.abs(audio.currentTime - correctedTime) > 0.3) {
@@ -183,16 +208,24 @@ export const useAudioPlayer = ({
                         }
                         setIsPlaying(true);
                         setIsAutoplayBlocked(false);
+                        setAudioError(false);
                         if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
                             try {
                                 navigator.mediaSession.playbackState = 'playing';
                             } catch {}
                         }
                     })
-                    .catch((err) => {
-                        console.warn('Autoplay blocked by browser policy:', err);
+                    .catch((err: DOMException | Error) => {
+                        if (cancelled || err?.name === 'AbortError') return;
                         setIsPlaying(false);
-                        setIsAutoplayBlocked(true);
+                        if (err?.name === 'NotAllowedError') {
+                            console.warn('Autoplay blocked by browser policy:', err);
+                            setIsAutoplayBlocked(true);
+                        } else {
+                            console.warn('Audio playback error:', err);
+                            setAudioError(true);
+                            setIsAutoplayBlocked(false);
+                        }
                     });
             }
         };
@@ -205,6 +238,7 @@ export const useAudioPlayer = ({
         }
 
         return () => {
+            cancelled = true;
             hasStarted = true;
             audio.removeEventListener('loadedmetadata', applySeekAndPlay);
             audio.removeEventListener('canplay', applySeekAndPlay);
@@ -291,8 +325,19 @@ export const useAudioPlayer = ({
         if ((durationIncreased || replayClicked) && !isAutoplayBlocked) {
             audio.currentTime = 0;
             audio.play()
-                .then(() => setIsPlaying(true))
-                .catch(() => {});
+                .then(() => {
+                    setIsPlaying(true);
+                    setAudioError(false);
+                })
+                .catch((err: DOMException | Error) => {
+                    if (err?.name === 'AbortError') return;
+                    setIsPlaying(false);
+                    if (err?.name === 'NotAllowedError') {
+                        setIsAutoplayBlocked(true);
+                    } else {
+                        setAudioError(true);
+                    }
+                });
         }
     }, [previewUrl, maxPlayDuration, isHeardle, isAutoplayBlocked, replayTrigger]);
 
@@ -308,6 +353,7 @@ export const useAudioPlayer = ({
         setVolume,
         isPlaying,
         isAutoplayBlocked,
+        audioError,
         resumeAudio,
     };
 };

@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { socketHandlers } from './socketHandlers';
 
 const API_URL =
     import.meta.env.VITE_API_URL ||
@@ -13,12 +14,17 @@ class SocketInstance {
         const token = localStorage.getItem('accessToken');
 
         // If the socket was previously created with a different or null token, tear it down
-        if (this.socket && (this.socket.auth as any)?.token !== token) {
+        if (this.socket && (this.socket.auth as { token?: string | null })?.token !== token) {
+            this.socket.removeAllListeners();
             this.socket.disconnect();
             this.socket = null;
+            socketHandlers.bindToSocket(null);
         }
 
         if (!this.socket || this.socket.disconnected) {
+            if (this.socket) {
+                this.socket.removeAllListeners();
+            }
             this.socket = io(API_URL, {
                 transports: ['websocket'],
                 auth: { token },
@@ -45,16 +51,25 @@ class SocketInstance {
             });
         }
 
+        if (this.socket) {
+            socketHandlers.bindToSocket(this.socket);
+        }
+
         if (this.socket && !this.socket.connected) {
             this.socket.connect();
         }
     }
 
     disconnect() {
-        if (this.socket && this.socket.connected) {
-            this.socket.disconnect();
-            console.log('🔌 WebSocket вручну відключено');
+        if (this.socket) {
+            this.socket.removeAllListeners();
+            if (this.socket.connected) {
+                this.socket.disconnect();
+                console.log('🔌 WebSocket вручну відключено');
+            }
+            this.socket = null;
         }
+        socketHandlers.bindToSocket(null);
     }
 
     getSocket(): Socket | null {

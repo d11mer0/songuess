@@ -109,4 +109,33 @@ describe('ScoringService - Streak Multipliers & Game Modes', () => {
         expect(room.gameProgress!.playerResults[1][0].score).toBeGreaterThan(150);
         expect(room.gameProgress!.playerResults[2][0].score).toBe(0);
     });
+
+    it('should not throw if a player has missing playerResults entry (BUG-02)', () => {
+        const room = createMockRoom();
+        room.players.push({ id: 3, login: 'NewJoiner', isOnline: true, avatar: null });
+        expect(() => service.calculateRoundScores(room, 0)).not.toThrow();
+    });
+
+    it('should NOT award achievements in solo rooms (< 2 players) or to guest players (BUG-17)', () => {
+        const awardAchievement = jest.fn().mockResolvedValue(undefined);
+        const svcWithAch = new ScoringService({ awardAchievement } as any);
+
+        const soloRoom = createMockRoom({ 1: 4 });
+        soloRoom.players = [{ id: 1, login: 'Solo', isOnline: true, avatar: null }];
+        soloRoom.gameProgress!.playerResults[1][0].timeTaken = 500;
+        svcWithAch.calculateRoundScores(soloRoom, 0);
+        expect(awardAchievement).not.toHaveBeenCalled();
+
+        const guestRoom = createMockRoom({ 1: 4 });
+        guestRoom.players[0].isGuest = true;
+        guestRoom.gameProgress!.playerResults[1][0].timeTaken = 500;
+        svcWithAch.calculateRoundScores(guestRoom, 0);
+        expect(awardAchievement).not.toHaveBeenCalled();
+
+        const regRoom = createMockRoom({ 1: 4 });
+        regRoom.gameProgress!.playerResults[1][0].timeTaken = 500;
+        svcWithAch.calculateRoundScores(regRoom, 0);
+        expect(awardAchievement).toHaveBeenCalledWith(1, 'SNIPER_1S');
+        expect(awardAchievement).toHaveBeenCalledWith(1, 'COMBO_5X');
+    });
 });

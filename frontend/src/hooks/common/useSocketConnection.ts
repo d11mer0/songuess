@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { socketEmitter, socketInstance } from "../../services/socket";
+import { socketInstance } from "../../services/socket";
 
 export const useSocketConnection = () => {
     useEffect(() => {
-        socketInstance.connect();
-        socketEmitter.emit('reconnectRoom');
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            socketInstance.connect();
+        }
     }, []);
 };

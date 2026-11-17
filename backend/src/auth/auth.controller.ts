@@ -104,7 +104,12 @@ export class AuthController {
     @ApiOperation({ summary: 'Вихід з облікового запису' })
     @ApiResponse({ status: 200, description: 'Користувач вийшов з системи' })
     logout(@Res() res: Response) {
-        res.clearCookie('refreshToken');
+        res.clearCookie('refreshToken', {
+            httpOnly: cookieOptions.httpOnly,
+            secure: cookieOptions.secure,
+            sameSite: cookieOptions.sameSite,
+            path: cookieOptions.path,
+        });
         return res.status(200).json({ message: 'Logout successful' });
     }
 

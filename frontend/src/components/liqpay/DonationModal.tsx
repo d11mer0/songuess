@@ -185,14 +185,18 @@ export const DonationModal: React.FC<DonationModalProps> = ({ show, onClose, onS
                 )}
             </Modal.Body>
             <Modal.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button
-                    variant="neutral"
-                    onClick={handleSimulateTest}
-                    disabled={isSimulating || isCheckingOut || activeAmount <= 0}
-                    style={{ fontSize: '0.85rem', backgroundColor: '#28a745', borderColor: '#28a745', color: '#ffffff' }}
-                >
-                    {isSimulating ? t('common.loading') : t('liqpay.testSimulate')}
-                </Button>
+                {import.meta.env.DEV ? (
+                    <Button
+                        variant="neutral"
+                        onClick={handleSimulateTest}
+                        disabled={isSimulating || isCheckingOut || activeAmount <= 0}
+                        style={{ fontSize: '0.85rem', backgroundColor: '#28a745', borderColor: '#28a745', color: '#ffffff' }}
+                    >
+                        {isSimulating ? t('common.loading') : t('liqpay.testSimulate')}
+                    </Button>
+                ) : (
+                    <span />
+                )}
                 <div>
                     <Button variant="secondary" onClick={onClose} style={{ marginRight: '8px' }}>
                         {t('common.cancel')}

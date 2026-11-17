@@ -38,7 +38,7 @@ const PlaylistSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props)
                 title: playlistDetails.title,
                 picture: playlistDetails.picture_big,
             },
-            tracks: playlistDetails?.tracks?.data,
+            tracks: playlistDetails?.tracks?.data || [],
         });
     };
 
@@ -57,12 +57,12 @@ const PlaylistSelection: FC<Props> = ({ handleStart, autoFocus = false }: Props)
                 <>
                     <PlaylistDetails details={playlistDetails} />
                     <PlaylistTracks
-                        tracks={playlistDetails.tracks.data}
+                        tracks={playlistDetails?.tracks?.data || []}
                         isLoading={isLoadingTracks}
                         isList={false}
                     />
                     <StartGameButtonBlock
-                        trackCount={playlistDetails.tracks.data.length}
+                        trackCount={playlistDetails?.tracks?.data?.length || 0}
                         onClick={handleSendTracks}
                     />
                     <ClearSelectionButton onClear={() => setSelectedPlaylistId(null)} />

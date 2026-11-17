@@ -1,8 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class DailyGuessDto {
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
     @IsString()
     @IsNotEmpty()
+    @MaxLength(200)
     guess: string;
 
     @IsNumber()

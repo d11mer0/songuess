@@ -73,7 +73,17 @@ export class AuthService {
             );
         }
 
-        const user = await this.userService.createUser(login, email, password);
+        let user;
+        try {
+            user = await this.userService.createUser(login, email, password);
+        } catch (err: any) {
+            if (err?.code === 'P2002') {
+                throw new BadRequestException(
+                    'User with this login or email already exists',
+                );
+            }
+            throw err;
+        }
         if (!user.isVerified) {
             await this.emailService.sendEmailVerification(user.id, user.email);
             return {
@@ -122,15 +132,33 @@ export class AuthService {
             'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg',
         );
 
-        const user = await this.prisma.user.create({
-            data: {
-                login: uniqueLogin,
-                email: guestEmail,
-                password: null,
-                isVerified: true,
-                avatar: defaultAvatar,
-            },
-        });
+        let user;
+        try {
+            user = await this.prisma.user.create({
+                data: {
+                    login: uniqueLogin,
+                    email: guestEmail,
+                    password: null,
+                    isVerified: true,
+                    avatar: defaultAvatar,
+                },
+            });
+        } catch (err: any) {
+            if (err?.code === 'P2002') {
+                const retryLogin = `${baseLogin}_${Date.now().toString().slice(-4)}_${Math.floor(10 + Math.random() * 89)}`;
+                user = await this.prisma.user.create({
+                    data: {
+                        login: retryLogin,
+                        email: `guest_${Date.now()}_${Math.random().toString(36).substring(2, 8)}@guest.songuess.local`,
+                        password: null,
+                        isVerified: true,
+                        avatar: defaultAvatar,
+                    },
+                });
+            } else {
+                throw err;
+            }
+        }
 
         const tokens = this.tokenService.generateTokens(
             user.id,
@@ -171,11 +199,6 @@ export class AuthService {
 
     async verifyEmail(token: string) {
         const decoded = this.tokenService.verifyEmailToken(token);
-        if (!decoded) {
-            throw new BadRequestException(
-                'Invalid or expired email verification token',
-            );
-        }
 
         const storedToken = await this.prisma.token.findFirst({
             where: {
@@ -204,11 +227,6 @@ export class AuthService {
 
     async resetPassword({ token, newPassword }: ResetPasswordDto) {
         const decoded = this.tokenService.verifyResetToken(token);
-        if (!decoded) {
-            throw new BadRequestException(
-                'Invalid or expired password reset token',
-            );
-        }
 
         const storedToken = await this.prisma.token.findFirst({
             where: {

@@ -12,6 +12,7 @@ import { wsCorsOptions } from '../../common/config/cors.config';
 import { GameplayService } from '../services/gameplay/gameplay.service';
 import { SubmitAnswerDto } from '../dto/submit-answer.dto';
 import { LaunchGameDto } from '../dto/launch-game.dto';
+import { RestartGameDto, SendReactionDto, UnlockHeardleDto } from '../dto/gameplay-actions.dto';
 
 @WebSocketGateway({
     cors: wsCorsOptions,
@@ -62,7 +63,7 @@ export class GameplayGateway {
     @SubscribeMessage('restartGame')
     handleRestartGame(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { roomId: string },
+        @MessageBody() data: RestartGameDto,
     ) {
         this.gameplayService.handleRestartGame(client, data.roomId);
     }
@@ -70,21 +71,21 @@ export class GameplayGateway {
     @SubscribeMessage('unlockHeardleSnippet')
     handleUnlockHeardleSnippet(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { roomId: string; roundNumber: number; snippetDuration: number },
+        @MessageBody() data: UnlockHeardleDto,
     ) {
         this.gameplayService.handleUnlockHeardleSnippet(
             client,
-            data?.roomId,
-            data?.roundNumber,
-            data?.snippetDuration,
+            data.roomId,
+            data.roundNumber,
+            data.snippetDuration,
         );
     }
 
     @SubscribeMessage('sendReaction')
     handleSendReaction(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { roomId: string; emoji: string },
+        @MessageBody() data: SendReactionDto,
     ) {
-        this.gameplayService.handleReaction(client, data?.roomId, data?.emoji);
+        this.gameplayService.handleReaction(client, data.roomId, data.emoji);
     }
 }

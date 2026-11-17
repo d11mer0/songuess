@@ -1,4 +1,4 @@
-import { GameRoom } from '../../game/interfaces/game.interface';
+import { GameRoom, Player } from '../../game/interfaces/game.interface';
 import { GameRound, RoundTrack } from '../../game/interfaces/game-progress.interface';
 import { TrackItem } from '../../game/interfaces/tracks.interface';
 import { pickRandomWrongOptions, shuffleArray } from '../array';
@@ -6,10 +6,11 @@ import { pickRandomWrongOptions, shuffleArray } from '../array';
 export function checkAllPlayersAnswered(
     playerResults: Record<number, Record<number, any>>,
     roundNumber: number,
-    totalPlayers: number,
+    players: Player[],
 ): boolean {
-    const answered = Object.values(playerResults).filter(r => r[roundNumber] !== undefined).length;
-    return totalPlayers > 0 && answered >= totalPlayers;
+    const onlinePlayers = players.filter((p) => p.isOnline);
+    if (onlinePlayers.length === 0) return false;
+    return onlinePlayers.every((p) => playerResults[p.id]?.[roundNumber] !== undefined);
 }
 
 export function isGameFinished(room: GameRoom): boolean {
@@ -32,7 +33,7 @@ export function buildGameRound(
     allTracks: TrackItem[],
     roundIndex: number
 ): GameRound {
-    const wrongOptions = pickRandomWrongOptions(allTracks, correctTrack.id, 3);
+    const wrongOptions = pickRandomWrongOptions(allTracks, correctTrack.id, 3, correctTrack.title);
     const options = shuffleArray([correctTrack.title, ...wrongOptions]);
 
     const roundTrack: RoundTrack = {
