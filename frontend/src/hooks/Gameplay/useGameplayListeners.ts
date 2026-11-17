@@ -18,6 +18,7 @@ import {
     changeRoomState
 } from '../../store/gameplay/gameplaySlice';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
+import { clearRoomSessionStorage } from '../../utils/storage/clearRoomSessionStorage';
 import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 
 interface RoundTrackWithoutPreview {
@@ -38,7 +39,7 @@ export const useGameplayListeners = () => {
         (payload: GameRoundPublicData & { answer: string | null; heardleUnlockedTier?: number }) => {
             dispatch(reconnectToRound(payload));
         },
-        [dispatch],
+        [dispatch, currentRoom?.id],
     );
 
     const handleSetTrackInfo = useCallback (
@@ -128,7 +129,8 @@ export const useGameplayListeners = () => {
     );
 
     const handleGameEnded = useCallback(
-        (resultPayload: GameEndedPayload) => { 
+        (resultPayload: GameEndedPayload) => {
+            clearRoomSessionStorage(currentRoom?.id);
             dispatch(setGameEndedData(resultPayload)); // ✅ зберігаємо в стейт
             dispatch(endGame()); // змінюємо статус кімнати
         },
@@ -142,6 +144,7 @@ export const useGameplayListeners = () => {
                 (player) => player.id === user?.id,
             );
             if (wasKicked) {
+                clearRoomSessionStorage(room.id);
                 dispatch(setCurrentRoom(null));
                 socketOffMany([
                     'playerDisconnected', 
@@ -210,6 +213,7 @@ export const useGameplayListeners = () => {
     }, [currentRoom?.id, currentRoom?.leaderId, currentRoom?.lobbyOptions?.isPartyMode, user?.id, navigate]);
 
     const handleGameRestarted = useCallback((room: Room) => {
+        clearRoomSessionStorage(room?.id);
         dispatch(setGameEndedData(null));          // ✅ очистка результатів
         dispatch(changeRoomState(RoomState.CREATING)); // ✅ оновлюємо стан кімнати
         dispatch(setCurrentRoom(room));            // оновлюємо інформацію про кімнату (гравці ті самі)

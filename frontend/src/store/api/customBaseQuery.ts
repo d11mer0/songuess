@@ -15,8 +15,8 @@ const getToken = () => localStorage.getItem('accessToken');
 
 const baseQuery = fetchBaseQuery({
     baseUrl: workLink,
-    credentials: 'include', // еквівалент withCredentials: true
-    prepareHeaders: (headers, { getState }) => {
+    credentials: 'include',
+    prepareHeaders: (headers) => {
         const token = getToken();
         if (token) {
             headers.set('Authorization', `Bearer ${token}`);
@@ -25,36 +25,51 @@ const baseQuery = fetchBaseQuery({
     },
 });
 
+let refreshPromise: Promise<string | null> | null = null;
+
 const customBaseQuery: BaseQueryFn<
-    string | FetchArgs, // Тип аргументу (запит)
-    unknown, // Очікуваний результат (може бути будь-яким)
-    FetchBaseQueryError // Помилки від `fetchBaseQuery`
+    string | FetchArgs,
+    unknown,
+    FetchBaseQueryError
 > = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
 
-    // Перевіряємо, чи отримали 401 і чи є сенс оновлювати токен
     if (result.error && result.error.status === 401) {
         const urlStr = typeof args === 'string' ? args : args.url;
-        const isAuthEndpoint = urlStr.includes('/auth/login') || urlStr.includes('/auth/register') || urlStr.includes('/auth/refresh');
+        const isAuthEndpoint =
+            urlStr.includes('/auth/login') ||
+            urlStr.includes('/auth/register') ||
+            urlStr.includes('/auth/refresh');
         const hasStoredToken = Boolean(localStorage.getItem('accessToken'));
 
         if (!isAuthEndpoint && hasStoredToken) {
-            const refreshResult = await baseQuery(
-                '/auth/refresh',
-                api,
-                extraOptions,
-            );
-            const accessToken = (refreshResult.data as { accessToken?: string })
-                ?.accessToken;
-            if (accessToken) {
-                // Зберігаємо новий токен
-                localStorage.setItem('accessToken', accessToken);
+            if (!refreshPromise) {
+                refreshPromise = (async () => {
+                    try {
+                        const refreshResult = await baseQuery(
+                            '/auth/refresh',
+                            api,
+                            extraOptions,
+                        );
+                        const newToken = (
+                            refreshResult.data as { accessToken?: string }
+                        )?.accessToken;
+                        if (newToken) {
+                            localStorage.setItem('accessToken', newToken);
+                            return newToken;
+                        }
+                        localStorage.removeItem('accessToken');
+                        api.dispatch({ type: 'user/logout' });
+                        return null;
+                    } finally {
+                        refreshPromise = null;
+                    }
+                })();
+            }
 
-                // Повторюємо оригінальний запит з новим токеном
+            const accessToken = await refreshPromise;
+            if (accessToken) {
                 return await baseQuery(args, api, extraOptions);
-            } else {
-                localStorage.removeItem('accessToken');
-                api.dispatch({ type: 'user/logout' });
             }
         }
     }

@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useSocketConnection } from '../common/useSocketConnection';
 import { setCurrentRoom } from '../../store/gameplay/gameplaySlice';
 import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
+import { clearRoomSessionStorage } from '../../utils/storage/clearRoomSessionStorage';
 
 export const useGameplay = () => {
     const dispatch = useAppDispatch();
@@ -31,6 +32,7 @@ export const useGameplay = () => {
     const deleteRoom = useCallback(() => {
         const targetId = roomId || currentRoom?.id;
         if (targetId) {
+            clearRoomSessionStorage(targetId);
             socketEmitter.emit('deleteRoom', { id: targetId });
             dispatch(setCurrentRoom(null));
             socketOffMany([
@@ -81,6 +83,7 @@ export const useGameplay = () => {
     const leaveRoom = useCallback(() => {
         const targetId = currentRoom?.id || roomId;
         if (targetId) {                   
+            clearRoomSessionStorage(targetId);
             socketEmitter.emit('leaveRoom', { id: targetId });
             dispatch(setCurrentRoom(null));
             socketOffMany([

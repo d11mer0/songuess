@@ -39,6 +39,11 @@ export class GameResultService {
             const socket = this.gameService.getClientSocketByUserId(player.id);
             socket?.emit('gameEnded', { myResults });
 
+            // Не зберігаємо результати в публічний рейтинг/досягнення для гостей або соло-ігор (1 гравець)
+            if (player.isGuest || room.players.length < 2) {
+                return;
+            }
+
             // Зберігаємо результати у БД для лідербордів
             const totalScore = room.gameProgress?.totalScores?.[player.id] ?? 0;
             const rawGenre = (room.gameData as any)?.genre || (room.gameData as any)?.theme || 'all';
@@ -85,8 +90,9 @@ export class GameResultService {
         await Promise.allSettled(resultsPromises);
 
         // Визначаємо переможця гри для FIRST_WIN та DUEL_GLADIATOR
-        if (this.achievementService && room.players.length > 0) {
-            const scores = room.players.map((p) => ({
+        const registeredPlayers = room.players.filter((p) => !p.isGuest);
+        if (this.achievementService && room.players.length >= 2 && registeredPlayers.length > 0) {
+            const scores = registeredPlayers.map((p) => ({
                 id: p.id,
                 score: room.gameProgress?.totalScores?.[p.id] ?? 0,
             }));

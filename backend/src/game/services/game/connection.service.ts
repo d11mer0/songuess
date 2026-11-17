@@ -39,7 +39,13 @@ export class ConnectionService {
 
     handleDisconnect(client: Socket) {
         const user = client.data.user;
+        this.clients.remove(client);
         if (!user) return;
+
+        // Якщо користувач досі підключений з іншої вкладки — не скидаємо статус онлайн і не видаляємо кімнату
+        if (this.clients.getClientId(user.id)) {
+            return;
+        }
 
         this.matchmakingService.removeFromDuelQueue(user.id);
 
@@ -66,7 +72,6 @@ export class ConnectionService {
                 }
             }
         }
-        this.clients.remove(client);
     }
 
     getClientsMap() {

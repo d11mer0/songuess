@@ -327,3 +327,17 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 6. **WebSockets & CORS & Swagger Hardening:** Created shared `backend/src/common/config/cors.config.ts` applied to HTTP CORS and all 4 WebSocket gateways (`GameGateway`, `GameplayGateway`, `RoomControlGateway`, `RoomLobbyGateway`). Added `ValidationPipe` + `class-validator` rules on `GameplayGateway` (`SubmitAnswerDto`, `LaunchGameDto`) and disabled Swagger `/api/docs` in `production`.
 7. **Auth Token & Enumeration Hardening (`AuthService`):** `refreshTokens` now verifies the user still exists in PostgreSQL; `sendTokenEmail` returns a generic success message for `PASSWORD_RESET` when the email does not exist.
 8. **Daily Challenge Server-Side Attempt Tracking (`DailyService.submitGuess`):** Attempt count and score are now calculated server-side from Redis (`attemptsHistory.length + 1`) rather than trusting client-supplied `attempt`, and missing/deleted users return `UnauthorizedException`.
+
+
+---
+
+## 7. Deep Security Audit Fixes — Stability, Anti-Farm & Party Mode (Items 9–16)
+
+9. **Solo & Guest Leaderboard Farming Prevention (`GameResultService.finishGame`):** `GameScore`, personal `record`, and achievements (`CENTURION_100`, `FIRST_WIN`, `DUEL_GLADIATOR`) are now recorded only for registered (non-guest) players in multiplayer rooms (`room.players.length >= 2`).
+10. **Multi-Tab Socket Disconnect Protection (`ClientsRegistry` & `ConnectionService`):** `handleDisconnect` removes the closing socket first and checks `this.clients.getClientId(user.id)` — if another browser tab for that `userId` is still connected, the player stays online without triggering room cleanup or leader reassignment. `getClientId` returns the newest connected socket.
+11. **Strict Cosmetics Validation (`UpdateCosmeticsDto`):** Enforced 6-digit HEX format `/^(#[0-9a-fA-F]{6})?$/` on `nameColor` and `@MaxLength(32)` on `customTitle`.
+12. **Deleted-User Daily Guess Guard:** Handled via `UnauthorizedException` in `DailyService.submitGuess` (covered in Section 6.8).
+13. **Party Mode TV Dynamic Round Timer (`PartyHostPage.tsx`):** Replaced hardcoded `25`s duration with `roundDurationRef` calculated from `payload.endsAt - startedAt` (or `room.lobbyOptions.roundDuration`), and omitted invalid `snippetDurationUsed: 0` in `PartyHostPage.tsx` and `PartyControllerPage.tsx`.
+14. **Scoped Socket Listener Cleanup (`PartyHostPage.tsx` & `PartyControllerPage.tsx`):** Passed exact callback references to `socketHandlers.off(event, handler)` instead of wiping all shared listeners.
+15. **Token Refresh Mutex (`customBaseQuery.ts`):** Added a shared `refreshPromise` lock so concurrent `401` responses trigger only one `/auth/refresh` call.
+16. **Session Storage Cleanup (`clearRoomSessionStorage.ts`):** Cleared `songuess_heardle_${roomId}_*` and `songuess_answered_${roomId}_*` keys on `leaveRoom`, `deleteRoom`, kick, `gameEnded`, and `gameRestarted`.

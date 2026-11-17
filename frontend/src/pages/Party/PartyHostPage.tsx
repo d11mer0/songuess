@@ -58,6 +58,7 @@ const PartyHostPage: React.FC = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const roundStartedAtRef = useRef<number | null>(null);
     const isResumingRef = useRef<boolean>(false);
+    const roundDurationRef = useRef<number>(25);
 
     const [currentRound, setCurrentRound] = useState<RoundPayload | null>(null);
     const [timeLeft, setTimeLeft] = useState(25);
@@ -251,11 +252,16 @@ const PartyHostPage: React.FC = () => {
     useEffect(() => {
         const handleRoundStarted = (payload: RoundPayload) => {
             const startedAt = payload.startedAt || Date.now();
+            const roundSec =
+                payload.endsAt && startedAt
+                    ? Math.max(1, Math.round((payload.endsAt - startedAt) / 1000))
+                    : currentRoom?.lobbyOptions?.roundDuration || 25;
+            roundDurationRef.current = roundSec;
             roundStartedAtRef.current = startedAt;
             setCurrentRound(payload);
             setRoundResult(null);
             setAnsweredPlayerIds(new Set());
-            setTimeLeft(25);
+            setTimeLeft(roundSec);
             setHostSelectedOptionIndex(null);
             setIsHostAnswerSubmitted(false);
 
@@ -323,8 +329,13 @@ const PartyHostPage: React.FC = () => {
                 endsAt: payload.endsAt,
             });
             setRoundResult(null);
+            const roundSec =
+                payload.endsAt && startedAt
+                    ? Math.max(1, Math.round((payload.endsAt - startedAt) / 1000))
+                    : currentRoom?.lobbyOptions?.roundDuration || 25;
+            roundDurationRef.current = roundSec;
             const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-            setTimeLeft(Math.max(0, 25 - elapsed));
+            setTimeLeft(Math.max(0, roundSec - elapsed));
             if (payload.answer) {
                 setIsHostAnswerSubmitted(true);
                 const idx = payload.options.indexOf(payload.answer);
@@ -357,12 +368,12 @@ const PartyHostPage: React.FC = () => {
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
 
         return () => {
-            socketHandlers.off('roundStarted');
-            socketHandlers.off('playerAnswered');
-            socketHandlers.off('roundResult');
-            socketHandlers.off('gameFinished');
-            socketHandlers.off('gameEnded');
-            socketHandlers.off('reconnectToRound');
+            socketHandlers.off('roundStarted', handleRoundStarted);
+            socketHandlers.off('playerAnswered', handlePlayerAnswered);
+            socketHandlers.off('roundResult', handleRoundResult);
+            socketHandlers.off('gameFinished', handleGameFinished);
+            socketHandlers.off('gameEnded', handleGameFinished);
+            socketHandlers.off('reconnectToRound', handleReconnectToRound);
             clearMediaSessionPlayback(audioRef.current);
         };
     }, []);
@@ -373,7 +384,7 @@ const PartyHostPage: React.FC = () => {
         const timer = setInterval(() => {
             if (roundStartedAtRef.current) {
                 const elapsed = (Date.now() - roundStartedAtRef.current) / 1000;
-                setTimeLeft(Math.max(0, Math.ceil(25 - elapsed)));
+                setTimeLeft(Math.max(0, Math.ceil(roundDurationRef.current - elapsed)));
             } else {
                 setTimeLeft((prev) => {
                     if (prev <= 1) {
@@ -400,7 +411,6 @@ const PartyHostPage: React.FC = () => {
                 roomId: currentRoom.id,
                 roundNumber: currentRound.roundNumber,
                 answer,
-                snippetDurationUsed: 0,
             });
         },
         [isHostAnswerSubmitted, currentRound, currentRoom],

@@ -16,7 +16,8 @@ export class ClientsRegistry {
     }
 
     getClientId(userId: number): string | undefined {
-        return [...this.clients.entries()].find(([_, id]) => id === userId)?.[0];
+        const matches = [...this.clients.entries()].filter(([_, id]) => id === userId);
+        return matches.length > 0 ? matches[matches.length - 1][0] : undefined;
     }
 
     getAll() {

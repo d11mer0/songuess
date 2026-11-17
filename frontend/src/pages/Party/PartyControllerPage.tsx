@@ -358,18 +358,18 @@ const PartyControllerPage: React.FC = () => {
         socketHandlers.on('playerLeft', handlePlayerLeft);
 
         return () => {
-            socketHandlers.off('joinedRoom');
-            socketHandlers.off('currentRoom');
-            socketHandlers.off('gameStarted');
-            socketHandlers.off('roundStarted');
-            socketHandlers.off('reconnectToRound');
-            socketHandlers.off('roundResult');
-            socketHandlers.off('gameFinished');
-            socketHandlers.off('gameEnded');
-            socketHandlers.off('gameRestarted');
-            socketHandlers.off('partyModeSwitched');
-            socketHandlers.off('roomDeleted');
-            socketHandlers.off('playerLeft');
+            socketHandlers.off('joinedRoom', handleJoinedRoom);
+            socketHandlers.off('currentRoom', handleJoinedRoom);
+            socketHandlers.off('gameStarted', handleGameStarted);
+            socketHandlers.off('roundStarted', handleRoundStarted);
+            socketHandlers.off('reconnectToRound', handleReconnectToRound);
+            socketHandlers.off('roundResult', handleRoundResult);
+            socketHandlers.off('gameFinished', handleGameFinished);
+            socketHandlers.off('gameEnded', handleGameFinished);
+            socketHandlers.off('gameRestarted', handleGameRestarted);
+            socketHandlers.off('partyModeSwitched', handlePartyModeSwitched);
+            socketHandlers.off('roomDeleted', handleRoomDeleted);
+            socketHandlers.off('playerLeft', handlePlayerLeft);
         };
     }, [clearJoinError, currentRoom?.players, dispatch, handleLeaveParty, navigate, partyModeDisabledData, roomCode, showToast, user]);
 
@@ -499,7 +499,6 @@ const PartyControllerPage: React.FC = () => {
             roomId: currentRoom.id,
             roundNumber: currentRound.roundNumber,
             answer,
-            snippetDurationUsed: 0,
         });
     }, [isAnswerSubmitted, currentRound, currentRoom]);
 
