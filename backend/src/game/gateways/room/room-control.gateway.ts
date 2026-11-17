@@ -113,9 +113,10 @@ export class RoomControlGateway {
 
         const room = this.roomManagerService.startGame(roomId, user.id);
         if (room) {
-            this.server.to(room.id).emit('gameStarted', room);
+            const safeRoom = sanitizeRoom(room);
+            this.server.to(room.id).emit('gameStarted', safeRoom);
             if (room.shortCode) {
-                this.server.to(room.shortCode).emit('gameStarted', room);
+                this.server.to(room.shortCode).emit('gameStarted', safeRoom);
             }
             this.server.emit(
                 'roomsList',

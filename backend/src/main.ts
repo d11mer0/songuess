@@ -22,12 +22,19 @@ async function bootstrap() {
     app.enableCors({
         origin: (origin, callback) => {
             if (!origin) return callback(null, true);
-            const isAllowed =
-                allowedOrigins.includes(origin) ||
-                origin.endsWith('.vercel.app') ||
-                origin.endsWith('.onrender.com') ||
-                origin.includes('localhost') ||
-                origin.includes('127.0.0.1');
+            let isAllowed = allowedOrigins.includes(origin);
+            if (!isAllowed) {
+                try {
+                    const { hostname } = new URL(origin);
+                    isAllowed =
+                        hostname === 'localhost' ||
+                        hostname === '127.0.0.1' ||
+                        hostname.endsWith('.vercel.app') ||
+                        hostname.endsWith('.onrender.com');
+                } catch {
+                    isAllowed = false;
+                }
+            }
             if (isAllowed) {
                 return callback(null, true);
             }

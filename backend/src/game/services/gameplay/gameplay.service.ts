@@ -10,6 +10,7 @@ import {checkAllPlayersAnswered } from '../../../utils/gameplay/round.util';
 import { filterTracks } from '../../../utils/track-utils';
 import { isFuzzyMatch } from '../../../utils/gameplay/fuzzy-match.util';
 import { RoundManagerService } from './round-manager.service';
+import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 import { GameEventsService } from './game-events.service';
 import { GameResultService } from './game-result.service';
 
@@ -26,7 +27,9 @@ export class GameplayService {
         private readonly gameResult: GameResultService,
         @Inject(forwardRef(() => RoomManagerService))
         private readonly roomManager: RoomManagerService,
-    ) {}
+    ) {
+        this.roomHelperService?.onRoomDisposed?.((roomId) => this.roundManager.cancelRoomGame(roomId));
+    }
 
     setServer(server: Server) {
         this.server = server;
@@ -209,6 +212,6 @@ export class GameplayService {
         this.roomHelperService.cancelRoomCleanup(room.id);
         this.roomManager.syncRoom(room);
         this.roomManager.broadcastRoomsList();
-        this.server?.to(room.id).emit('gameRestarted', room);
+        this.server?.to(room.id).emit('gameRestarted', sanitizeRoom(room));
     }
 }

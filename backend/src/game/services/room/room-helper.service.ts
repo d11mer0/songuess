@@ -9,6 +9,17 @@ import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 export class RoomHelperService {
     private disconnectGraceTimers = new Map<string, NodeJS.Timeout>();
     private leaderReassignTimers = new Map<string, NodeJS.Timeout>();
+    private disposeCallbacks: Array<(roomId: string) => void> = [];
+
+    onRoomDisposed(cb: (roomId: string) => void) {
+        this.disposeCallbacks.push(cb);
+    }
+
+    private notifyDisposed(roomId: string) {
+        for (const cb of this.disposeCallbacks) {
+            try { cb(roomId); } catch {}
+        }
+    }
 
     constructor(
         private readonly roomManagerService: RoomManagerService,
@@ -109,6 +120,7 @@ export class RoomHelperService {
         const room = rooms[roomIndex];
         const hasOnlinePlayers = room.players.some((player) => player.isOnline);
         if (room.players.length === 0 || !hasOnlinePlayers) {
+            this.notifyDisposed(roomId);
             rooms.splice(roomIndex, 1);
             this.redisService?.deleteRoom(roomId);
             this.roomManagerService.broadcastRoomsList();
@@ -130,6 +142,7 @@ export class RoomHelperService {
 
         if (room.players.length === 0) {
             this.cancelRoomCleanup(roomId);
+            this.notifyDisposed(roomId);
             rooms.splice(roomIndex, 1);
             this.redisService?.deleteRoom(roomId);
             this.roomManagerService.broadcastRoomsList();
@@ -139,6 +152,7 @@ export class RoomHelperService {
         if (!hasOnlinePlayers) {
             if (immediate) {
                 this.cancelRoomCleanup(roomId);
+                this.notifyDisposed(roomId);
                 rooms.splice(roomIndex, 1);
                 this.redisService?.deleteRoom(roomId);
                 this.roomManagerService.broadcastRoomsList();
