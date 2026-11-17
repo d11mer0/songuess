@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
@@ -13,6 +14,7 @@ interface PodiumCardProps {
 
 const PodiumCard = memo(({ player, rank, isYou }: PodiumCardProps) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const roundedScore = Math.round(player.totalScore ?? 0);
 
     const renderBadge = () => {
@@ -43,6 +45,8 @@ const PodiumCard = memo(({ player, rank, isYou }: PodiumCardProps) => {
     return (
         <div
             className={`${styles.podiumCard} ${styles[`podium${rank}`]} ${isYou ? styles.youHighlight : ''}`}
+            onClick={() => navigate(isYou ? '/user/me' : `/user/${player.id}`)}
+            style={{ cursor: 'pointer' }}
         >
             {/* Top Place Badge */}
             <div className={styles.podiumBadgeWrapper}>

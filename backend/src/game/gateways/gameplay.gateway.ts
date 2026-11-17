@@ -72,4 +72,12 @@ export class GameplayGateway {
             data?.snippetDuration,
         );
     }
+
+    @SubscribeMessage('sendReaction')
+    handleSendReaction(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { roomId: string; emoji: string },
+    ) {
+        this.gameplayService.handleReaction(client, data?.roomId, data?.emoji);
+    }
 }

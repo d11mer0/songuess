@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGetLeaderboardQuery } from '../../../store/api/leaderboardApi';
 import { useAppSelector } from '../../../store/hooks';
 import styles from './LeaderboardPage.module.css';
@@ -6,7 +7,12 @@ import { useTranslation } from '../../../i18n/LanguageContext';
 
 const LeaderboardPage: React.FC = () => {
     const { t, language } = useTranslation();
+    const navigate = useNavigate();
     const { user } = useAppSelector((state) => state.user);
+
+    const goToProfile = (targetId: number) => {
+        navigate(targetId === user?.id ? '/user/me' : `/user/${targetId}`);
+    };
     const [period, setPeriod] = useState<'all_time' | 'weekly' | 'monthly'>('all_time');
     const [genre, setGenre] = useState<string>('all');
 
@@ -78,7 +84,7 @@ const LeaderboardPage: React.FC = () => {
                     {top1 && (
                         <div className={styles.podiumContainer}>
                             {top2 && (
-                                <div className={`${styles.podiumCard} ${styles.podium2}`}>
+                                <div className={`${styles.podiumCard} ${styles.podium2}`} onClick={() => goToProfile(top2.userId)} style={{ cursor: "pointer" }}>
                                     <div className={styles.podiumTrophy}>🥈</div>
                                     <img
                                         src={top2.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
@@ -102,7 +108,7 @@ const LeaderboardPage: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className={`${styles.podiumCard} ${styles.podium1}`}>
+                            <div className={`${styles.podiumCard} ${styles.podium1}`} onClick={() => goToProfile(top1.userId)} style={{ cursor: "pointer" }}>
                                 <div className={styles.podiumTrophy}>🥇</div>
                                 <img
                                     src={top1.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
@@ -126,7 +132,7 @@ const LeaderboardPage: React.FC = () => {
                             </div>
 
                             {top3 && (
-                                <div className={`${styles.podiumCard} ${styles.podium3}`}>
+                                <div className={`${styles.podiumCard} ${styles.podium3}`} onClick={() => goToProfile(top3.userId)} style={{ cursor: "pointer" }}>
                                     <div className={styles.podiumTrophy}>🥉</div>
                                     <img
                                         src={top3.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
@@ -200,7 +206,7 @@ const LeaderboardPage: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <div className={styles.userCell}>
+                                                <div className={styles.userCell} onClick={() => goToProfile(entry.userId)} style={{ cursor: "pointer" }} title={entry.login}>
                                                     <img
                                                         src={entry.avatar || 'https://i.ibb.co/Xyw2rwG/photo-2023-04-05-18-59-19.jpg'}
                                                         alt={entry.login}

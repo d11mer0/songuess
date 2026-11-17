@@ -119,6 +119,13 @@ const CurrentRoom = ({ startGame, leaveRoom, kickMember }: Props) => {
                     </span>
                 </div>
                 <div className={styles.settingTag}>
+                    <span className={styles.settingIcon}>🔢</span>
+                    <span className={styles.settingLabel}>{t('lobby.roundsCountLabel')}</span>
+                    <span className={styles.settingValue}>
+                        {roomInfo.lobbyOptions.roundsCount || 10}
+                    </span>
+                </div>
+                <div className={styles.settingTag}>
                     <span className={styles.settingIcon}>🎮</span>
                     <span className={styles.settingLabel}>{t('lobby.gameModeLabel')}</span>
                     <span className={styles.settingValue}>

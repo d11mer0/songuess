@@ -79,6 +79,8 @@ export interface TranslationDictionary {
         modeHeardle: string;
         answerModeLabel: string;
         roundDurationLabel: string;
+        roundsCountLabel: string;
+        roundsShort: string;
         modeOptions: string;
         modeHardcore: string;
         availableRooms: string;
@@ -264,6 +266,8 @@ export interface TranslationDictionary {
         yourAnswer: string;
         waitingForRoundEnd: string;
         typeInFuzzyHint: string;
+        artistMatchHint: string;
+        reactionsLabel: string;
         blitzDuel: string;
         nextRoundLoading: string;
         timeLeft: string;
@@ -494,6 +498,12 @@ export interface TranslationDictionary {
     };
     gameCreation: {
         selectGameType: string;
+        singleMode: string;
+        mixMode: string;
+        mixBasketTitle: string;
+        mixEmptyHint: string;
+        mixStartBtn: string;
+        mixAddedToast: string;
         typeThemes: string;
         typeArtist: string;
         typePlaylist: string;

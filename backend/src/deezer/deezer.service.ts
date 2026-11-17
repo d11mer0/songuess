@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Optional } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { DeezerApi } from '../utils/deezer-api';
 import { RedisService } from '../redis/redis.service';
+import { SpotifyService } from '../spotify/spotify.service';
 import {
     normalizeTitle,
     filterTracks,
@@ -50,7 +51,8 @@ export class DeezerService {
 
     constructor(
         private readonly httpService: HttpService,
-        private readonly redisService?: RedisService,
+        @Optional() private readonly redisService?: RedisService,
+        @Optional() private readonly spotifyService?: SpotifyService,
     ) {
         this.deezerApi = new DeezerApi(this.httpService);
     }
@@ -452,22 +454,80 @@ export class DeezerService {
                     tracks: album.tracks,
                 };
             } else {
-                // 3. Spotify Playlist: open.spotify.com/playlist/ID
+                // 3. Spotify Playlist: open.spotify.com/playlist/ID -> Spotify-to-Deezer Bridge
                 const spotifyPlaylistMatch = url.match(/spotify\.com\/playlist\/([a-zA-Z0-9]+)/i);
                 if (spotifyPlaylistMatch) {
-                    try {
-                        const oembedRes = await firstValueFrom(
-                            this.httpService.get(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, { timeout: 5000 }),
-                        );
-                        const spotifyTitle = oembedRes?.data?.title;
-                        if (spotifyTitle) {
-                            const searchRes = await this.search(spotifyTitle, 'playlist');
-                            if (searchRes?.data?.length) {
-                                result = await this.getPlaylistById(searchRes.data[0].id);
+                    const spotifyPlaylistId = spotifyPlaylistMatch[1];
+
+                    if (this.spotifyService) {
+                        const spotifyPlaylist = await this.spotifyService.getPlaylistById(spotifyPlaylistId);
+                        if (spotifyPlaylist?.tracks?.length) {
+                            const limit = pLimit(5);
+                            const matchedRaw = await Promise.all(
+                                spotifyPlaylist.tracks.slice(0, 45).map((item) =>
+                                    limit(async () => {
+                                        // 1) Спроба точного матчингу за ISRC
+                                        if (item.isrc) {
+                                            try {
+                                                const byIsrc = await this.deezerApi.fetch(`/track/isrc:${item.isrc}`);
+                                                if (byIsrc?.id && byIsrc?.preview) {
+                                                    return byIsrc;
+                                                }
+                                            } catch {
+                                                // continue to text search
+                                            }
+                                        }
+                                        // 2) Пошук у Deezer за артистом та назвою
+                                        try {
+                                            const strictQuery = `artist:"${item.artistName}" track:"${item.title}"`;
+                                            let searchRes = await this.search(strictQuery, 'track');
+                                            let found = searchRes?.data?.find((t: any) => t?.preview);
+                                            if (!found) {
+                                                searchRes = await this.search(`${item.artistName} ${item.title}`, 'track');
+                                                found = searchRes?.data?.find((t: any) => t?.preview);
+                                            }
+                                            return found || null;
+                                        } catch {
+                                            return null;
+                                        }
+                                    }),
+                                ),
+                            );
+
+                            const seenIds = new Set<number>();
+                            const matchedTracks = filterTracks(matchedRaw.filter(Boolean)).filter((t: any) => {
+                                if (!t?.id || seenIds.has(t.id)) return false;
+                                seenIds.add(t.id);
+                                return true;
+                            });
+
+                            if (matchedTracks.length >= 4) {
+                                result = {
+                                    id: spotifyPlaylist.id,
+                                    title: spotifyPlaylist.title,
+                                    picture_big: spotifyPlaylist.picture_big || matchedTracks[0]?.album?.cover_big || '',
+                                    tracks: { data: matchedTracks },
+                                };
                             }
                         }
-                    } catch {
-                        // oEmbed unavailable or failed to find match
+                    }
+
+                    // Fallback: якщо Spotify API повернув 404 (напр., редакційний плейлист) або < 4 треків — oEmbed + пошук плейлиста на Deezer
+                    if (!result) {
+                        try {
+                            const oembedRes = await firstValueFrom(
+                                this.httpService.get(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, { timeout: 5000 }),
+                            );
+                            const spotifyTitle = oembedRes?.data?.title;
+                            if (spotifyTitle) {
+                                const searchRes = await this.search(spotifyTitle, 'playlist');
+                                if (searchRes?.data?.length) {
+                                    result = await this.getPlaylistById(searchRes.data[0].id);
+                                }
+                            }
+                        } catch {
+                            // oEmbed unavailable or failed to find match
+                        }
                     }
                 }
             }
@@ -479,5 +539,20 @@ export class DeezerService {
 
         await this.setCached(cacheKey, result, 1800);
         return result;
+    }
+
+    async getChartTracks(limit: number = 50): Promise<any[]> {
+        const cacheKey = `deezer:chart_tracks:${limit}`;
+        const cached = await this.getCachedValid<any[]>(cacheKey);
+        if (cached && Array.isArray(cached) && cached.length > 0) {
+            return cached;
+        }
+
+        const res = await this.deezerApi.fetch(`/chart/0/tracks?limit=${limit}`);
+        const tracks = filterTracks(res?.data || []);
+        if (tracks.length > 0) {
+            await this.setCached(cacheKey, tracks, 1800);
+        }
+        return tracks;
     }
 }

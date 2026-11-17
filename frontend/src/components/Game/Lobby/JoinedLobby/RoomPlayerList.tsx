@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCrown } from 'react-icons/fa';
 import { BsXLg, BsPerson } from 'react-icons/bs';
 import { useAppSelector } from '../../../../store/hooks';
@@ -12,7 +13,12 @@ interface Props {
 }
 
 const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
+    const navigate = useNavigate();
     const { user } = useAppSelector((state) => state.user);
+
+    const goToProfile = (targetId: number) => {
+        navigate(targetId === user?.id ? '/user/me' : `/user/${targetId}`);
+    };
     const roomInfo = useAppSelector(selectCurrentRoom);
     const { t } = useTranslation();
     
@@ -55,6 +61,8 @@ const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
                                 <img
                                     src={getAvatarUrl(player.avatar)}
                                     alt={player.login}
+                                    onClick={() => goToProfile(player.id)}
+                                    style={{ cursor: 'pointer' }}
                                     className={`${styles.avatar} ${isLeader ? styles.leaderAvatar : ''} ${player.isPremium ? styles.premiumAvatar : ''}`}
                                     onError={(e) => {
                                         e.currentTarget.src = DEFAULT_AVATAR;
@@ -62,7 +70,7 @@ const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
                                 />
                                 {user?.id === roomInfo.leaderId && !isLeader && (
                                     <button
-                                        onClick={() => kickMember(player.id)}
+                                        onClick={(e) => { e.stopPropagation(); kickMember(player.id); }}
                                         className={styles.kickIcon}
                                         title={`Kick ${player.login}`}
                                     >
@@ -77,10 +85,12 @@ const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
                             <div
                                 className={styles.login}
                                 title={player.login}
+                                onClick={() => goToProfile(player.id)}
                                 style={{
                                     color: player.nameColor || (player.isPremium ? '#ffd700' : 'inherit'),
                                     textShadow: player.isPremium ? '0 0 8px rgba(255, 215, 0, 0.7)' : 'none',
                                     fontWeight: player.isPremium ? 800 : 600,
+                                    cursor: 'pointer',
                                 }}
                             >
                                 {player.isPremium && '⭐ '}

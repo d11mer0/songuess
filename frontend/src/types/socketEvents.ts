@@ -35,4 +35,6 @@ export interface ServerToClientEvents {
     streaks?: Record<number, number>;
   }) => void;
   gameEnded: () => void;
+  artistMatchHint: (payload: { roundNumber: number; artistName: string }) => void;
+  playerReaction: (payload: { playerId: number; emoji: string; timestamp: number }) => void;
 }

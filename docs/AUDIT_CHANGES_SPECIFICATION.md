@@ -285,3 +285,31 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 | Backend NestJS | `npm run build` | Built with exit code 0 |
 | Frontend Vite | `npm run build` | Built client bundles successfully in 1.09s |
 | Frontend TypeScript | `npx tsc --noEmit` | 0 errors |
+
+
+---
+
+## 5. Audit Part 1 Completion & Part 2 Feature Rollout (2026-11-17)
+
+### 5.1 Prisma Migration History Sync
+- **Problem:** Only an outdated 2025 migration (`20250226121828_`) existed in `backend/prisma/migrations/`, while `DailyResult`, `GameScore`, `Achievement`, `UserAchievement`, `Donation`, and new `User` columns/indexes were only pushed via `prisma db push`.
+- **Fix:** Generated incremental SQL migration `backend/prisma/migrations/20261117000000_sync_audit_schema/migration.sql` via `prisma migrate diff` and marked it applied with `prisma migrate resolve --applied` (`prisma migrate status` reports 2 migrations, schema up to date).
+
+### 5.2 Real Spotify Playlist Import (Spotify → Deezer Bridge)
+- **Fix:** Exported `SpotifyService` from `SpotifyModule`, imported `SpotifyModule` into `DeezerModule`, added `SpotifyService.getPlaylistById(playlistId)` fetching up to 50 tracks (title, artist, ISRC). In `DeezerService.parsePlaylistUrl`, Spotify playlists are matched track-by-track in Deezer (ISRC lookup first, then `artist:"..." track:"..."` search throttled with `pLimit(5)`), with automatic fallback to `oEmbed` title search if Spotify returns 404 (e.g. restricted editorial playlists) or < 4 playable tracks.
+- **Files Modified:** `backend/src/spotify/spotify.module.ts`, `backend/src/spotify/spotify.service.ts`, `backend/src/deezer/deezer.module.ts`, `backend/src/deezer/deezer.service.ts`.
+
+### 5.3 Clickable Public Profiles (`/user/:id`)
+- **Fix:** Wired navigation from player names/avatars in Leaderboard (`LeaderboardPage.tsx`), Joined Lobby (`RoomPlayerList.tsx`), and Final Scores (`PodiumCard.tsx`, `PlayerCard.tsx`) to `/user/${id}` (or `/user/me` for the signed-in user).
+
+### 5.4 `TYPE_IN` Mode Artist Match Hint
+- **Fix:** In `GameplayService.handleAnswer`, if `answerMode === 'TYPE_IN'` and `isFuzzyMatch` returns `!isMatch && isArtistMatch`, the round submission is NOT locked out; instead `client.emit('artistMatchHint', { roundNumber, artistName })` is sent. On the frontend (`PlayingGame.tsx` + `TypeInAnswer.tsx`), the input unlocks immediately and shows a glowing amber banner prompting the player to enter the song title.
+
+### 5.5 Daily Challenge Live Deezer Charts
+- **Fix:** Added `DeezerService.getChartTracks(50)` and `DailyService.resolveTodayChallengePool(dayNumber, dateStr)` backed by Redis (`daily:challenge_pool:${dateStr}`, 24h TTL) to deterministically select daily tracks and options from live Deezer top charts, keeping `DAILY_TRACKS_BANK` as an offline fallback. Also fixed `submitGuess` existing-result streak in `generateShareText`.
+
+### 5.6 Custom Round Count (`5 / 10 / 15 / 20`) & Mix Packs (Multi-Select)
+- **Fix:** Added round count selector (`[5, 10, 15, 20]`) in `LobbyControls.tsx` and display in `CurrentRoom.tsx`, plus fixed `socketHandlers.off` callback references in `LobbyControls.tsx`. Added Mix Pack Basket mode in `CreatingGame.tsx` so room leaders can combine deduplicated playable tracks from multiple artists, playlists, albums, themes, or imported URLs into a single custom game pool.
+
+### 5.7 Real-Time Emoji Reactions
+- **Fix:** Added `sendReaction` WebSocket handler in `GameplayGateway` and `GameplayService.handleReaction` (whitelist `['🔥', '💀', '😭', '🎉', '🤔', '👏']`, 400ms cooldown) broadcasting `playerReaction`. Frontend renders a neon reaction bar in `PlayingGame.tsx` and floating animated emoji badges over player avatars in `TotalScore.tsx`.

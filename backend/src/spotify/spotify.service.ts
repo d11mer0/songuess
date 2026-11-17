@@ -283,4 +283,43 @@ export class SpotifyService {
             throw new BadRequestException('Error fetching album info.');
         }
     }
+
+    async getPlaylistById(playlistId: string) {
+        const token = await this.getAccessToken();
+        try {
+            const response = await this.httpService.axiosRef.get(
+                `https://api.spotify.com/v1/playlists/${playlistId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: {
+                        fields: 'id,name,images,tracks.items(track(name,artists(name),external_ids))',
+                        limit: 50,
+                    },
+                    timeout: 8000,
+                },
+            );
+
+            const data = response.data;
+            if (!data) return null;
+
+            const rawItems: any[] = data.tracks?.items || [];
+            const tracks = rawItems
+                .map((item) => item?.track)
+                .filter((track) => track && track.name && track.artists?.length)
+                .map((track) => ({
+                    title: track.name as string,
+                    artistName: track.artists[0].name as string,
+                    isrc: (track.external_ids?.isrc as string | undefined) || null,
+                }));
+
+            return {
+                id: data.id as string,
+                title: (data.name as string) || 'Spotify Playlist',
+                picture_big: data.images?.[0]?.url || '',
+                tracks,
+            };
+        } catch {
+            return null;
+        }
+    }
 }

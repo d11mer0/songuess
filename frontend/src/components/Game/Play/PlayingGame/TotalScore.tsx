@@ -1,15 +1,45 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useState, useEffect, useRef } from 'react';
 import { useAppSelector } from '../../../../store/hooks';
 import { selectCurrentRoom } from '../../../../store/gameplay/gameplaySelectors';
 import { useTranslation } from '../../../../i18n/LanguageContext';
 import styles from './TotalScore.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../assets/avatars/presetAvatars';
 import { FaCrown, FaStar, FaTrophy } from 'react-icons/fa';
+import { socketHandlers } from '../../../../services/socket';
 
 const TotalScore = memo(() => {
     const { t } = useTranslation();
     const currentRoom = useAppSelector(selectCurrentRoom);
     const { user } = useAppSelector((state) => state.user);
+
+    const [reactions, setReactions] = useState<Record<number, { emoji: string; key: number }>>({});
+    const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+
+    useEffect(() => {
+        const handleReaction = (data: { playerId: number; emoji: string; timestamp: number }) => {
+            if (!data?.playerId || !data?.emoji) return;
+            if (timersRef.current[data.playerId]) {
+                clearTimeout(timersRef.current[data.playerId]);
+            }
+            setReactions((prev) => ({
+                ...prev,
+                [data.playerId]: { emoji: data.emoji, key: data.timestamp || Date.now() },
+            }));
+            timersRef.current[data.playerId] = setTimeout(() => {
+                setReactions((prev) => {
+                    const next = { ...prev };
+                    delete next[data.playerId];
+                    return next;
+                });
+            }, 2500);
+        };
+
+        socketHandlers.on('playerReaction', handleReaction);
+        return () => {
+            socketHandlers.off('playerReaction', handleReaction);
+            Object.values(timersRef.current).forEach(clearTimeout);
+        };
+    }, []);
 
     const sortedPlayers = useMemo(
         () => currentRoom ? [...currentRoom.players].sort((a, b) => (b.totalScore ?? 0) - (a.totalScore ?? 0)) : [],
@@ -67,6 +97,11 @@ const TotalScore = memo(() => {
                                     {hasStreak && (
                                         <span className={styles.flameIconMini} title={`Streak x${playerStreak}`}>
                                             🔥
+                                        </span>
+                                    )}
+                                    {reactions[player.id] && (
+                                        <span key={reactions[player.id].key} className={styles.reactionBubble}>
+                                            {reactions[player.id].emoji}
                                         </span>
                                     )}
                                 </div>

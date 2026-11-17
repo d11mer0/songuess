@@ -109,10 +109,87 @@ export class DailyService {
         return previewUrl;
     }
 
+    async resolveTodayChallengePool(
+        dayNumber: number,
+        dateStr: string,
+    ): Promise<{ track: DailyTrack; options: string[] }> {
+        const poolCacheKey = `daily:challenge_pool:${dateStr}`;
+
+        if (this.redisService) {
+            try {
+                const cached = await this.redisService.get(poolCacheKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached) as { track: DailyTrack; options: string[] };
+                    if (parsed?.track?.title && Array.isArray(parsed.options) && parsed.options.length >= 4) {
+                        return parsed;
+                    }
+                }
+            } catch {
+                // ignore cache parse errors
+            }
+        }
+
+        if (this.deezerService) {
+            try {
+                const chartTracks = await this.deezerService.getChartTracks(50);
+                if (Array.isArray(chartTracks) && chartTracks.length >= 4) {
+                    const seen = new Set<string>();
+                    const uniquePool: DailyTrack[] = [];
+                    for (const t of chartTracks) {
+                        const title = t?.title?.trim();
+                        const artistName = t?.artist?.name?.trim();
+                        if (!title || !artistName || !t?.preview) continue;
+                        const key = `${artistName.toLowerCase()}::${title.toLowerCase()}`;
+                        if (seen.has(key)) continue;
+                        seen.add(key);
+                        uniquePool.push({
+                            id: String(t.id),
+                            title,
+                            artistName,
+                            preview: t.preview,
+                        });
+                    }
+
+                    if (uniquePool.length >= 4) {
+                        const chosenIndex = (dayNumber - 1) % uniquePool.length;
+                        const track = uniquePool[chosenIndex];
+                        const wrongOptions = shuffleArray(
+                            uniquePool
+                                .filter((item) => item.id !== track.id)
+                                .map((item) => `${item.artistName} - ${item.title}`),
+                        ).slice(0, 3);
+                        const options = shuffleArray([
+                            ...wrongOptions,
+                            `${track.artistName} - ${track.title}`,
+                        ]);
+
+                        const payload = { track, options };
+                        if (this.redisService) {
+                            try {
+                                await this.redisService.set(poolCacheKey, JSON.stringify(payload), 86400);
+                            } catch {
+                                // ignore cache write error
+                            }
+                        }
+                        return payload;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to load live Deezer chart for Daily Challenge, falling back to bank:', err);
+            }
+        }
+
+        const fallbackTrack = this.getTodayTrack(dayNumber);
+        return {
+            track: fallbackTrack,
+            options: this.getOptions(fallbackTrack),
+        };
+    }
+
     async getDailyChallenge(userId?: number) {
         const dayNumber = this.getDayNumber();
         const dateStr = this.getTodayDateString();
-        const track = this.getTodayTrack(dayNumber);
+        const { track, options } = await this.resolveTodayChallengePool(dayNumber, dateStr);
         const resolvedPreview = await this.resolveDailyPreview(track, dateStr);
 
         let userResult: any = null;
@@ -158,7 +235,7 @@ export class DailyService {
             isSolved: userResult?.isSolved ?? false,
             guessesCount: isCompleted ? (userResult?.guessesCount ?? 0) : attemptsHistory.length,
             attemptsHistory: attemptsHistory.length > 0 ? attemptsHistory : undefined,
-            options: this.getOptions(track),
+            options,
             streak,
             maxStreak,
             // Розкриваємо трек ТІЛЬКИ якщо гру на сьогодні вже завершено!
@@ -186,7 +263,7 @@ export class DailyService {
 
         const dayNumber = this.getDayNumber();
         const dateStr = this.getTodayDateString();
-        const track = this.getTodayTrack(dayNumber);
+        const { track } = await this.resolveTodayChallengePool(dayNumber, dateStr);
 
         if (userId) {
             // Перевіряємо, чи користувач вже завершив челендж на сьогодні
@@ -200,6 +277,10 @@ export class DailyService {
             });
 
             if (existing) {
+                const user = await this.prisma.user.findUnique({
+                    where: { id: userId },
+                    select: { dailyStreak: true },
+                });
                 return {
                     isCompleted: true,
                     isSolved: existing.isSolved,
@@ -208,7 +289,12 @@ export class DailyService {
                         title: track.title,
                         artistName: track.artistName,
                     },
-                    shareText: this.generateShareText(dayNumber, existing.guessesCount, existing.isSolved, 0),
+                    shareText: this.generateShareText(
+                        dayNumber,
+                        existing.guessesCount,
+                        existing.isSolved,
+                        user?.dailyStreak || 0,
+                    ),
                 };
             }
         }

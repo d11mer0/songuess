@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../../GameFinished.module.css';
 import { getAvatarUrl, DEFAULT_AVATAR } from '../../../../../assets/avatars/presetAvatars';
 import { useTranslation } from '../../../../../i18n/LanguageContext';
@@ -13,11 +14,14 @@ interface PlayerCardProps {
 
 const PlayerCard = memo(({ player, rank, isYou }: PlayerCardProps) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const roundedScore = Math.round(player.totalScore ?? 0);
 
     return (
         <div
             className={`${styles.playerCard} ${isYou ? styles.playerCardYou : ''}`}
+            onClick={() => navigate(isYou ? '/user/me' : `/user/${player.id}`)}
+            style={{ cursor: 'pointer' }}
         >
             <div className={styles.rankNumberBadge}>{rank}</div>
             <img

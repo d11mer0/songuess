@@ -31,6 +31,7 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
         gameMode: 'CLASSIC',
         answerMode: 'MULTIPLE_CHOICE',
         roundDuration: 25,
+        roundsCount: 10,
     });
 
     const [isSearchingDuel, setIsSearchingDuel] = useState<boolean>(false);
@@ -45,14 +46,16 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
             }
         };
 
+        const handleDuelEnd = () => setIsSearchingDuel(false);
+
         socketHandlers.on('duelQueueStatus', handleDuelStatus);
-        socketHandlers.on('duelMatchFound', () => setIsSearchingDuel(false));
-        socketHandlers.on('duelError', () => setIsSearchingDuel(false));
+        socketHandlers.on('duelMatchFound', handleDuelEnd);
+        socketHandlers.on('duelError', handleDuelEnd);
 
         return () => {
-            socketHandlers.off('duelQueueStatus');
-            socketHandlers.off('duelMatchFound');
-            socketHandlers.off('duelError');
+            socketHandlers.off('duelQueueStatus', handleDuelStatus);
+            socketHandlers.off('duelMatchFound', handleDuelEnd);
+            socketHandlers.off('duelError', handleDuelEnd);
         };
     }, []);
 
@@ -70,6 +73,9 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
 
     const setRoundDuration = (duration: number) =>
         setLobbyOptions(prev => ({ ...prev, roundDuration: duration }));
+
+    const setRoundsCount = (rounds: number) =>
+        setLobbyOptions(prev => ({ ...prev, roundsCount: rounds }));
 
     const handleStartDuelSearch = () => {
         setIsSearchingDuel(true);
@@ -212,6 +218,23 @@ const LobbyControls = ({ createRoom, autoJoinRoom }: Props) => {
                                     onClick={() => setRoundDuration(sec)}
                                 >
                                     {sec}{t('common.secondsShort')}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Вибір кількості раундів */}
+                    <div className={styles.modeSelectContainer}>
+                        <label className={styles.modeLabel}>{t('lobby.roundsCountLabel')}</label>
+                        <div className={styles.durationButtonGroup} style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+                            {[5, 10, 15, 20].map((cnt) => (
+                                <button
+                                    key={cnt}
+                                    type="button"
+                                    className={`${styles.durationBtn} ${(lobbyOptions.roundsCount ?? 10) === cnt ? styles.active : ''}`}
+                                    onClick={() => setRoundsCount(cnt)}
+                                >
+                                    {cnt} {t('lobby.roundsShort')}
                                 </button>
                             ))}
                         </div>

@@ -8,6 +8,7 @@ import { SelectedTracks, TrackItem } from '../../interfaces/tracks.interface';
 import { createInitialPlayerResults, validateAnswerSubmission, createPlayerRoundResult} from '../../../utils/gameplay/player-results.utils';
 import {checkAllPlayersAnswered } from '../../../utils/gameplay/round.util';
 import { filterTracks } from '../../../utils/track-utils';
+import { isFuzzyMatch } from '../../../utils/gameplay/fuzzy-match.util';
 import { RoundManagerService } from './round-manager.service';
 import { GameEventsService } from './game-events.service';
 import { GameResultService } from './game-result.service';
@@ -15,6 +16,8 @@ import { GameResultService } from './game-result.service';
 @Injectable()
 export class GameplayService {
     private server: Server | null = null;
+    private reactionCooldowns = new Map<number, number>();
+    private readonly allowedReactions = new Set(['🔥', '💀', '😭', '🎉', '🤔', '👏']);
 
     constructor(
         private readonly roomHelperService: RoomHelperService,
@@ -51,7 +54,8 @@ export class GameplayService {
         };
         room.state = GameRoomState.STARTED;
 
-        const roundsCount = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
+        const rawRounds = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
+        const roundsCount = Math.min(20, Math.max(1, Number(rawRounds) || 10));
         const rounds = this.roundManager.generateGameRounds(playableTracks, roundsCount);
         const playerResults = createInitialPlayerResults(room.players);
 
@@ -97,6 +101,18 @@ export class GameplayService {
         const round = rounds[roundNumber];
         const answerMode = room.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
         const gameMode = room.lobbyOptions?.gameMode || 'CLASSIC';
+
+        // Якщо гравець у режимі TYPE_IN ввів правильного артиста замість назви треку — не спалюємо спробу, а даємо підказку!
+        if (answerMode === 'TYPE_IN' && answer?.trim()) {
+            const preMatch = isFuzzyMatch(answer, round.track.title, round.track.artistName);
+            if (!preMatch.isMatch && preMatch.isArtistMatch) {
+                client.emit('artistMatchHint', {
+                    roundNumber,
+                    artistName: round.track.artistName || '',
+                });
+                return;
+            }
+        }
 
         const recordedSnippet = room.gameProgress.heardleUnlockedTiers?.[playerId]?.[roundNumber] || 1;
         const effectiveSnippetDuration = gameMode === 'HEARDLE'
@@ -148,6 +164,31 @@ export class GameplayService {
         }
         const currentMax = room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] || 1;
         room.gameProgress.heardleUnlockedTiers[playerId][roundNumber] = Math.max(currentMax, snippetDuration);
+    }
+
+
+    handleReaction(client: Socket, roomId: string, emoji: string) {
+        const room = this.roomHelperService.findRoom(roomId);
+        if (!room) return;
+
+        const playerId = client.data.user?.id;
+        if (!playerId) return;
+
+        const inRoom = room.players.some((p) => p.id === playerId);
+        if (!inRoom) return;
+
+        if (!emoji || !this.allowedReactions.has(emoji)) return;
+
+        const now = Date.now();
+        const lastAt = this.reactionCooldowns.get(playerId) || 0;
+        if (now - lastAt < 400) return;
+        this.reactionCooldowns.set(playerId, now);
+
+        this.server?.to(roomId).emit('playerReaction', {
+            playerId,
+            emoji,
+            timestamp: now,
+        });
     }
 
     handleRestartGame(client: Socket, roomId: string) {

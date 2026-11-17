@@ -12,12 +12,14 @@ import styles from './TypeInAnswer.module.css';
 
 interface Props {
     onSubmit: (answer: string) => void;
+    artistHintTrigger?: number;
 }
 
-const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
+const TypeInAnswer: React.FC<Props> = ({ onSubmit, artistHintTrigger = 0 }) => {
     const { t } = useTranslation();
     const [inputValue, setInputValue] = useState('');
     const [submittedAnswer, setSubmittedAnswer] = useState<string | null>(null);
+    const [showArtistHint, setShowArtistHint] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     const currentRoom = useAppSelector(selectCurrentRoom);
@@ -28,10 +30,22 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
     useEffect(() => {
         setInputValue('');
         setSubmittedAnswer(initialAnswer ?? null);
+        setShowArtistHint(false);
         if (inputRef.current) {
             inputRef.current.focus();
         }
     }, [trackInfo, initialAnswer]);
+
+    useEffect(() => {
+        if (artistHintTrigger > 0) {
+            setSubmittedAnswer(null);
+            setInputValue('');
+            setShowArtistHint(true);
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 20);
+        }
+    }, [artistHintTrigger]);
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -49,6 +63,12 @@ const TypeInAnswer: React.FC<Props> = ({ onSubmit }) => {
             <h2 className={styles.title}>
                 <FaKeyboard className={styles.icon} /> {t('gameplay.typeInTitle')}
             </h2>
+
+            {showArtistHint && !submittedAnswer && !result && (
+                <div className={styles.artistHintBanner}>
+                    {t('gameplay.artistMatchHint')}
+                </div>
+            )}
 
             {!submittedAnswer && !result ? (
                 <form onSubmit={handleSubmit} className={styles.inputWrapper}>

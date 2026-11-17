@@ -18,7 +18,7 @@ import {
     selectInitialAnswer
 } from '../../../store/gameplay/gameplaySelectors';
 import { setHeardleUnlockedTier } from '../../../store/gameplay/gameplaySlice';
-import { socketEmitter } from '../../../services/socket';
+import { socketEmitter, socketHandlers } from '../../../services/socket';
 import { useTranslation } from '../../../i18n/LanguageContext';
 import Loader from '../../UI/Loader/Loader/Loader';
 import styles from './PlayingGame.module.css';
@@ -66,6 +66,25 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
     const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
     const [replayTrigger, setReplayTrigger] = useState<number>(0);
+    const [artistHintTrigger, setArtistHintTrigger] = useState<number>(0);
+
+    // Якщо у режимі TYPE_IN гравець вгадав артиста, розблоковуємо поле вводу для назви пісні
+    useEffect(() => {
+        const handleArtistMatchHint = (payload: { roundNumber: number }) => {
+            if (payload?.roundNumber === trackInfo?.roundNumber) {
+                setHasAnswered(false);
+                if (answeredStorageKey) {
+                    sessionStorage.removeItem(answeredStorageKey);
+                }
+                setArtistHintTrigger((prev) => prev + 1);
+            }
+        };
+
+        socketHandlers.on('artistMatchHint', handleArtistMatchHint);
+        return () => {
+            socketHandlers.off('artistMatchHint', handleArtistMatchHint);
+        };
+    }, [trackInfo?.roundNumber, answeredStorageKey]);
 
     // Синхронізація з Redux heardleUnlockedTier (наприклад, при отриманні reconnectToRound)
     useEffect(() => {
@@ -112,6 +131,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
             const answered = Boolean(initialAnswer) || (answeredStorageKey ? sessionStorage.getItem(answeredStorageKey) === 'true' : false);
             setHasAnswered(answered);
+            setArtistHintTrigger(0);
 
             // Чистимо ключі попередніх раундів цієї кімнати для збереження пам'яті
             if (currentRoom?.id && trackInfo.roundNumber > 0) {
@@ -197,7 +217,7 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
 
                             <div className={styles.section}>
                                 {answerMode === 'TYPE_IN' ? (
-                                    <TypeInAnswer onSubmit={handleSubmit} />
+                                    <TypeInAnswer onSubmit={handleSubmit} artistHintTrigger={artistHintTrigger} />
                                 ) : (
                                     <AnswerOptions onSubmit={handleSubmit} />
                                 )}
@@ -212,6 +232,23 @@ const PlayingGame = ({ onSubmitAnswer }: PlayingGameProps) => {
                                         replayTrigger={replayTrigger}
                                         onPlayingChange={setIsPlayingAudio}
                                     />
+                                    <div className={styles.reactionsBar} aria-label={t('gameplay.reactionsLabel')}>
+                                        {['🔥', '💀', '😭', '🎉', '🤔', '👏'].map((emoji) => (
+                                            <button
+                                                key={emoji}
+                                                type="button"
+                                                className={styles.reactionBtn}
+                                                onClick={() =>
+                                                    socketEmitter.emit('sendReaction', {
+                                                        roomId: currentRoom.id,
+                                                        emoji,
+                                                    })
+                                                }
+                                            >
+                                                {emoji}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </>
