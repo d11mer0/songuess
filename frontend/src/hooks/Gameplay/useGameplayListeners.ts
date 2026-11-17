@@ -220,12 +220,14 @@ export const useGameplayListeners = () => {
     }, [dispatch]);
 
     useEffect(() => {
+        const handleReconnectFailed = () => navigate('/game');
+
         socketHandlers.on('roundStarted', handleSetTrackInfo);
         socketHandlers.on('joinedRoom', handleJoinedRoom);
         socketHandlers.on('reconnectToRound', handleReconnectToRound);
         socketHandlers.on('gameRestarted', handleGameRestarted);
         socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
-        socketHandlers.on('reconnectFailed', () => navigate('/game'));
+        socketHandlers.on('reconnectFailed', handleReconnectFailed);
         socketHandlers.on('gameEnded', handleGameEnded);
         socketHandlers.on('roundResult', handleRoundEnded);
         socketHandlers.on('playerLeft', handlePlayerLeft);
@@ -233,19 +235,17 @@ export const useGameplayListeners = () => {
         socketHandlers.on('roomDeleted', handleRoomDeleted);
 
         return () => {
-            socketOffMany([
-                'joinedRoom',
-                'roundStarted',
-                'reconnectToRound',
-                'gameRestarted',
-                'partyModeSwitched',
-                'reconnectFailed',
-                'gameEnded',
-                'roundResult',
-                'playerLeft',
-                'playerDisconnected',
-                'roomDeleted',
-            ]);
+            socketHandlers.off('roundStarted', handleSetTrackInfo);
+            socketHandlers.off('joinedRoom', handleJoinedRoom);
+            socketHandlers.off('reconnectToRound', handleReconnectToRound);
+            socketHandlers.off('gameRestarted', handleGameRestarted);
+            socketHandlers.off('partyModeSwitched', handlePartyModeSwitched);
+            socketHandlers.off('reconnectFailed', handleReconnectFailed);
+            socketHandlers.off('gameEnded', handleGameEnded);
+            socketHandlers.off('roundResult', handleRoundEnded);
+            socketHandlers.off('playerLeft', handlePlayerLeft);
+            socketHandlers.off('playerDisconnected', handlePlayerDisconnected);
+            socketHandlers.off('roomDeleted', handleRoomDeleted);
         };
     }, [
         handleSetTrackInfo,

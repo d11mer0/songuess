@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { useAppDispatch } from '../../store/hooks';
-import { socketOffMany } from '../../utils/socketUtils/socketOffMany';
 import { setCurrentRoom, setRooms } from '../../store/gameplay/gameplaySlice';
 import { mapBackendRoomToFrontend } from '../../utils/mapBackendRoomToFrontend';
 
@@ -29,15 +28,7 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
         (data: Room) => {
             dispatch(setCurrentRoom(mapBackendRoomToFrontend(data)));
             navigate(`/game/${data.id}`);
-            socketOffMany([
-                'playerDisconnected', 
-                'playerLeft', 
-                'gameStarted',            
-                'roomCreated', 
-                'joinedRoom', 
-                'roomsList',
-                'roomDeleted',
-            ]);
+
         },
         [navigate, dispatch],
     );
@@ -112,17 +103,7 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
         (data: { roomId: string; room: Room }) => {
             dispatch(setCurrentRoom(mapBackendRoomToFrontend(data.room)));
             navigate(`/game/${data.roomId}`);
-            socketOffMany([
-                'playerDisconnected',
-                'playerLeft',
-                'gameStarted',
-                'roomCreated',
-                'joinedRoom',
-                'roomsList',
-                'roomDeleted',
-                'partyModeSwitched',
-                'duelMatchFound',
-            ]);
+
         },
         [navigate, dispatch],
     );
@@ -159,18 +140,16 @@ export const useGameRoomListeners = ({ updateSearchParams }: UseGameRoomListener
         socketHandlers.on('partyModeSwitched', handlePartyModeSwitched);
 
         return () => {
-            socketOffMany([
-                'roomCreated',
-                'joinedRoom',
-                'currentRoom',
-                'roomsList',
-                'duelMatchFound',
-                'playerLeft',
-                'playerDisconnected',
-                'roomDeleted',
-                'gameStarted',
-                'partyModeSwitched',
-            ]);
+            socketHandlers.off('roomCreated', handleRoomCreated);
+            socketHandlers.off('joinedRoom', handleJoinedRoom);
+            socketHandlers.off('currentRoom', handleJoinedRoom);
+            socketHandlers.off('roomsList', handleRoomsUpdate);
+            socketHandlers.off('duelMatchFound', handleDuelMatchFound);
+            socketHandlers.off('playerLeft', handlePlayerLeft);
+            socketHandlers.off('playerDisconnected', handlePlayerDisconnected);
+            socketHandlers.off('roomDeleted', handleRoomDeleted);
+            socketHandlers.off('gameStarted', handleGameStarted);
+            socketHandlers.off('partyModeSwitched', handlePartyModeSwitched);
         };
     }, [
         handleRoomCreated,

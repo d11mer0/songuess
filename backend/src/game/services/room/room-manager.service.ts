@@ -79,9 +79,26 @@ export class RoomManagerService implements OnModuleInit {
             }],
             lobbyOptions: {
                 ...lobbyOptions,
-                roundDuration: Math.min(25, Math.max(5, lobbyOptions?.roundDuration || 25)),
-                allowAutoJoin: lobbyOptions.publicLobby
-                    ? lobbyOptions.allowAutoJoin
+                maxPlayers: Math.min(12, Math.max(1, Number(lobbyOptions?.maxPlayers) || 4)),
+                roundDuration: Math.min(25, Math.max(5, Number(lobbyOptions?.roundDuration) || 25)),
+                roundsCount: Math.min(
+                    20,
+                    Math.max(
+                        1,
+                        Number(lobbyOptions?.roundsCount) ||
+                            (lobbyOptions?.gameMode === 'DUEL' ? 5 : 10),
+                    ),
+                ),
+                gameMode:
+                    lobbyOptions?.gameMode === 'HEARDLE' || lobbyOptions?.gameMode === 'DUEL'
+                        ? lobbyOptions.gameMode
+                        : 'CLASSIC',
+                answerMode:
+                    lobbyOptions?.answerMode === 'TYPE_IN'
+                        ? 'TYPE_IN'
+                        : 'MULTIPLE_CHOICE',
+                allowAutoJoin: lobbyOptions?.publicLobby
+                    ? Boolean(lobbyOptions?.allowAutoJoin)
                     : false,
             },
             leaderId: playerId,

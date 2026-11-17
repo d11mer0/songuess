@@ -78,6 +78,9 @@ const PartyHostPage: React.FC = () => {
     const [isLaunching, setIsLaunching] = useState(false);
     const [launchError, setLaunchError] = useState<string | null>(null);
 
+    const isMutedRef = useRef<boolean>(isMuted);
+    isMutedRef.current = isMuted;
+
     const toggleMute = useCallback(() => {
         if (audioRef.current) {
             const next = !audioRef.current.muted;
@@ -209,7 +212,7 @@ const PartyHostPage: React.FC = () => {
         }
 
         isResumingRef.current = true;
-        audio.muted = isMuted;
+        audio.muted = isMutedRef.current;
         audio.volume = 0.8;
         audio.play()
             .then(() => {
@@ -233,7 +236,7 @@ const PartyHostPage: React.FC = () => {
                 console.warn('Playback still prevented on TV unlock', err);
                 isResumingRef.current = false;
             });
-    }, [isMuted]);
+    }, []);
 
     useEffect(() => {
         if (!isAudioBlocked) return;
@@ -272,7 +275,7 @@ const PartyHostPage: React.FC = () => {
                     audioRef.current.currentTime = seekTo;
                 } catch {}
                 audioRef.current.volume = 0.8;
-                audioRef.current.muted = isMuted;
+                audioRef.current.muted = isMutedRef.current;
                 audioRef.current.play().then(() => {
                     setIsAudioBlocked(false);
                     if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
@@ -294,6 +297,9 @@ const PartyHostPage: React.FC = () => {
             roundStartedAtRef.current = null;
             setIsAudioBlocked(false);
             setRoundResult(payload);
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
             if (audioRef.current) {
                 audioRef.current.pause();
             }
@@ -344,7 +350,7 @@ const PartyHostPage: React.FC = () => {
             if (audioRef.current && payload.preview) {
                 audioRef.current.src = payload.preview;
                 audioRef.current.volume = 0.8;
-                audioRef.current.muted = isMuted;
+                audioRef.current.muted = isMutedRef.current;
                 const seekTo = calculateStartTime(startedAt);
                 try {
                     audioRef.current.currentTime = seekTo;

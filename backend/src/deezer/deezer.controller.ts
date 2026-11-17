@@ -1,63 +1,65 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { DeezerService } from './deezer.service';
 import { Throttle } from '@nestjs/throttler';
+
+const ALLOWED_SEARCH_TYPES = new Set(['track', 'album', 'artist', 'playlist']);
 
 @Throttle({ default: { limit: 30, ttl: 60000 } })
 @Controller('deezer')
 export class DeezerController {
     constructor(private readonly deezerService: DeezerService) {}
 
-    // 🔹 Отримати інформацію про трек
     @Get('track/:trackId')
-    async getTrack(@Param('trackId') trackId: string) {
-        return this.deezerService.getTrackById(Number(trackId));
+    async getTrack(@Param('trackId', ParseIntPipe) trackId: number) {
+        return this.deezerService.getTrackById(trackId);
     }
 
-    // 🔹 Отримати інформацію про альбом
     @Get('album/:albumId')
-    async getAlbum(@Param('albumId') albumId: string) {
-        return this.deezerService.getAlbumById(Number(albumId));
+    async getAlbum(@Param('albumId', ParseIntPipe) albumId: number) {
+        return this.deezerService.getAlbumById(albumId);
     }
 
-    // 🔹 Отримати інформацію про артиста
     @Get('artist/:artistId')
-    async getArtist(@Param('artistId') artistId: string) {
-        return this.deezerService.getArtistById(Number(artistId));
+    async getArtist(@Param('artistId', ParseIntPipe) artistId: number) {
+        return this.deezerService.getArtistById(artistId);
     }
 
     @Get('artist/:artistId/albums')
-    async getAlbums(@Param('artistId') artistId: string) {
-        return this.deezerService.getAlbumsByArtist(Number(artistId));
+    async getAlbums(@Param('artistId', ParseIntPipe) artistId: number) {
+        return this.deezerService.getAlbumsByArtist(artistId);
     }
 
     @Get('artist/:artistId/related')
-    async getRelatedArtists(@Param('artistId') artistId: string) {
-        return this.deezerService.getRelatedArtists(Number(artistId));
+    async getRelatedArtists(@Param('artistId', ParseIntPipe) artistId: number) {
+        return this.deezerService.getRelatedArtists(artistId);
     }
 
-    // 🔹 Отримати інформацію про плейліст
     @Get('playlist/:playlistId')
-    async getPlaylist(@Param('playlistId') playlistId: string) {
-        return this.deezerService.getPlaylistById(Number(playlistId));
+    async getPlaylist(@Param('playlistId', ParseIntPipe) playlistId: number) {
+        return this.deezerService.getPlaylistById(playlistId);
     }
 
-    // 🔹 Отримати топ-треки артиста
     @Get('artist/:artistId/top-tracks')
-    async getTopTracks(@Param('artistId') artistId: string) {
-        return this.deezerService.getTopTracksByArtist(Number(artistId));
+    async getTopTracks(@Param('artistId', ParseIntPipe) artistId: number) {
+        return this.deezerService.getTopTracksByArtist(artistId);
     }
 
     @Get('artist/:artistId/all-tracks')
-    async getAllTracks(@Param('artistId') artistId: string) {
-        return this.deezerService.getAllTracksByArtist(Number(artistId));
+    async getAllTracks(@Param('artistId', ParseIntPipe) artistId: number) {
+        return this.deezerService.getAllTracksByArtist(artistId);
     }
 
-    // 🔹 Пошук (треки, альбоми, артисти, плейлісти)
     @Get('search')
     async search(
         @Query('query') query: string,
         @Query('type') type: 'track' | 'album' | 'artist' | 'playlist',
     ) {
+        if (!query || !query.trim()) {
+            throw new BadRequestException('Search query cannot be empty');
+        }
+        if (!ALLOWED_SEARCH_TYPES.has(type)) {
+            throw new BadRequestException('Invalid search type');
+        }
         return this.deezerService.search(query, type);
     }
 

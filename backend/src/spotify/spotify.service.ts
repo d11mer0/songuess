@@ -12,6 +12,13 @@ export class SpotifyService {
     private readonly clientId: string;
     private readonly clientSecret: string;
     private readonly tokenUrl = 'https://accounts.spotify.com/api/token';
+
+    private validateSpotifyId(id: string, label = 'ID'): string {
+        if (!id || !/^[a-zA-Z0-9]{1,64}$/.test(id)) {
+            throw new BadRequestException(`Invalid Spotify ${label}`);
+        }
+        return id;
+    }
     private accessToken: string | null = null;
     private tokenExpiresAt: number | null = null;
 
@@ -146,6 +153,7 @@ export class SpotifyService {
     }
 
     async getTopTracks(artistId: string) {
+        this.validateSpotifyId(artistId, 'artist ID');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(
@@ -167,6 +175,7 @@ export class SpotifyService {
     }
 
     async getArtistAlbums(artistId: string) {
+        this.validateSpotifyId(artistId, 'artist ID');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(
@@ -188,6 +197,7 @@ export class SpotifyService {
     }
 
     async getAlbumTracks(albumId: string) {
+        this.validateSpotifyId(albumId, 'album ID');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(
@@ -230,6 +240,7 @@ export class SpotifyService {
     }
 
     async getAlbumInfo(albumId: string) {
+        this.validateSpotifyId(albumId, 'album ID');
         const token = await this.getAccessToken();
 
         try {
@@ -285,6 +296,7 @@ export class SpotifyService {
     }
 
     async getPlaylistById(playlistId: string) {
+        this.validateSpotifyId(playlistId, 'playlist ID');
         const token = await this.getAccessToken();
         try {
             const response = await this.httpService.axiosRef.get(

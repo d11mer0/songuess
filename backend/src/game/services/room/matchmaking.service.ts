@@ -58,21 +58,12 @@ export class MatchmakingService {
     }
 
     private async checkAndStartMatch() {
+        // Очищуємо відключені сокети, щоб черга не зупинялася при застряглому першому гравці
+        this.duelQueue = this.duelQueue.filter((p) => !p.socket.disconnected);
         if (this.duelQueue.length < 2) return;
 
-        // Беремо перших двох гравців з черги
         const player1 = this.duelQueue.shift()!;
         const player2 = this.duelQueue.shift()!;
-
-        // Перевіряємо чи вони все ще підключені
-        if (player1.socket.disconnected) {
-            this.duelQueue.unshift(player2);
-            return;
-        }
-        if (player2.socket.disconnected) {
-            this.duelQueue.unshift(player1);
-            return;
-        }
 
         try {
             // Створюємо кімнату для дуелі 1v1
@@ -125,6 +116,13 @@ export class MatchmakingService {
                 }
             }
 
+            if (tracks.length < 4) {
+                this.roomManager.deleteRoomIfLeader(roomId, player1.userId);
+                player1.socket.emit('duelError', 'Not enough playable tracks available right now');
+                player2.socket.emit('duelError', 'Not enough playable tracks available right now');
+                return;
+            }
+
             const selectedTracks: SelectedTracks = {
                 type: 'PLAYLIST',
                 playlist: {
@@ -147,7 +145,12 @@ export class MatchmakingService {
             // Автоматичний старт гри через 2 секунди
             setTimeout(() => {
                 const currentRoom = this.roomManager.allRooms.find((r) => r.id === roomId);
-                if (!currentRoom || currentRoom.players.length < 2) return;
+                const onlinePlayers = currentRoom?.players.filter((p) => p.isOnline) || [];
+                if (!currentRoom || onlinePlayers.length < 2) {
+                    this.server?.to(roomId).emit('duelError', 'Opponent disconnected before match start');
+                    this.roomManager.deleteRoomIfLeader(roomId, player1.userId);
+                    return;
+                }
 
                 this.gameplayService.handleLaunchGame(
                     player1.socket,

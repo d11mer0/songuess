@@ -341,3 +341,17 @@ A comprehensive audit of both backend and frontend systems was executed, coverin
 14. **Scoped Socket Listener Cleanup (`PartyHostPage.tsx` & `PartyControllerPage.tsx`):** Passed exact callback references to `socketHandlers.off(event, handler)` instead of wiping all shared listeners.
 15. **Token Refresh Mutex (`customBaseQuery.ts`):** Added a shared `refreshPromise` lock so concurrent `401` responses trigger only one `/auth/refresh` call.
 16. **Session Storage Cleanup (`clearRoomSessionStorage.ts`):** Cleared `songuess_heardle_${roomId}_*` and `songuess_answered_${roomId}_*` keys on `leaveRoom`, `deleteRoom`, kick, `gameEnded`, and `gameRestarted`.
+
+
+---
+
+## 8. Audit Cycle #3 Fixes (Cache Isolation, API Validation, Matchmaking, Audio & Sockets)
+
+1. **RTK Query Cache Reset on Logout (`frontend/src/store/store.ts`):** Wrapped `appReducer` so `user/logout` resets the entire Redux store (all 10 RTK Query API slices + `user` + `gameplay`), preventing stale profile/daily/achievement data when switching accounts.
+2. **Spotify & Deezer Path/Query Validation (`SpotifyService` & `DeezerController`):** Added `validateSpotifyId` (`/^[a-zA-Z0-9]{1,64}$/`) to all Spotify ID endpoints (`getTopTracks`, `getArtistAlbums`, `getAlbumTracks`, `getAlbumInfo`, `getPlaylistById`), `ParseIntPipe` on numeric Deezer params, and runtime `ALLOWED_SEARCH_TYPES` check in `DeezerController.search`.
+3. **Blitz Duel Matchmaking Reliability (`MatchmakingService` & `ConnectionService`):** Removed `client.id` from `duelQueue` prior to multi-tab early return; purged disconnected sockets in `checkAndStartMatch` instead of stalling the queue; handled `< 4` tracks or mid-countdown disconnects by emitting `duelError` and deleting the abandoned room.
+4. **Heardle Audio Race Fix (`frontend/src/hooks/useAudioPlayer.ts`):** Effect 2 now tracks previous URL/duration/replay refs so it only rewinds and plays from `0` when unlocking a longer tier or clicking Replay—eliminating concurrent `play()` on round mount and double-play on autoplay unlock.
+5. **Party TV Mute & Unmount Cleanup (`frontend/src/pages/Party/PartyHostPage.tsx`):** Added `isMutedRef` to avoid stale closure in socket listeners and paused `audioRef.current` on unmount.
+6. **Server-Side `LobbyOptions` Clamping (`RoomManagerService.createRoom`):** Enforced bounds on `maxPlayers` (`1..12`), `roundsCount` (`1..20`), `roundDuration` (`5..25`), `gameMode`, and `answerMode`.
+7. **Lobby Room Card Rounds Badge (`RoomItem.tsx`):** Displayed `roundsCount` badge alongside round duration.
+8. **Scoped Socket Listener Cleanup (`useGameRoomListeners.ts` & `useGameplayListeners.ts`):** Replaced global `socketOffMany` wipeouts with exact `socketHandlers.off(event, handler)` callback unsubscriptions.

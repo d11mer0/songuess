@@ -262,17 +262,39 @@ export const useAudioPlayer = ({
         };
     }, [maxPlayDuration, isHeardle]);
 
+    const prevHeardleUrlRef = useRef<string | null>(null);
+    const prevHeardleDurationRef = useRef<number | undefined>(maxPlayDuration);
+    const prevReplayTriggerRef = useRef<number>(replayTrigger);
+
     useEffect(() => {
-        if (audioRef.current && isHeardle && maxPlayDuration) {
-            const audio = audioRef.current;
-            audio.currentTime = 0;
-            if (!isAutoplayBlocked) {
-                audio.play()
-                    .then(() => setIsPlaying(true))
-                    .catch(() => {});
-            }
+        const audio = audioRef.current;
+        if (!audio || !isHeardle || !previewUrl) {
+            prevHeardleUrlRef.current = previewUrl;
+            prevHeardleDurationRef.current = maxPlayDuration;
+            prevReplayTriggerRef.current = replayTrigger;
+            return;
         }
-    }, [maxPlayDuration, isHeardle, isAutoplayBlocked, replayTrigger]);
+
+        const isSameTrack = prevHeardleUrlRef.current === previewUrl;
+        const durationIncreased = Boolean(
+            isSameTrack &&
+            maxPlayDuration &&
+            prevHeardleDurationRef.current &&
+            maxPlayDuration > prevHeardleDurationRef.current,
+        );
+        const replayClicked = isSameTrack && replayTrigger !== prevReplayTriggerRef.current;
+
+        prevHeardleUrlRef.current = previewUrl;
+        prevHeardleDurationRef.current = maxPlayDuration;
+        prevReplayTriggerRef.current = replayTrigger;
+
+        if ((durationIncreased || replayClicked) && !isAutoplayBlocked) {
+            audio.currentTime = 0;
+            audio.play()
+                .then(() => setIsPlaying(true))
+                .catch(() => {});
+        }
+    }, [previewUrl, maxPlayDuration, isHeardle, isAutoplayBlocked, replayTrigger]);
 
     useEffect(() => {
         if (audioRef.current) {
