@@ -61,15 +61,34 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         } catch (err: any) {
             this.logger.warn('Could not connect to Redis (' + redisHost + ':' + redisPort + '): ' + err?.message + '. Continuing with in-memory fallback.');
             this.isConnected = false;
+            if (this.client) {
+                try {
+                    this.client.disconnect();
+                } catch {
+                    // ignore
+                }
+                this.client = null;
+            }
         }
     }
 
     async onModuleDestroy() {
         if (this.client) {
+            const client = this.client;
+            this.client = null;
+            this.isConnected = false;
             try {
-                await this.client.quit();
+                if (client.status === 'ready' || client.status === 'connect') {
+                    await client.quit();
+                } else {
+                    client.disconnect();
+                }
             } catch {
-                // ignore
+                try {
+                    client.disconnect();
+                } catch {
+                    // ignore
+                }
             }
         }
     }

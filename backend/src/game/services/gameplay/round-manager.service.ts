@@ -51,6 +51,20 @@ export class RoundManagerService {
 
     startRound(roomId: string, roundNumber: number, round: GameRound) {
         const canonicalId = this.resolveCanonicalId(roomId);
+        const room = this.gameEvents.getRoom(canonicalId);
+        if (room?.lobbyOptions?.gameMode === 'HEARDLE' && room.gameProgress) {
+            if (!room.gameProgress.heardleUnlockedTiers) {
+                room.gameProgress.heardleUnlockedTiers = {};
+            }
+            for (const player of room.players) {
+                if (!room.gameProgress.heardleUnlockedTiers[player.id]) {
+                    room.gameProgress.heardleUnlockedTiers[player.id] = {};
+                }
+                if (!room.gameProgress.heardleUnlockedTiers[player.id][roundNumber]) {
+                    room.gameProgress.heardleUnlockedTiers[player.id][roundNumber] = 1;
+                }
+            }
+        }
         round.startedAt = Date.now();
         this.startRoundTimeout(canonicalId, roundNumber);
         this.gameEvents.emitRoundEvent(canonicalId, round);

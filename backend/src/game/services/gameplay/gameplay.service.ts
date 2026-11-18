@@ -10,6 +10,7 @@ import { createInitialPlayerResults, validateAnswerSubmission, createPlayerRound
 import {checkAllPlayersAnswered } from '../../../utils/gameplay/round.util';
 import { filterTracks } from '../../../utils/track-utils';
 import { isFuzzyMatch } from '../../../utils/gameplay/fuzzy-match.util';
+import { inferMinHeardleTierFromElapsed, VALID_HEARDLE_TIERS } from '../../../utils/gameplay/scoring.util';
 import { RoundManagerService } from './round-manager.service';
 import { sanitizeRoom } from '../../../utils/room-utils/sanitizeRoom';
 import { GameEventsService } from './game-events.service';
@@ -55,28 +56,37 @@ export class GameplayService {
         roomId: string,
         selectedTracks: SelectedTracks,
         isSystemLaunch: boolean = false,
-    ) {
+    ): boolean {
         const room = this.roomHelperService.findRoom(roomId);
-        if (!room) return;
+        if (!room) {
+            if (isSystemLaunch) {
+                throw new Error(`Room ${roomId} not found for system launch`);
+            }
+            return false;
+        }
 
         if (!isSystemLaunch) {
             const userId = client?.data?.user?.id;
-            if (!userId || room.leaderId !== userId) return;
-            if (room.state === GameRoomState.STARTED) return;
-            if (!room.lobbyOptions?.isPartyMode && room.state !== GameRoomState.CREATING) return;
+            if (!userId || room.leaderId !== userId) return false;
+            if (room.state === GameRoomState.STARTED) return false;
+            if (!room.lobbyOptions?.isPartyMode && room.state !== GameRoomState.CREATING) return false;
             if (
                 room.lobbyOptions?.isPartyMode &&
                 room.state !== GameRoomState.ADDING &&
                 room.state !== GameRoomState.CREATING
             ) {
-                return;
+                return false;
             }
         }
 
         const playableTracks = filterTracks(selectedTracks?.tracks || []);
         if (playableTracks.length < 4) {
-            client?.emit('gameError', 'Not enough playable tracks to start the game (minimum 4 required)');
-            return;
+            const message = 'Not enough playable tracks to start the game (minimum 4 required)';
+            if (isSystemLaunch) {
+                throw new Error(message);
+            }
+            client?.emit('gameError', message);
+            return false;
         }
 
         const rawRounds = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
@@ -86,8 +96,12 @@ export class GameplayService {
         try {
             rounds = this.roundManager.generateGameRounds(playableTracks, roundsCount);
         } catch (err) {
-            client?.emit('gameError', (err as Error)?.message || 'Failed to generate game rounds');
-            return;
+            const message = (err as Error)?.message || 'Failed to generate game rounds';
+            if (isSystemLaunch) {
+                throw err instanceof Error ? err : new Error(message);
+            }
+            client?.emit('gameError', message);
+            return false;
         }
 
         this.roundManager.cancelRoomGame(room.id);
@@ -107,16 +121,29 @@ export class GameplayService {
             {} as Record<number, number>,
         );
 
+        const initialHeardleTiers: Record<number, Record<number, number>> | undefined =
+            room.lobbyOptions?.gameMode === 'HEARDLE'
+                ? room.players.reduce(
+                      (acc, player) => {
+                          acc[player.id] = { 0: 1 };
+                          return acc;
+                      },
+                      {} as Record<number, Record<number, number>>,
+                  )
+                : undefined;
+
         room.gameProgress = {
             currentRound: 0,
             rounds,
             playerResults,
             totalScores,
             streaks: {},
+            ...(initialHeardleTiers ? { heardleUnlockedTiers: initialHeardleTiers } : {}),
         };
 
         this.roomManager.syncRoom(room);
         this.roundManager.startRound(room.id, 0, rounds[0]);
+        return true;
     }
 
     handleAnswer(client: Socket, roomId: string, roundNumber: number, answer: string, snippetDurationUsed?: number) {
@@ -157,19 +184,21 @@ export class GameplayService {
             }
         }
 
-        const VALID_HEARDLE_TIERS = [1, 2, 5, 10, 20];
         const recordedSnippet = room.gameProgress.heardleUnlockedTiers?.[playerId]?.[roundNumber] || 1;
         const validClientTier =
             typeof snippetDurationUsed === 'number' &&
             Number.isFinite(snippetDurationUsed) &&
-            VALID_HEARDLE_TIERS.includes(snippetDurationUsed)
+            (VALID_HEARDLE_TIERS as readonly number[]).includes(snippetDurationUsed)
                 ? snippetDurationUsed
                 : undefined;
+        const elapsedMs = Math.max(0, Date.now() - round.startedAt);
+        const minTierByElapsed = inferMinHeardleTierFromElapsed(elapsedMs);
         const effectiveSnippetDuration =
             gameMode === 'HEARDLE'
-                ? validClientTier !== undefined
-                    ? Math.max(recordedSnippet, validClientTier)
-                    : recordedSnippet
+                ? Math.max(
+                      validClientTier !== undefined ? Math.max(recordedSnippet, validClientTier) : recordedSnippet,
+                      minTierByElapsed,
+                  )
                 : snippetDurationUsed;
 
         playerResults[playerId][roundNumber] = createPlayerRoundResult(

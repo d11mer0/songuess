@@ -152,6 +152,30 @@ describe('Batch B Room Lifecycle & Matchmaking Spec', () => {
             expect.objectContaining({ tracks }),
             true,
         );
+
+        // Also verify system launch failure emits duelError and deletes broken duel room
+        const brokenRoom: GameRoom = {
+            ...room,
+            id: 'duel-broken',
+            shortCode: 'DUELBR',
+            state: GameRoomState.ADDING,
+        };
+        roomManager.allRooms = [brokenRoom];
+        roomManager.createRoom.mockResolvedValue('duel-broken');
+        roomManager.joinRoom.mockResolvedValue(brokenRoom);
+        gameplayService.handleLaunchGame.mockImplementation(() => {
+            throw new Error('Not enough playable tracks to start the game (minimum 4 required)');
+        });
+
+        mm.addToDuelQueue(p1Socket as never, { id: 1, login: 'p1' });
+        mm.addToDuelQueue(p2Socket as never, { id: 2, login: 'p2' });
+        for (let i = 0; i < 6; i++) {
+            await Promise.resolve();
+        }
+        jest.advanceTimersByTime(2000);
+
+        expect(roomEmit).toHaveBeenCalledWith('duelError', 'Failed to launch duel match');
+        expect(roomManager.deleteRoomBySystem).toHaveBeenCalledWith('duel-broken');
         jest.useRealTimers();
     });
 });

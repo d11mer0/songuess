@@ -1,5 +1,39 @@
 import { GameMode } from '../../game/interfaces/game.interface';
 
+export const VALID_HEARDLE_TIERS = [1, 2, 5, 10, 20] as const;
+
+export function inferMinHeardleTierFromElapsed(timeTakenMs: number): number {
+    if (!Number.isFinite(timeTakenMs) || timeTakenMs <= 6000) return 1;
+    if (timeTakenMs <= 8000) return 2;
+    if (timeTakenMs <= 12000) return 5;
+    if (timeTakenMs <= 18000) return 10;
+    return 20;
+}
+
+export function resolveEffectiveHeardleDuration(
+    snippetDurationUsed: number | undefined,
+    timeTakenMs: number,
+): number {
+    const minTierByTime = inferMinHeardleTierFromElapsed(timeTakenMs);
+
+    if (
+        typeof snippetDurationUsed === 'number' &&
+        Number.isFinite(snippetDurationUsed) &&
+        snippetDurationUsed >= 1
+    ) {
+        return Math.max(snippetDurationUsed, minTierByTime);
+    }
+
+    if (snippetDurationUsed !== undefined) {
+        // Spoofed/invalid snippet values (0, negative, NaN) never receive 1s bonus
+        return 20;
+    }
+
+    const elapsedSec = Math.max(1, timeTakenMs / 1000);
+    const fallbackTier = elapsedSec <= 2 ? 2 : elapsedSec <= 5 ? 5 : elapsedSec <= 10 ? 10 : 20;
+    return Math.max(fallbackTier, minTierByTime);
+}
+
 export function calculateScore(
     timeTaken: number,
     isCorrect: boolean,
@@ -23,20 +57,7 @@ export function calculateScore(
     // Режим Heardle (Прогресивне відгадування): бали залежать від тривалості відкритого фрагменту
     if (gameMode === 'HEARDLE') {
         let basePoints = 100;
-        let duration: number;
-        if (
-            typeof snippetDurationUsed === 'number' &&
-            Number.isFinite(snippetDurationUsed) &&
-            snippetDurationUsed >= 1
-        ) {
-            duration = snippetDurationUsed;
-        } else if (snippetDurationUsed !== undefined) {
-            // Spoofed/invalid snippet values (0, negative, NaN) never get 1s bonus
-            duration = 20;
-        } else {
-            const elapsedSec = Math.max(1, timeTaken / 1000);
-            duration = elapsedSec <= 2 ? 2 : elapsedSec <= 5 ? 5 : elapsedSec <= 10 ? 10 : 20;
-        }
+        const duration = resolveEffectiveHeardleDuration(snippetDurationUsed, timeTaken);
 
         if (duration <= 1) {
             basePoints = 500;

@@ -1,6 +1,6 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { GameRoom } from '../../interfaces/game.interface';
-import { calculateScore } from '../../../utils/gameplay/scoring.util';
+import { calculateScore, resolveEffectiveHeardleDuration } from '../../../utils/gameplay/scoring.util';
 import { AchievementService } from '../../../achievements/achievement.service';
 
 @Injectable()
@@ -74,11 +74,15 @@ export class ScoringService {
                 if (currentStreak >= 5) {
                     this.achievementService.awardAchievement(playerId, 'COMBO_5X').catch(() => {});
                 }
+                const effectiveHeardleDuration =
+                    gameMode === 'HEARDLE' && typeof timeTaken === 'number'
+                        ? resolveEffectiveHeardleDuration(snippetDurationUsed, timeTaken)
+                        : snippetDurationUsed;
                 const isValidHeardleProSnippet =
-                    typeof snippetDurationUsed === 'number' &&
-                    Number.isFinite(snippetDurationUsed) &&
-                    snippetDurationUsed >= 1 &&
-                    snippetDurationUsed <= 2;
+                    typeof effectiveHeardleDuration === 'number' &&
+                    Number.isFinite(effectiveHeardleDuration) &&
+                    effectiveHeardleDuration >= 1 &&
+                    effectiveHeardleDuration <= 2;
                 if (gameMode === 'HEARDLE' && isCorrect && isValidHeardleProSnippet) {
                     this.achievementService.awardAchievement(playerId, 'HEARDLE_PRO').catch(() => {});
                 }

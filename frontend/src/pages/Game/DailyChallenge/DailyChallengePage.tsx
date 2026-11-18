@@ -211,6 +211,13 @@ const DailyChallengePage: React.FC = () => {
             setAttempts(reconstructed);
         } else if (data?.attemptsHistory && data.attemptsHistory.length > 0) {
             setAttempts(data.attemptsHistory);
+        } else if (data && !data.isCompleted && data.guessesCount > 0) {
+            setAttempts(
+                Array.from({ length: Math.min(6, data.guessesCount) }, () => ({
+                    text: '—',
+                    isCorrect: false,
+                })),
+            );
         }
     }, [data, t]);
 

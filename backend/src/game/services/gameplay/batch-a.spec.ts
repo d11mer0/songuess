@@ -230,4 +230,88 @@ describe('Batch A Security & Anti-Cheat Spec', () => {
         expect((await validate(tooHigh)).length).toBeGreaterThan(0);
         expect(await validate(valid)).toHaveLength(0);
     });
+
+    it('BUG-07 hotfix: HEARDLE initializes unlocked tiers to 1 and clamps disproportionate elapsed time on handleAnswer & ScoringService', () => {
+        const heardleRoom: GameRoom = {
+            id: 'heardle-init',
+            shortCode: 'HRD001',
+            leaderId: 1,
+            state: GameRoomState.CREATING,
+            players: [
+                { id: 1, login: 'p1', avatar: null, isOnline: true },
+                { id: 2, login: 'p2', avatar: null, isOnline: true },
+            ],
+            lobbyOptions: {
+                allowAutoJoin: false,
+                publicLobby: true,
+                maxPlayers: 4,
+                gameMode: 'HEARDLE',
+            },
+        };
+
+        const rounds = [
+            {
+                roundNumber: 0,
+                track: { id: '1', title: 'Track 1', preview: 'https://cdns-preview.dzcdn.net/track-1.mp3' },
+                options: ['Track 1', 'Track 2', 'Track 3', 'Track 4'],
+                startedAt: Date.now() - 15000,
+            },
+        ];
+
+        const roomHelper = {
+            findRoom: jest.fn().mockReturnValue(heardleRoom),
+            cancelRoomCleanup: jest.fn(),
+            onRoomDisposed: jest.fn(),
+            onRosterChanged: jest.fn(),
+        };
+        const roundManager = {
+            cancelRoomGame: jest.fn(),
+            generateGameRounds: jest.fn().mockReturnValue(rounds),
+            startRound: jest.fn(),
+            finishRound: jest.fn(),
+            setServer: jest.fn(),
+        };
+        const roomManager = { syncRoom: jest.fn(), broadcastRoomsList: jest.fn() };
+        const service = new GameplayService(
+            roomHelper as never,
+            roundManager as never,
+            { setServer: jest.fn() } as never,
+            { setServer: jest.fn() } as never,
+            roomManager as never,
+        );
+
+        const hostSocket = { data: { user: { id: 1 } }, emit: jest.fn() };
+        const launched = service.handleLaunchGame(hostSocket as never, 'heardle-init', {
+            type: 'PLAYLIST',
+            tracks: createTracks(4),
+        });
+        expect(launched).toBe(true);
+
+        expect(() =>
+            service.handleLaunchGame(
+                hostSocket as never,
+                'heardle-init',
+                { type: 'PLAYLIST', tracks: createTracks(2) },
+                true,
+            ),
+        ).toThrow();
+        expect(heardleRoom.gameProgress?.heardleUnlockedTiers).toEqual({
+            1: { 0: 1 },
+            2: { 0: 1 },
+        });
+
+        // Simulate 15 seconds elapsed since round started while attacker claims snippetDurationUsed: 1
+        heardleRoom.gameProgress!.rounds[0].startedAt = Date.now() - 15000;
+        service.handleAnswer(hostSocket as never, 'heardle-init', 0, 'Track 1', 1);
+
+        const recordedResult = heardleRoom.gameProgress!.playerResults[1][0];
+        expect(recordedResult.snippetDurationUsed).toBeGreaterThanOrEqual(10);
+
+        const awardAchievement = jest.fn().mockResolvedValue(undefined);
+        const scoring = new ScoringService({ awardAchievement } as never);
+        scoring.calculateRoundScores(heardleRoom, 0);
+
+        expect(recordedResult.score).toBeLessThan(300);
+        expect(awardAchievement).not.toHaveBeenCalledWith(1, 'HEARDLE_PRO');
+    });
 });

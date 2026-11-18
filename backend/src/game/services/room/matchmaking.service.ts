@@ -215,12 +215,15 @@ export class MatchmakingService {
 
                 const starterSocket = targetRoom.leaderId === player2.userId ? player2.socket : player1.socket;
                 try {
-                    this.gameplayService.handleLaunchGame(
+                    const launched = this.gameplayService.handleLaunchGame(
                         starterSocket,
                         activeRoomId,
                         selectedTracks,
                         true,
                     );
+                    if (launched === false) {
+                        throw new Error('Duel launch failed');
+                    }
                 } catch (launchErr) {
                     console.error('Duel launch failed:', launchErr);
                     this.server?.to(activeRoomId).emit('duelError', 'Failed to launch duel match');

@@ -163,4 +163,30 @@ describe('Batch C Daily, Deezer & Achievements Spec', () => {
         expect(achievementService.awardAchievement).toHaveBeenCalledWith(1, 'CENTURION_100');
         expect(achievementService.awardAchievement).toHaveBeenCalledWith(1, 'FIRST_WIN');
     });
+
+    it('BUG-08 hotfix: getDailyChallenge preserves DB guessesCount and incomplete state when Redis history is empty', async () => {
+        const prisma = {
+            user: {
+                findUnique: jest.fn().mockResolvedValue({
+                    id: 7,
+                    dailyStreak: 2,
+                    maxDailyStreak: 4,
+                    dailyResults: [{ isSolved: false, guessesCount: 3 }],
+                }),
+            },
+        };
+        const redisService = {
+            get: jest.fn().mockResolvedValue(null),
+            set: jest.fn().mockResolvedValue(undefined),
+        };
+
+        const service = new DailyService(prisma as never, undefined, redisService as never);
+        const day = service.getDayNumber();
+        const challenge = await service.getDailyChallenge(7);
+
+        expect(challenge.dayNumber).toBe(day);
+        expect(challenge.isCompleted).toBe(false);
+        expect(challenge.guessesCount).toBe(3);
+        expect(challenge.attemptsHistory).toBeUndefined();
+    });
 });
