@@ -23,9 +23,11 @@ const PlaylistList: React.FC<PlaylistListProps> = ({
     const { language } = useTranslation();
     const dateLocale = language === 'uk' ? 'uk-UA' : 'en-US';
 
+    const safePlaylists = Array.isArray(playlists) ? playlists : [];
+
     return (
         <div className={styles.listWrapper}>
-            {playlists.map((playlist) => (
+            {safePlaylists.map((playlist) => (
                 <div
                     key={playlist.id}
                     className={`${styles.card} ${

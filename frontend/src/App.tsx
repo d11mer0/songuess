@@ -9,7 +9,7 @@ const App: React.FC = () => {
     const [triggerRefresh] = useLazyRefreshQuery();
 
     useEffect(() => {
-        if (localStorage.getItem('accessToken')) {
+        if (!localStorage.getItem('accessToken')) {
             triggerRefresh();
         }
     }, [triggerRefresh]);

@@ -24,7 +24,8 @@ const RoomPlayerList: React.FC<Props> = ({ kickMember }) => {
     
     if (!roomInfo) return <div></div>;
 
-    const slots = Array.from({ length: roomInfo.lobbyOptions.maxPlayers }, (_, index) => roomInfo.players[index] ?? null);
+    const slotCount = Math.min(20, Math.max(roomInfo.players.length, Number(roomInfo.lobbyOptions?.maxPlayers) || 4));
+    const slots = Array.from({ length: slotCount }, (_, index) => roomInfo.players[index] ?? null);
 
     return (
         <ul className={styles.grid}>

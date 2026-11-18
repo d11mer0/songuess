@@ -280,7 +280,9 @@ const DailyChallengePage: React.FC = () => {
                 soundEffects.playIncorrect();
             }
 
-            refetch();
+            if (res.isGameOver) {
+                refetch();
+            }
         } catch (err) {
             console.error('Failed to submit guess', err);
         }

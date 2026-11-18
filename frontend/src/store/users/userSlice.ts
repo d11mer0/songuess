@@ -54,7 +54,12 @@ const userSlice = createSlice({
                 authApi.endpoints.refresh.matchFulfilled,
                 handleAuthSuccess,
             )
-            .addMatcher(authApi.endpoints.refresh.matchRejected, handleLogout)
+            .addMatcher(authApi.endpoints.refresh.matchRejected, (state) => {
+                if (state.isAuthenticated && localStorage.getItem('accessToken')) {
+                    return;
+                }
+                handleLogout(state);
+            })
             .addMatcher(authApi.endpoints.logout.matchFulfilled, handleLogout)
             .addMatcher(authApi.endpoints.logout.matchRejected, handleLogout)
             .addMatcher(

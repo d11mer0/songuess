@@ -87,7 +87,10 @@ describe('DailyService - Daily Challenge', () => {
     });
 
     it('should reset streak on 6th failed attempt', async () => {
-        mockPrisma.dailyResult.findUnique.mockResolvedValue(null);
+        mockPrisma.dailyResult.findUnique.mockResolvedValue({
+            isSolved: false,
+            guessesCount: 5,
+        });
         mockPrisma.user.findUnique.mockResolvedValue({
             id: 1,
             dailyStreak: 5,

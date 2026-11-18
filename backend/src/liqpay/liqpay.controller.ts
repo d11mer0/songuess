@@ -33,7 +33,7 @@ export class LiqPayController {
     @Post('simulate-test')
     @ApiOperation({ summary: 'Тестова симуляція успішного донату (Dev sandbox)' })
     async simulateTest(@Req() req: AuthRequest, @Body() dto: CreateCheckoutDto) {
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' && process.env.ALLOW_LIQPAY_SANDBOX !== 'true') {
             throw new ForbiddenException('Simulation is disabled in production environment');
         }
         const userId = req.user?.id;

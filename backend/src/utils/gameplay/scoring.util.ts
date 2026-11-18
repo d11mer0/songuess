@@ -23,7 +23,20 @@ export function calculateScore(
     // Режим Heardle (Прогресивне відгадування): бали залежать від тривалості відкритого фрагменту
     if (gameMode === 'HEARDLE') {
         let basePoints = 100;
-        const duration = snippetDurationUsed || 1;
+        let duration: number;
+        if (
+            typeof snippetDurationUsed === 'number' &&
+            Number.isFinite(snippetDurationUsed) &&
+            snippetDurationUsed >= 1
+        ) {
+            duration = snippetDurationUsed;
+        } else if (snippetDurationUsed !== undefined) {
+            // Spoofed/invalid snippet values (0, negative, NaN) never get 1s bonus
+            duration = 20;
+        } else {
+            const elapsedSec = Math.max(1, timeTaken / 1000);
+            duration = elapsedSec <= 2 ? 2 : elapsedSec <= 5 ? 5 : elapsedSec <= 10 ? 10 : 20;
+        }
 
         if (duration <= 1) {
             basePoints = 500;

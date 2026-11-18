@@ -74,7 +74,12 @@ export class ScoringService {
                 if (currentStreak >= 5) {
                     this.achievementService.awardAchievement(playerId, 'COMBO_5X').catch(() => {});
                 }
-                if (gameMode === 'HEARDLE' && isCorrect && (snippetDurationUsed || 1) <= 2) {
+                const isValidHeardleProSnippet =
+                    typeof snippetDurationUsed === 'number' &&
+                    Number.isFinite(snippetDurationUsed) &&
+                    snippetDurationUsed >= 1 &&
+                    snippetDurationUsed <= 2;
+                if (gameMode === 'HEARDLE' && isCorrect && isValidHeardleProSnippet) {
                     this.achievementService.awardAchievement(playerId, 'HEARDLE_PRO').catch(() => {});
                 }
             }

@@ -14,8 +14,11 @@ export function normalizeText(text: string): string {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '');
 
-    // Видаляємо дужки з метаданими. Якщо за межами дужок залишається текст, видаляємо дужки
-    const withoutParens = cleaned.replace(/\([^)]*\)/g, '').replace(/\[[^\]]*\]/g, '');
+    // Видаляємо дужки з метаданими та службові суфікси після ' - ' (remastered/live/remix тощо), не ламаючи 'a-ha' чи 'Artist - Title'
+    const withoutParens = cleaned
+        .replace(/\([^)]*\)/g, '')
+        .replace(/\[[^\]]*\]/g, '')
+        .replace(/\s+-\s+.*?\b(remaster(?:ed)?|live|remix|edit|version|mono|stereo|feat|ft|official|audio|video)\b.*$/gi, '');
     if (withoutParens.trim().length > 0) {
         cleaned = withoutParens;
     }

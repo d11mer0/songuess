@@ -4,6 +4,7 @@ import { GameService } from '../game/game.service';
 import { RoomHelperService } from '../room/room-helper.service';
 import { RoomManagerService } from '../room/room-manager.service';
 import { GameRoom, GameRoomState } from '../../interfaces/game.interface';
+import { GameRound } from '../../interfaces/game-progress.interface';
 import { SelectedTracks, TrackItem } from '../../interfaces/tracks.interface';
 import { createInitialPlayerResults, validateAnswerSubmission, createPlayerRoundResult} from '../../../utils/gameplay/player-results.utils';
 import {checkAllPlayersAnswered } from '../../../utils/gameplay/round.util';
@@ -49,16 +50,45 @@ export class GameplayService {
         this.gameResult.setServer(server);
     }
 
-    handleLaunchGame(client: Socket, roomId: string, selectedTracks: SelectedTracks) {
+    handleLaunchGame(
+        client: Socket,
+        roomId: string,
+        selectedTracks: SelectedTracks,
+        isSystemLaunch: boolean = false,
+    ) {
         const room = this.roomHelperService.findRoom(roomId);
         if (!room) return;
 
-        const userId = client.data.user?.id;
-        if (room.leaderId !== userId) return;
-        if (room.state === GameRoomState.STARTED) return;
-        
+        if (!isSystemLaunch) {
+            const userId = client?.data?.user?.id;
+            if (!userId || room.leaderId !== userId) return;
+            if (room.state === GameRoomState.STARTED) return;
+            if (!room.lobbyOptions?.isPartyMode && room.state !== GameRoomState.CREATING) return;
+            if (
+                room.lobbyOptions?.isPartyMode &&
+                room.state !== GameRoomState.ADDING &&
+                room.state !== GameRoomState.CREATING
+            ) {
+                return;
+            }
+        }
+
         const playableTracks = filterTracks(selectedTracks?.tracks || []);
-        if (playableTracks.length < 4) return;
+        if (playableTracks.length < 4) {
+            client?.emit('gameError', 'Not enough playable tracks to start the game (minimum 4 required)');
+            return;
+        }
+
+        const rawRounds = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
+        const roundsCount = Math.min(20, Math.max(1, Number(rawRounds) || 10));
+
+        let rounds: GameRound[];
+        try {
+            rounds = this.roundManager.generateGameRounds(playableTracks, roundsCount);
+        } catch (err) {
+            client?.emit('gameError', (err as Error)?.message || 'Failed to generate game rounds');
+            return;
+        }
 
         this.roundManager.cancelRoomGame(room.id);
 
@@ -67,10 +97,6 @@ export class GameplayService {
             tracks: playableTracks,
         };
         room.state = GameRoomState.STARTED;
-
-        const rawRounds = room.lobbyOptions?.roundsCount || (room.lobbyOptions?.gameMode === 'DUEL' ? 5 : 10);
-        const roundsCount = Math.min(20, Math.max(1, Number(rawRounds) || 10));
-        const rounds = this.roundManager.generateGameRounds(playableTracks, roundsCount);
         const playerResults = createInitialPlayerResults(room.players);
 
         const totalScores: Record<number, number> = room.players.reduce(
@@ -131,10 +157,20 @@ export class GameplayService {
             }
         }
 
+        const VALID_HEARDLE_TIERS = [1, 2, 5, 10, 20];
         const recordedSnippet = room.gameProgress.heardleUnlockedTiers?.[playerId]?.[roundNumber] || 1;
-        const effectiveSnippetDuration = gameMode === 'HEARDLE'
-            ? Math.max(recordedSnippet, snippetDurationUsed || 1)
-            : snippetDurationUsed;
+        const validClientTier =
+            typeof snippetDurationUsed === 'number' &&
+            Number.isFinite(snippetDurationUsed) &&
+            VALID_HEARDLE_TIERS.includes(snippetDurationUsed)
+                ? snippetDurationUsed
+                : undefined;
+        const effectiveSnippetDuration =
+            gameMode === 'HEARDLE'
+                ? validClientTier !== undefined
+                    ? Math.max(recordedSnippet, validClientTier)
+                    : recordedSnippet
+                : snippetDurationUsed;
 
         playerResults[playerId][roundNumber] = createPlayerRoundResult(
             round,

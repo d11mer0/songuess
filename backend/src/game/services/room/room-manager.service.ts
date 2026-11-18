@@ -33,6 +33,9 @@ export class RoomManagerService implements OnModuleInit {
                     ...r,
                     players: r.players.map((p) => ({ ...p, isOnline: false })),
                 }));
+                for (const r of this.rooms) {
+                    this.roomHelperService.scheduleRoomCleanup(r.id, 30000);
+                }
                 console.log('[RoomManagerService] Відновлено ' + restored.length + ' активних кімнат із Redis');
             }
         } catch (err) {
@@ -91,7 +94,7 @@ export class RoomManagerService implements OnModuleInit {
             }],
             lobbyOptions: {
                 ...lobbyOptions,
-                maxPlayers: Math.min(12, Math.max(1, Number(lobbyOptions?.maxPlayers) || 4)),
+                maxPlayers: Math.min(20, Math.max(2, Number(lobbyOptions?.maxPlayers) || 4)),
                 roundDuration: Math.min(25, Math.max(5, Number(lobbyOptions?.roundDuration) || 25)),
                 roundsCount: Math.min(
                     20,
@@ -182,8 +185,8 @@ export class RoomManagerService implements OnModuleInit {
         const isParty = Boolean(room.lobbyOptions?.isPartyMode);
         const isAllowedState =
             room.state === GameRoomState.ADDING ||
+            room.state === GameRoomState.CREATING ||
             (isParty && (
-                room.state === GameRoomState.CREATING ||
                 room.state === GameRoomState.ENDED ||
                 room.state === GameRoomState.STARTED
             ));

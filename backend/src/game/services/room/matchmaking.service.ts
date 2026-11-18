@@ -5,6 +5,7 @@ import { RoomQueryService } from './room-query.service';
 import { RoomHelperService } from './room-helper.service';
 import { GameplayService } from '../gameplay/gameplay.service';
 import { DeezerService } from '../../../deezer/deezer.service';
+import { GameRoomState } from '../../interfaces/game.interface';
 import { SelectedTracks, TrackItem } from '../../interfaces/tracks.interface';
 
 interface QueuedPlayer {
@@ -180,6 +181,13 @@ export class MatchmakingService {
                 tracks,
             };
 
+            const activeTarget = this.roomManager.allRooms.find((r) => r.id === roomId);
+            if (!activeTarget) {
+                return;
+            }
+            activeTarget.state = GameRoomState.STARTED;
+            await this.roomManager.syncRoom(activeTarget);
+
             const roomInfo = this.roomQuery.getRoomInfo(roomId, this.roomManager.allRooms);
 
             this.server?.to(roomId).emit('duelMatchFound', {
@@ -206,11 +214,18 @@ export class MatchmakingService {
                 }
 
                 const starterSocket = targetRoom.leaderId === player2.userId ? player2.socket : player1.socket;
-                this.gameplayService.handleLaunchGame(
-                    starterSocket,
-                    activeRoomId,
-                    selectedTracks,
-                );
+                try {
+                    this.gameplayService.handleLaunchGame(
+                        starterSocket,
+                        activeRoomId,
+                        selectedTracks,
+                        true,
+                    );
+                } catch (launchErr) {
+                    console.error('Duel launch failed:', launchErr);
+                    this.server?.to(activeRoomId).emit('duelError', 'Failed to launch duel match');
+                    this.roomManager.deleteRoomBySystem(activeRoomId);
+                }
             }, 2000);
 
             this.clearPendingDuelTimer(activeRoomId);

@@ -156,6 +156,9 @@ export const useAudioPlayer = ({
             audio.removeEventListener('ended', onEnded);
             audio.removeEventListener('waiting', onWaiting);
             audio.removeEventListener('error', onError);
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
             clearMediaSessionPlayback(audio);
         };
     }, []);

@@ -36,14 +36,41 @@ export class DailyService {
         return DAILY_TRACKS_BANK[index];
     }
 
-    getOptions(correctTrack: DailyTrack): string[] {
+    private deterministicSelectAndOrder(
+        correctOption: string,
+        candidates: string[],
+        dayNumber: number,
+    ): string[] {
+        const pool = [...candidates];
+        const pickedWrong: string[] = [];
+        if (pool.length > 0) {
+            let seed = Math.abs(dayNumber) * 2654435761;
+            for (let i = 0; i < 3 && pool.length > 0; i++) {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                const idx = seed % pool.length;
+                pickedWrong.push(pool.splice(idx, 1)[0]);
+            }
+        }
+        const all = [...pickedWrong, correctOption];
+        let orderSeed = Math.abs(dayNumber) * 1103515245 + 12345;
+        for (let i = all.length - 1; i > 0; i--) {
+            orderSeed = (orderSeed * 1664525 + 1013904223) >>> 0;
+            const j = orderSeed % (i + 1);
+            [all[i], all[j]] = [all[j], all[i]];
+        }
+        return all;
+    }
+
+    getOptions(correctTrack: DailyTrack, dayNumber: number = this.getDayNumber()): string[] {
         const otherOptions = DAILY_TRACKS_BANK
             .filter((t) => t.id !== correctTrack.id)
             .map((t) => `${t.artistName} - ${t.title}`);
-        
-        const shuffled = shuffleArray(otherOptions).slice(0, 3);
-        const all = [...shuffled, `${correctTrack.artistName} - ${correctTrack.title}`];
-        return shuffleArray(all);
+
+        return this.deterministicSelectAndOrder(
+            `${correctTrack.artistName} - ${correctTrack.title}`,
+            otherOptions,
+            dayNumber,
+        );
     }
 
     generateShareText(dayNumber: number, guessesCount: number, isSolved: boolean, streak: number): string {
@@ -166,15 +193,14 @@ export class DailyService {
                     if (uniquePool.length >= 4) {
                         const chosenIndex = (dayNumber - 1) % uniquePool.length;
                         const track = uniquePool[chosenIndex];
-                        const wrongOptions = shuffleArray(
-                            uniquePool
-                                .filter((item) => item.id !== track.id)
-                                .map((item) => `${item.artistName} - ${item.title}`),
-                        ).slice(0, 3);
-                        const options = shuffleArray([
-                            ...wrongOptions,
+                        const candidates = uniquePool
+                            .filter((item) => item.id !== track.id)
+                            .map((item) => `${item.artistName} - ${item.title}`);
+                        const options = this.deterministicSelectAndOrder(
                             `${track.artistName} - ${track.title}`,
-                        ]);
+                            candidates,
+                            dayNumber,
+                        );
 
                         const payload = { track, options };
                         if (this.redisService) {
@@ -195,7 +221,7 @@ export class DailyService {
         const fallbackTrack = this.getTodayTrack(dayNumber);
         return {
             track: fallbackTrack,
-            options: this.getOptions(fallbackTrack),
+            options: this.getOptions(fallbackTrack, dayNumber),
         };
     }
 
@@ -226,7 +252,9 @@ export class DailyService {
             }
         }
 
-        const isCompleted = !!userResult;
+        const isCompleted = Boolean(
+            userResult && (userResult.isSolved || userResult.guessesCount >= 6),
+        );
 
         let attemptsHistory: Array<{ text: string; isCorrect: boolean }> = [];
         if (userId && !isCompleted && this.redisService) {
@@ -246,7 +274,9 @@ export class DailyService {
             preview: resolvedPreview,
             isCompleted,
             isSolved: userResult?.isSolved ?? false,
-            guessesCount: isCompleted ? (userResult?.guessesCount ?? 0) : attemptsHistory.length,
+            guessesCount: isCompleted
+                ? (userResult?.guessesCount ?? 0)
+                : Math.max(userResult?.guessesCount ?? 0, attemptsHistory.length),
             attemptsHistory: attemptsHistory.length > 0 ? attemptsHistory : undefined,
             options,
             streak,
@@ -308,9 +338,10 @@ export class DailyService {
 
         const { track, options } = await this.resolveTodayChallengePool(dayNumber, dateStr);
 
+        let existingDailyRow: any = null;
         if (userId) {
             // Перевіряємо, чи користувач вже завершив челендж на сьогодні
-            const existing = await this.prisma.dailyResult.findUnique({
+            existingDailyRow = await this.prisma.dailyResult.findUnique({
                 where: {
                     userId_date: {
                         userId,
@@ -319,23 +350,23 @@ export class DailyService {
                 },
             });
 
-            if (existing) {
+            if (existingDailyRow && (existingDailyRow.isSolved || existingDailyRow.guessesCount >= 6)) {
                 const user = await this.prisma.user.findUnique({
                     where: { id: userId },
                     select: { dailyStreak: true },
                 });
                 return {
                     isCompleted: true,
-                    isSolved: existing.isSolved,
-                    guessesCount: existing.guessesCount,
+                    isSolved: existingDailyRow.isSolved,
+                    guessesCount: existingDailyRow.guessesCount,
                     track: {
                         title: track.title,
                         artistName: track.artistName,
                     },
                     shareText: this.generateShareText(
                         dayNumber,
-                        existing.guessesCount,
-                        existing.isSolved,
+                        existingDailyRow.guessesCount,
+                        existingDailyRow.isSolved,
                         user?.dailyStreak || 0,
                     ),
                 };
@@ -359,11 +390,13 @@ export class DailyService {
         const hasTitleBeyondArtist =
             normGuess.length > normArtist.length + 1 && matchFull.similarity > artistSimilarity;
 
+        const isOnlyArtistInput = Boolean(normArtist) && normGuess === normArtist && normTitle !== normArtist;
         const isCorrect =
-            fullNormalizedMatch ||
-            (isSelectedOption && (matchFull.isMatch || matchResult.isMatch)) ||
-            matchResult.isMatch ||
-            (matchFull.isMatch && (containsTitle || hasTitleBeyondArtist || !matchResult.isArtistMatch));
+            !isOnlyArtistInput &&
+            (fullNormalizedMatch ||
+                (isSelectedOption && (matchFull.isMatch || matchResult.isMatch)) ||
+                matchResult.isMatch ||
+                (matchFull.isMatch && (containsTitle || hasTitleBeyondArtist || !matchResult.isArtistMatch)));
 
         let existingAttempts: Array<{ text: string; isCorrect: boolean }> = [];
         if (userId && this.redisService) {
@@ -378,10 +411,13 @@ export class DailyService {
             }
         }
 
-        const effectiveAttempt =
-            userId && this.redisService
-                ? Math.min(6, existingAttempts.length + 1)
-                : Math.min(6, Math.max(1, Number(attempt) || 1));
+        const serverAttemptBaseline = Math.max(
+            existingDailyRow?.guessesCount ?? 0,
+            existingAttempts.length,
+        );
+        const effectiveAttempt = userId
+            ? Math.min(6, serverAttemptBaseline + 1)
+            : Math.min(6, Math.max(1, Number(attempt) || 1));
 
         const isGameOver = isCorrect || effectiveAttempt >= 6;
 
@@ -395,6 +431,25 @@ export class DailyService {
                     JSON.stringify(existingAttempts),
                     86400,
                 );
+            }
+        }
+
+        if (!isGameOver && userId && typeof this.prisma.dailyResult.upsert === 'function') {
+            try {
+                await this.prisma.dailyResult.upsert({
+                    where: { userId_date: { userId, date: dateStr } },
+                    update: { guessesCount: effectiveAttempt },
+                    create: {
+                        userId,
+                        date: dateStr,
+                        dayNumber,
+                        guessesCount: effectiveAttempt,
+                        isSolved: false,
+                        score: 0,
+                    },
+                });
+            } catch {
+                // ignore intermediate persistence error if user record missing
             }
         }
 
@@ -424,18 +479,38 @@ export class DailyService {
                 const score = isCorrect ? Math.max(100, 700 - effectiveAttempt * 100) : 0;
 
                 try {
+                    const useUpsert = Boolean(existingDailyRow) && typeof this.prisma.dailyResult.upsert === 'function';
+                    const resultWriteOp = useUpsert
+                        ? this.prisma.dailyResult.upsert({
+                              where: { userId_date: { userId, date: dateStr } },
+                              update: {
+                                  guessesCount: effectiveAttempt,
+                                  isSolved: isCorrect,
+                                  score,
+                              },
+                              create: {
+                                  userId,
+                                  date: dateStr,
+                                  dayNumber,
+                                  guessesCount: effectiveAttempt,
+                                  isSolved: isCorrect,
+                                  score,
+                              },
+                          })
+                        : this.prisma.dailyResult.create({
+                              data: {
+                                  userId,
+                                  date: dateStr,
+                                  dayNumber,
+                                  guessesCount: effectiveAttempt,
+                                  isSolved: isCorrect,
+                                  score,
+                              },
+                          });
+
                     if (typeof this.prisma.$transaction === 'function') {
                         await this.prisma.$transaction([
-                            this.prisma.dailyResult.create({
-                                data: {
-                                    userId,
-                                    date: dateStr,
-                                    dayNumber,
-                                    guessesCount: effectiveAttempt,
-                                    isSolved: isCorrect,
-                                    score,
-                                },
-                            }),
+                            resultWriteOp,
                             this.prisma.user.update({
                                 where: { id: userId },
                                 data: {
@@ -446,16 +521,7 @@ export class DailyService {
                             }),
                         ]);
                     } else {
-                        await this.prisma.dailyResult.create({
-                            data: {
-                                userId,
-                                date: dateStr,
-                                dayNumber,
-                                guessesCount: effectiveAttempt,
-                                isSolved: isCorrect,
-                                score,
-                            },
-                        });
+                        await resultWriteOp;
                         await this.prisma.user.update({
                             where: { id: userId },
                             data: {

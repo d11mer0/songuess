@@ -22,8 +22,8 @@ export class CreateRoomDto implements LobbyOptions {
 
     @IsOptional()
     @IsInt()
-    @Min(1)
-    @Max(12)
+    @Min(2)
+    @Max(20)
     maxPlayers: number = 4;
 
     @IsOptional()

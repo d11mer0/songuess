@@ -89,6 +89,10 @@ export class RoundManagerService {
         this.pauseTimeouts.set(canonicalId, timer);
     }
 
+    clearRoomTimers(roomId: string) {
+        this.cancelRoomGame(roomId);
+    }
+
     cancelRoomGame(roomId: string) {
         const canonicalId = this.resolveCanonicalId(roomId);
         this.clearExistingTimeout(canonicalId);

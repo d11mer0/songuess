@@ -224,7 +224,7 @@ export class DeezerService {
 
     private async getFilteredArtistAlbums(artistId: number) {
         const albumsResponse = await this.getAlbumsByArtist(artistId);
-        const allReleases: any[] = albumsResponse?.data || [];
+        const allReleases: any[] = Array.isArray(albumsResponse?.data) ? albumsResponse.data : [];
 
         // Включаємо повноцінні альбоми, сингли та EP
         const validTypes = new Set(['album', 'single', 'ep']);
@@ -294,7 +294,7 @@ export class DeezerService {
         const releases = await this.getFilteredArtistAlbums(artistId);
         const allTracks = await this.getTracksFromAlbums(releases);
         const res = filterTracksByArtist(allTracks, this.nonOriginalKeywords);
-        await this.setCached(cacheKey, res, 43200);
+        await this.setCached(cacheKey, res, 1800);
         return res;
     }
 
@@ -323,17 +323,16 @@ export class DeezerService {
         // 1️⃣ Шукаємо артиста
         const artistResponse = await this.search(query, 'artist');
         if (!artistResponse || !Array.isArray(artistResponse.data) || artistResponse.data.length === 0) {
-            return { message: 'Артист не знайдений' };
+            return [];
         }
 
         const artist = artistResponse.data[0]; // Беремо першого знайденого
-        const artistId = artist.id;
         const artistName = artist.name;
 
         // 2️⃣ Шукаємо плейлісти, що містять ім'я виконавця
         const playlistsResponse = await this.search(artistName, 'playlist');
         if (!playlistsResponse || !Array.isArray(playlistsResponse.data) || playlistsResponse.data.length === 0) {
-            return { message: 'Плейлісти не знайдені' };
+            return [];
         }
 
         // 3️⃣ Фільтруємо та сортуємо результати

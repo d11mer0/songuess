@@ -43,7 +43,7 @@ describe('Batch 4 Fixes (BUG-05, BUG-21, BUG-25, BUG-27)', () => {
         const dzSvc = new DeezerService({ fetch: jest.fn() } as any);
         jest.spyOn(dzSvc, 'search').mockResolvedValue({ error: { message: 'Quota' } } as any);
         const res = await dzSvc.searchPlaylistsByArtist('Queen');
-        expect(res).toEqual({ message: 'Артист не знайдений' });
+        expect(res).toEqual([]);
     });
 
     it('SpotifyService initializes without crashing when env vars missing and rejects empty query (BUG-27)', async () => {

@@ -49,7 +49,7 @@ export const dailyApi = createApi({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: ['Daily'],
+            invalidatesTags: (result) => (result?.isGameOver ? ['Daily'] : []),
         }),
     }),
 });

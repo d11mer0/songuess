@@ -1,7 +1,10 @@
 import { GameRoom } from '../../game/interfaces/game.interface';
 import { SafeGameRoom } from '../../game/interfaces/safe-game.interface';
 
-export function sanitizeRoom(room: GameRoom): SafeGameRoom {
+export function sanitizeRoom(room: GameRoom): SafeGameRoom;
+export function sanitizeRoom(room?: GameRoom | null): SafeGameRoom | null;
+export function sanitizeRoom(room?: GameRoom | null): SafeGameRoom | null {
+    if (!room) return null;
     const { gameData, gameProgress, ...safeRoom } = room;
 
     return {

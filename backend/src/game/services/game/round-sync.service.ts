@@ -29,10 +29,11 @@ export class RoundSyncService {
         const roundResult = playerResults?.[round.roundNumber];
 
         const durationSec = Math.min(25, Math.max(5, room.lobbyOptions?.roundDuration || 25));
+        const answerMode = room.lobbyOptions?.answerMode || 'MULTIPLE_CHOICE';
         const heardleUnlockedTier = room.gameProgress.heardleUnlockedTiers?.[userId]?.[round.roundNumber] || 1;
 
         client.emit('reconnectToRound', {
-            ...formatRoundPayload(round, durationSec * 1000),
+            ...formatRoundPayload(round, durationSec * 1000, answerMode),
             answer: roundResult?.answer ?? null,
             heardleUnlockedTier,
         });

@@ -33,7 +33,7 @@ export const corsOriginCallback = (
     if (isOriginAllowed(origin)) {
         return callback(null, true);
     }
-    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
 };
 
 export const wsCorsOptions = {
